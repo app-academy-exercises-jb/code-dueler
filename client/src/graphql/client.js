@@ -1,6 +1,8 @@
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
+import { WebSocketLink } from 'apollo-link-ws';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { onError } from "apollo-link-error";
 import { CURRENT_USER } from "./queries";
 import gql from "graphql-tag";
@@ -9,6 +11,8 @@ import { setContext } from "apollo-link-context";
 
 const createClient = async () => {
   const cache = new InMemoryCache({ dataIdFromObject: (object) => object._id });
+
+  const links = [];
 
   const errorLink = onError(({ networkError, graphQLErrors }) => {
     if (graphQLErrors) {
@@ -42,14 +46,28 @@ const createClient = async () => {
     uri: "http://localhost:5000/graphql",
   });
 
+  const subscriptionClient = new SubscriptionClient('ws://localhost:5000/graphql', {
+    reconnect: true,
+    connectionParams: {
+      authToken: localStorage.getItem('token')
+    }
+  });
+  // const wsLink = new WebSocketLink(subscriptionClient);
+
+  links.push(
+    authLink, //authLink must be first, as it sets necessary auth headers
+    httpLink,
+    errorLink,
+    // wsLink,
+    );
+  const link = links.reduce((acc,l) => acc.concat(l));
+
   const client = new ApolloClient({
     cache,
-    link: authLink.concat(httpLink, errorLink),
+    link,
     typeDefs,
     resolvers,
   });
-
-  
 
   if (process.env.NODE_ENV === "development") {
     window.client = client;
@@ -63,7 +81,6 @@ const createClient = async () => {
 
   if (localStorage.getItem("token")) {
     await client.query({ query: CURRENT_USER }).then(({ data }) => {
-      console.log(data);
       // if there is no data or data.me is null, then reset the cache
       if (!data || !data.me) client.resetStore();
     });

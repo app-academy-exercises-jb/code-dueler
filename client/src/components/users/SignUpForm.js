@@ -24,7 +24,6 @@ export default () => {
     refetchQueries: [{ query: IS_LOGGED_IN }, { query: CURRENT_USER }],
   });
 
-  console.log("sign up form component");
   return (
     <form
       className="session-form"

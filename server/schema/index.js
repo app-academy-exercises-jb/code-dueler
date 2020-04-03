@@ -10,6 +10,10 @@ const typeDefs = `
   type Mutation {
     _: String
   }
+  type Subscription {
+    _: String
+    messageAdded: Message
+  }
 `;
 
 module.exports = {
@@ -18,5 +22,7 @@ module.exports = {
     resolvers: merge(...types.map(t => t.resolvers)),
     logger: { log: e => console.log('\x1b[31m%s\x1b[0m', e.message) }
   }),
+  typeDefs: [...types.map(t => t.typeDefs), typeDefs],
   resolvers: merge(...types.map(t => t.resolvers)),
+  subscriptions: merge(...types.map(t => t.subscriptions))
 };
