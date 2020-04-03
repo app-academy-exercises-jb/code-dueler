@@ -6,7 +6,9 @@ export default () => {
   return (
     <div className="main">
       <NavBar />
-      <SignUpForm />
+      <div className="signup-page">
+        <SignUpForm />
+      </div>
     </div>
   );
 };
