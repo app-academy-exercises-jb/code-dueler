@@ -1,12 +1,12 @@
 import React from "react";
-import SignUpForm from "../components/users/SignUpForm";
 import NavBar from "../components/nav/NavBar";
 
-export default () => {
+const Test = (props) => {
   return (
     <div className="main">
       <NavBar />
-      <SignUpForm />
     </div>
   );
 };
+
+export default Test;

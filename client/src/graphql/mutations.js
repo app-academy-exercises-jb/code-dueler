@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { USER_CREDENTIALS_DATA, BOOK_DATA } from './fragments';
+import { USER_CREDENTIALS_DATA } from './fragments';
 
 export const LOGIN_USER = gql `
   mutation LogIn($username: String!, $password: String!) {
