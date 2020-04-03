@@ -1,6 +1,8 @@
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
+import { WebSocketLink } from 'apollo-link-ws';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { onError } from "apollo-link-error";
 import { CURRENT_USER } from "./queries";
 import gql from "graphql-tag";
@@ -41,6 +43,18 @@ const createClient = async () => {
   const httpLink = new HttpLink({
     uri: "http://localhost:5000/graphql",
   });
+
+  const subscriptionClient = new SubscriptionClient('ws://localhost:5000/graphql', {
+    reconnect: true,
+    connectionParams: {
+      authToken: localStorage.getItem('token')
+    }
+  });
+  const wsLink = new WebSocketLink(subscriptionClient);
+
+  links.push(wsLink);
+  links.push(httpLink);
+  links.push(errorLink);
 
   const client = new ApolloClient({
     cache,
