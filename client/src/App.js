@@ -1,10 +1,11 @@
 import React from 'react';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import GlobalLobby from './pages/GlobalLobby';
+import ErrorPage from './pages/ErrorPage';
 import ProtectedRoute from './components/util/ProtectedRoute'
 import AuthRoute from './components/util/AuthRoute'
 
@@ -15,6 +16,7 @@ export default () => {
         <ProtectedRoute exact path="/" component={ GlobalLobby} />
         <AuthRoute exact path="/login" component={ Login} />
         <AuthRoute exact path="/signup" component={ SignUp } />
+        <Route path="/" component={ErrorPage} />
       </Switch>
     </BrowserRouter>
   );

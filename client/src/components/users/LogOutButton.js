@@ -1,5 +1,7 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/react-hooks';
+import { useApolloClient } from '@apollo/react-hooks';
+
 
 export default () => {
   const client = useApolloClient();
@@ -7,7 +9,8 @@ export default () => {
     <button onClick={() => {
       client.resetStore();
     }}>
-      Log Out
-    </button>
+      Log Out    
+    </button> 
+
   )
 };
