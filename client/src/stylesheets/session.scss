@@ -36,7 +36,7 @@
 .session-header {
   font-size: 24px;
   font-weight: 700;
-  margin: 10px 0 30px 0;
+  margin: 10px 0 0 0;
 }
 
 .input-wrapper {
@@ -48,6 +48,8 @@
 
 .session-label {
   margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .session-button {
@@ -68,4 +70,9 @@
   text-transform: capitalize;
   font-style: italic;
   font-weight: 700;
+}
+
+.session-sub-header {
+  font-size: 16px;
+  margin: 10px 0 20px 0;
 }

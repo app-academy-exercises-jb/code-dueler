@@ -34,6 +34,7 @@ export default () => {
     >
       <div className="session-errors">{errorMessage}</div>
       <h1 className="session-header">Create an account</h1>
+      <p className="session-sub-header">It's free!</p>
       <div className="input-wrapper">
         <div>
           <h2 className="session-label">Username</h2>
