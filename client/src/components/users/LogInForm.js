@@ -66,7 +66,7 @@ export default () => {
           />
         </div>
       </div>
-      {/* <input type="submit" value="Sign Up" disabled={loading} /> */}
+      
       <button className="session-button" disabled={loading}>
         Log In
       </button>
