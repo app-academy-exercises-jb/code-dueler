@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -14,11 +14,11 @@ export default () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/" component={Test} />
-        <AuthRoute exact path="/" component={GlobalLobby} />
-        <ProtectedRoute exact path="/login" component={Login} />
-        <ProtectedRoute exact path="/signup" component={SignUp} />
+        <ProtectedRoute exact path="/" component={GlobalLobby} />
+        <AuthRoute exact path="/login" component={Login} />
+        <AuthRoute exact path="/signup" component={SignUp} />
         <Route path="/" component={ErrorPage} />
+        <Redirect to="/" component={Test} />
       </Switch>
     </BrowserRouter>
   );

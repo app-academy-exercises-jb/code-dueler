@@ -3,7 +3,7 @@ import NavBar from "../components/nav/NavBar";
 
 const Test = (props) => {
   return (
-    <div>
+    <div className="main">
       <NavBar />
     </div>
   );
