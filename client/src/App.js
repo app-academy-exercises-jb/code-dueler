@@ -14,6 +14,7 @@ export default () => {
   return (
     <BrowserRouter>
       <Switch>
+        <Route path="/" component={Test} />
         <ProtectedRoute exact path="/" component={GlobalLobby} />
         <AuthRoute exact path="/login" component={Login} />
         <AuthRoute exact path="/signup" component={SignUp} />
