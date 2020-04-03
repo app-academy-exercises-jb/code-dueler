@@ -30,7 +30,6 @@ export default () => {
   return (
     <form onSubmit={(e) => {
       e.preventDefault();
-      debugger
       signup();
     }}>
       {errorMessage}

@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { CURRENT_USER } from './queries';
+// import { CURRENT_USER } from './queries';
 
 export const typeDefs = gql `
   extend type Query {
