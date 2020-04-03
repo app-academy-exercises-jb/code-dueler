@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import { ApolloProvider } from "@apollo/react-hooks";
-import createClient from "./graphql/client";
+import createClient from './graphql/client';
 
 const client = createClient().then((client) => {
   ReactDOM.render(
