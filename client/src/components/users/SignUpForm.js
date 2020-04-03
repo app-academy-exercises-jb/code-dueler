@@ -32,18 +32,33 @@ export default () => {
         signup();
       }}
     >
-      {errorMessage}
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <input type="submit" value="Sign Up" disabled={loading} />
+      <div className="session-errors">{errorMessage}</div>
+      <h1 className="session-header">Create an account</h1>
+      <p className="session-sub-header">It's free!</p>
+      <div className="input-wrapper">
+        <div>
+          <h2 className="session-label">Username</h2>
+          <input
+            className="session-input"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div>
+          <h2 className="session-label">Password</h2>
+          <input
+            className="session-input"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+      </div>
+      {/* <input type="submit" value="Sign Up" disabled={loading} /> */}
+      <button className="session-button" disabled={loading}>
+        Sign Up
+      </button>
     </form>
   );
 };
