@@ -1,19 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import './App.css';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import ProtectedRoute from './components/util/ProtectedRoute'
-import AuthRoute from './components/util/AuthRoute'
+import React from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import ProtectedRoute from "./components/util/ProtectedRoute";
+import AuthRoute from "./components/util/AuthRoute";
+import Test from "./pages/Test";
+import "./stylesheets/application.scss";
 
 export default () => {
   return (
     <BrowserRouter>
       <Switch>
-        <ProtectedRoute exact path="/" component={ SignUp } />
-        <AuthRoute exact path="/login" component={ Login} />
-        <AuthRoute exact path="/signup" component={ Login} />
+        <Route exact path="/" component={Test} />
+        <ProtectedRoute exact path="/login" component={Login} />
+        <ProtectedRoute exact path="/signup" component={Login} />
       </Switch>
     </BrowserRouter>
   );
