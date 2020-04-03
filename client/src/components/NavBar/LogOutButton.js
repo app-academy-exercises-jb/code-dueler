@@ -8,7 +8,6 @@ export default () => {
       client.resetStore();
     }}>
       Log Out
-    </button> 
-
+    </button>
   )
 };
