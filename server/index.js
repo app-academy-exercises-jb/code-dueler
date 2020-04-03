@@ -4,18 +4,33 @@ const express = require('express'),
   graphqlHTTP = require('express-graphql'),
   expressPlayground = require('graphql-playground-middleware-express').default,
   passport = require('passport'),
-  morgan = require('morgan')
+  jwt = require('jsonwebtoken'),
+  morgan = require('morgan'),
   cors = require('cors'),
-  require ('./models'),
-  { schema, resolvers } = require('./schema'),
+  { SubscriptionServer } = require('subscriptions-transport-ws'),
+  { execute, subscribe } = require('graphql'),
+  { ApolloServer } = require('apollo-server-express');
+  require ('./models');
+  
+const { schema, resolvers, typeDefs } = require('./schema'),
   { graphqlLogger, passportAuthenticate } = require('./middlewares'),
-  db = require('./config/keys').mongoURI;
-
+  { mongoURI } = require('./config/keys'),
+  http = require('http');
+  
 require('./config/passport')(passport);
 app.use(passport.initialize());
 
+const server = new ApolloServer({
+  resolvers,
+  typeDefs,
+  schema,
+  context: async ({ req }) => {
+    return { user: req.user }
+  }
+});
+
 mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
   .then(() => console.log("Connected to MongoDb"))
   .catch(err => console.log(`Could not connect to MongoDB: ${err}`));
 
@@ -29,16 +44,37 @@ app.use(morgan("dev"));
 
 app.use(
   "/graphql",
-  passportAuthenticate(passport),
-  graphqlLogger(true),
-  graphqlHTTP({
-    schema,
-    rootValue: resolvers
-  })
+  passportAuthenticate(passport)
 );
+
+server.applyMiddleware({ 
+  app,
+  path: "/graphql",
+  cors: false
+});
 
 app.get('/playground', expressPlayground({ endpoint: "/graphql" }));
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+app.listen = function() {
+  const server = http.createServer(this);
+
+  SubscriptionServer.create(
+    {
+      schema,
+      execute,
+      subscribe
+    },
+    {
+      server,
+      path: '/graphql'
+    }
+  );
+
+  return server.listen.apply(server, arguments);
+}
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`)
+});

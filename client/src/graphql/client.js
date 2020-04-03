@@ -2,8 +2,9 @@ import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloLink } from 'apollo-link';
 import { HttpLink } from "apollo-link-http";
+import { WebSocketLink } from 'apollo-link-ws';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { onError } from "apollo-link-error";
-import gql from 'graphql-tag';
 import { typeDefs, resolvers } from './resolvers';
 
 const createClient = () => {
@@ -38,8 +39,19 @@ const createClient = () => {
           authorization: localStorage.getItem('token')
       }
   });
+
+  const subscriptionClient = new SubscriptionClient('ws://localhost:5000/graphql', {
+    reconnect: true,
+    connectionParams: {
+      authToken: localStorage.getItem('token')
+    }
+  });
+  const wsLink = new WebSocketLink(subscriptionClient);
+
+  links.push(wsLink);
   links.push(httpLink);
   links.push(errorLink);
+
   const client = new ApolloClient({
     cache,
     link: ApolloLink.from(links), 
