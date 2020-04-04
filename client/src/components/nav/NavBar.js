@@ -1,6 +1,7 @@
 import React from "react";
 import LogOutButton from "../users/LogOutButton";
 import { Link } from "react-router-dom";
+import ProtectedComponent from "../util/ProtectedComponent";
 
 const NavBar = (props) => {
   return (
@@ -11,8 +12,8 @@ const NavBar = (props) => {
           CodeDueler
         </Link>
       </div>
-      <div className="logout-nav">
-        <LogOutButton />
+      <div>
+        <ProtectedComponent component={LogOutButton} />
       </div>
     </div>
   );

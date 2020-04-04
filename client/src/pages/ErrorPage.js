@@ -1,10 +1,10 @@
 import React from 'react';
-// import NavBar from '../components/navbar/NavBar';
+import NavBar from '../components/nav/NavBar';
 
 export default () => {
     return (
         <>
-            {/* <NavBar /> */}
+            <NavBar />
             <h1>404 Error</h1>
             <h2>Could not find the page you were looking for.</h2>
         </>

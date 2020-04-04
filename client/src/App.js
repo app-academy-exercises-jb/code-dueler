@@ -14,11 +14,12 @@ export default () => {
   return (
     <BrowserRouter>
       <Switch>
+        {/* <Route exact path="/" component={Test} /> */}
         <ProtectedRoute exact path="/" component={GlobalLobby} />
         <AuthRoute exact path="/login" component={Login} />
         <AuthRoute exact path="/signup" component={SignUp} />
         <Route path="/" component={ErrorPage} />
-        <Redirect to="/" component={Test} />
+        {/* <Redirect to="/" component={Test} /> */}
       </Switch>
     </BrowserRouter>
   );
