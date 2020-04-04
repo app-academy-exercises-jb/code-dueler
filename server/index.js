@@ -14,11 +14,13 @@ const express = require('express'),
   
 const { schema, resolvers, typeDefs } = require('./schema'),
   { graphqlLogger, passportAuthenticate } = require('./middlewares'),
-  { mongoURI } = require('./config/keys'),
+  mongoURI = process.env.MONGO_URI,
   http = require('http');
   
 require('./config/passport')(passport);
 app.use(passport.initialize());
+
+console.log("mongo:", mongoURI)
 
 const server = new ApolloServer({
   resolvers,
@@ -60,11 +62,23 @@ const port = process.env.PORT || 5000;
 app.listen = function() {
   const server = http.createServer(this);
 
-  SubscriptionServer.create(
+  new SubscriptionServer(
     {
       schema,
       execute,
-      subscribe
+      subscribe,
+      // keepAlive: 0,
+      onConnect: (connectionParams, ws, context) => {
+        console.log("params:", connectionParams.authToken);
+
+        if (!connectionParams.authToken) {
+          return false;
+        }
+      },
+      onDisconnect: (ws, context) => {
+        console.log("dc'd")
+        // console.log("!disconnected: ", JSON.stringify(context));
+      },
     },
     {
       server,

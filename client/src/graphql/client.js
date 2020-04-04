@@ -50,15 +50,18 @@ const createClient = async () => {
     reconnect: true,
     connectionParams: {
       authToken: localStorage.getItem('token')
+    },
+    connectionCallback: err => {
+      console.log(err)
     }
   });
-  // const wsLink = new WebSocketLink(subscriptionClient);
+  const wsLink = new WebSocketLink(subscriptionClient);
 
   links.push(
     authLink, //authLink must be first, as it sets necessary auth headers
     httpLink,
     errorLink,
-    // wsLink,
+    wsLink,
     );
   const link = links.reduce((acc,l) => acc.concat(l));
 
