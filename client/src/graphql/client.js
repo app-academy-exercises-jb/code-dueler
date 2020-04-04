@@ -81,7 +81,7 @@ const createClient = async () => {
 
   if (localStorage.getItem("token")) {
     await client.query({ query: CURRENT_USER }).then(({ data }) => {
-      // if there is no data or data.me is null, then reset the cache
+     
       if (!data || !data.me) client.resetStore();
     });
   }

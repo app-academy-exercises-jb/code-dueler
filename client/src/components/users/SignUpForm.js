@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { SIGNUP_USER } from "../../graphql/mutations";
 import { IS_LOGGED_IN, CURRENT_USER } from "../../graphql/queries";
+import { Link } from "react-router-dom";
 
 export default () => {
   const [username, setUsername] = useState("");
@@ -55,10 +56,13 @@ export default () => {
           />
         </div>
       </div>
-      {/* <input type="submit" value="Sign Up" disabled={loading} /> */}
+     
       <button className="session-button" disabled={loading}>
         Sign Up
       </button>
+      <Link to="/login" className="logo-nav">
+        Already have an account? Sign in
+      </Link>
     </form>
   );
 };
