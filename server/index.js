@@ -14,7 +14,7 @@ const express = require('express'),
   
 const { schema, resolvers, typeDefs } = require('./schema'),
   { graphqlLogger, passportAuthenticate } = require('./middlewares'),
-  { mongoURI } = require('./config/keys'),
+  mongoURI = process.env.MONGO_URI,
   http = require('http');
   
 require('./config/passport')(passport);
