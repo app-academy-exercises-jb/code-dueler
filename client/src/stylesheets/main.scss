@@ -1,6 +1,17 @@
+html, body, #root {
+    height:100%;
+}
+
+// html, body, #root
+// {
+//     height: 100vh;
+// }
+
 .main {
-  background-color: #6E7DAB;
-  padding-top: 60px;
-  min-height: 1080px;
+  background-color: #63768D;
+  height: 100vh;
   font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
 }

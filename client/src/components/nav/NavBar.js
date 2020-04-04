@@ -5,17 +5,20 @@ import ProtectedComponent from "../util/ProtectedComponent";
 
 const NavBar = (props) => {
   return (
-    <div className="nav-bar-wrapper">
-      <div className="left-nav"></div>
-      <div className="logo-wrapper">
-        <Link to="/" className="logo-nav">
-          CodeDueler
-        </Link>
+    <>
+      <div className="nav-bar-wrapper">
+        <div className="left-nav">&nbsp;</div>
+        <div className="logo-wrapper">
+          <Link to="/" className="logo-nav">
+            CodeDueler
+          </Link>
+        </div>
+        <div>
+          <ProtectedComponent component={LogOutButton} />
+        </div>
       </div>
-      <div>
-        <ProtectedComponent component={LogOutButton} />
-      </div>
-    </div>
+      <div className="spacer">&nbsp;</div>
+    </>
   );
 };
 
