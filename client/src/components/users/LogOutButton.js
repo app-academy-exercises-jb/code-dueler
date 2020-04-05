@@ -12,7 +12,7 @@ export default () => {
           client.resetStore();
         }}
       >
-        LOG OUT
+        Log Out
       </button>
     </div>
   );

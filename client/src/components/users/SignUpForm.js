@@ -8,7 +8,9 @@ export default () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
-  const [signup, { loading, error }] = useMutation(SIGNUP_USER, {
+  const [signup, { loading }] = useMutation(SIGNUP_USER, {
+    // Removed "error" from second arg. May need to add back
+    // for improved error messages later
     variables: {
       username,
       password,
@@ -56,7 +58,7 @@ export default () => {
           />
         </div>
       </div>
-     
+
       <button className="session-button" disabled={loading}>
         Sign Up
       </button>

@@ -4,12 +4,13 @@ import { LOGIN_USER } from "../../graphql/mutations";
 // import { IS_LOGGED_IN, CURRENT_USER } from '../../graphql/queries';
 import { Link } from "react-router-dom";
 
-
 export default () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
-  const [login, { loading, error }] = useMutation(LOGIN_USER, {
+  const [login, { loading }] = useMutation(LOGIN_USER, {
+    // Removed "error" from second arg. May need to add back
+    // for improved error messages later
     variables: {
       username,
       password,
@@ -66,7 +67,7 @@ export default () => {
           />
         </div>
       </div>
-      
+
       <button className="session-button" disabled={loading}>
         Log In
       </button>
