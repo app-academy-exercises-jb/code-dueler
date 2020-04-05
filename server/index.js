@@ -10,8 +10,9 @@ const express = require('express'),
   { SubscriptionServer } = require('subscriptions-transport-ws'),
   { execute, subscribe } = require('graphql'),
   { ApolloServer } = require('apollo-server-express');
+  require('dotenv').config();
   require ('./models');
-  
+
 const { schema, resolvers, typeDefs } = require('./schema'),
   { graphqlLogger, passportAuthenticate } = require('./middlewares'),
   { mongoURI } = require('./config/keys'),
