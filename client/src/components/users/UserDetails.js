@@ -1,16 +1,11 @@
-import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { Link } from 'react-router-dom';
-import { CURRENT_USER } from '../../graphql/queries';
-
+import React from "react";
+import { useQuery } from "@apollo/react-hooks";
+import { CURRENT_USER } from "../../graphql/queries";
 
 export default () => {
-  const { data, loading, error } = useQuery(
-    CURRENT_USER,
-    {
-      fetchPolicy: 'network-only'
-    }
-  );
+  const { data, loading, error } = useQuery(CURRENT_USER, {
+    fetchPolicy: "network-only",
+  });
 
   if (loading) return <p>Loading</p>;
   if (error) return <p>ERROR</p>;
@@ -21,4 +16,4 @@ export default () => {
       <h1>Hello {data.me.username}!</h1>
     </>
   );
-}
+};
