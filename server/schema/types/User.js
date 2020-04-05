@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const User = mongoose.model('User');
+const User = mongoose.model("User");
 
 const typeDefs = `
   type User {
@@ -9,6 +9,7 @@ const typeDefs = `
   }
   extend type Query {
     me: User
+    users: [User]
   }
   extend type Mutation {
     signup(username: String!, password: String!): UserCredentials!
@@ -27,7 +28,10 @@ const resolvers = {
     me(_, __, context) {
       // user provided by passport
       return context.user;
-    }
+    },
+    users(_, __) {
+      return User.find({});
+    },
   },
   Mutation: {
     signup(_, { username, password }) {
@@ -35,11 +39,11 @@ const resolvers = {
     },
     login(_, { username, password }) {
       return User.login(username, password);
-    }
-  }
-}
+    },
+  },
+};
 
 module.exports = {
   typeDefs,
-  resolvers
+  resolvers,
 };
