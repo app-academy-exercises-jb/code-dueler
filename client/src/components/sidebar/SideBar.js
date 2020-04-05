@@ -6,6 +6,10 @@ const SideBar = (props) => {
     <div className="sidebar-wrapper">
       <div className="user-list-wrapper">
         <SideBarUsers />
+        <SideBarUsers />
+        <SideBarUsers />
+        <SideBarUsers />
+        <SideBarUsers />
       </div>
     </div>
   );
