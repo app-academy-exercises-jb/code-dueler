@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
-const { pubsub } = require('../../subscriptions');
-
 const Message = mongoose.model('Message');
 
 const typeDefs = `
+  scalar Date
   type Message {
     _id: ID!
     author: User
     body: String!
+    createdAt: Date!
   }
   extend type Query {
     messages: [Message]
@@ -29,10 +29,10 @@ const typeDefs = `
 const resolvers = {
   Query: {
     messages(_, __, context) {
-      return Message.find({});
+      return Message.find({}).populate('author');
     },
     message(_, { _id }) {
-      return Message.findById(_id);
+      return Message.findById(_id).populate('author');
     }
   },
   Mutation: {

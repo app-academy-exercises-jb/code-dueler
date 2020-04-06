@@ -3,12 +3,14 @@ import SideBarUsers from "./SideBarUsers";
 import { GET_ONLINE_USERS } from "../../graphql/queries";
 import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
 import { useQuery } from "@apollo/react-hooks";
+import UserDetails from "../users/UserDetails";
 
 const SideBar = (props) => {
   const { subscribeToMore, ...result} = useQuery(GET_ONLINE_USERS);
   
   return (
     <div className="sidebar-wrapper">
+      <UserDetails />
       <div className="user-list-wrapper">
         <SideBarUsers
           {...result}
@@ -18,8 +20,7 @@ const SideBar = (props) => {
               updateQuery: (prev, { subscriptionData }) => {
                 if (!subscriptionData) return prev;
                 const { user, loggedIn} = subscriptionData.data.userLoggedEvent;
-                const next = { users: [] };
-                Object.assign(next.users, prev.users);
+                const next = { users: [...prev.users] };
 
                 if (loggedIn === true) {
                   next.users.splice(0, 0, user);

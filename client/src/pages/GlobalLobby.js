@@ -1,14 +1,15 @@
 import React from "react";
-import NavBar from "../components/nav/NavBar.js";
-import UserDetails from "../components/users/UserDetails.js";
-import SideBar from "../components/sidebar/SideBar.js";
+import NavBar from "../components/nav/NavBar";
+import SideBar from "../components/sidebar/SideBar";
+import ChatBox from "../components/chat/ChatBox";
+
 
 export default () => {
   return (
     <div className="main">
       <NavBar />
       <SideBar />
-      <UserDetails />
+      <ChatBox />
     </div>
   );
 };

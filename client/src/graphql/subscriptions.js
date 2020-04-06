@@ -9,6 +9,7 @@ export const ON_MESSAGE_ADDED = gql`
         username
       }
       body
+      createdAt
     }
   }
 `;

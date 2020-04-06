@@ -11,6 +11,11 @@ const MessageSchema = new Schema({
     type: String,
     required: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    required: true
+  },
 });
 
 MessageSchema.statics.post = async function (author, body, user, pubsub) {
@@ -22,8 +27,8 @@ MessageSchema.statics.post = async function (author, body, user, pubsub) {
   const Message = this,
     newMessage = new Message({author: user, body});
 
-  await newMessage.save();
 
+  await newMessage.save();
   pubsub.publish('messageAdded', newMessage);
   
   return {
