@@ -11,7 +11,6 @@ const ChatView = (props) => {
 
   const setRef = useCallback((node) => {
     if (node !== null) {
-      console.log("setting current");
       messagesRef.current = node;
     }
   }, []);

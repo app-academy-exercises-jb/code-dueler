@@ -82,19 +82,26 @@ app.listen = function() {
       execute,
       subscribe,
       keepAlive: 29000,
+      onOperation(message, params, ws) {
+        console.log("operation:", message.payload.operationName);
+        console.log("subscribers:", Object.values(params.context.pubsub.subscribers));
+        return params;
+      },
+      onOperationComplete(ws, opId) {},
       onConnect: (connectionParams, ws, context) => {
+        console.log("connecting:", pubsub.subscribers)
         // the following line should actually verify that the user passport found
         // is the same as found in connectionParams.authToken
         if (!connectionParams.authToken) {
           console.log("connection refused")
           return false;
-        } else {
+        } else { 
           const user = jwt.verify(
             connectionParams.authToken.replace('Bearer ', ''),
             process.env.SECRET_OR_KEY
           );
 
-          console.log(`${user._id} connected to the websocket`);
+          console.log(`${user._id} connected to the websocket`, pubsub.subscribers);
 
           // save connections to keep track of online users
           // we access pubsub from the resolvers
@@ -105,12 +112,16 @@ app.listen = function() {
           } else {
             if (pubsub.subscribers[user._id] === undefined) {
               pubsub.subscribers[user._id] = [user];
-
-              pubsub.publish('userLoggedEvent', {
-                _id: user._id,
-                loggedIn: true
-              });
+              setTimeout(() => {
+                console.log("publishing")
+                pubsub.publish('userLoggedEvent', {
+                  _id: user._id,
+                  loggedIn: true
+                });
+              }, 100);
+              
             } else {
+              console.log("else: ", pubsub.subscribers)
               pubsub.subscribers[user._id].push(user);
             }
           }
@@ -124,6 +135,7 @@ app.listen = function() {
       },
       onDisconnect: (ws, context) => {
         if (ws.userId === undefined) return;
+        console.log("disconnecting:", pubsub.subscribers)
         console.log(`${ws.userId} disconnected from the websocket`);
         pubsub.subscribers[ws.userId].pop();
         

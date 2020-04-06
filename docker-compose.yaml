@@ -15,6 +15,7 @@ services:
       DOCKERIZED: 'true'
     volumes: 
       - ./server:/usr/src/app
+    command: npm run dev
       
   client:
     build: ./client

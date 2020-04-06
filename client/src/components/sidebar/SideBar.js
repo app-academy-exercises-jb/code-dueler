@@ -5,6 +5,7 @@ import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
 import { useQuery } from "@apollo/react-hooks";
 
 const SideBar = (props) => {
+  // debugger
   const { subscribeToMore, ...result } = useQuery(GET_ONLINE_USERS);
 
   return (
@@ -17,20 +18,21 @@ const SideBar = (props) => {
               document: USER_LOGGED_EVENT,
               updateQuery: (prev, { subscriptionData }) => {
                 if (!subscriptionData) return prev;
+                
                 const {
                   user,
                   loggedIn,
-                } = subscriptionData.data.userLoggedEvent;
-                const next = { users: [...prev.users] };
+                } = subscriptionData.data.userLoggedEvent,
+                  next = { users: [...prev.users] },
+                  idx = next.users.findIndex((u) => u._id === user._id);
 
-                if (loggedIn === true) {
+                if (loggedIn === true && idx === -1) {
                   next.users.splice(0, 0, user);
-                } else {
-                  const idx = next.users.findIndex((u) => u._id === user._id);
+                } else if (loggedIn === false) {
                   if (idx === -1) return prev;
                   next.users.splice(idx, 1);
                 }
-
+                
                 return next;
               },
             })
