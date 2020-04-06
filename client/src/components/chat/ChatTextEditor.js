@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useMutation } from "@apollo/react-hooks";
+import { ADD_MESSAGE } from "../../graphql/mutations";
 
-const ChatTextEditor = (props) => {
+const ChatTextEditor = ({ me }) => {
+  const [addMessage, { data: mData }] = useMutation(ADD_MESSAGE);
   const [chatInput, setChatInput] = useState("");
   const handleChatSubmit = (e) => {
     e.preventDefault();
-    // do something with the input
-    // console.log("chat: " + chatInput);
+    addMessage({ variables: { author: data.me._id, body: chatInput } });
     setChatInput("");
   };
   return (
