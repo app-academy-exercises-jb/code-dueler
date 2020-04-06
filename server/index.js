@@ -17,7 +17,9 @@ const express = require('express'),
 const { schema, resolvers, typeDefs } = require('./schema'),
   { graphqlLogger, passportAuthenticate } = require('./middlewares'),
   mongoURI = process.env.MONGO_URI,
-  http = require('http');
+  http = require('http'),
+  https = require('https'),
+  fs = require('fs');
   
 require('./config/passport')(passport);
 app.use(passport.initialize());
@@ -63,7 +65,16 @@ app.get('/playground', expressPlayground({ endpoint: "/graphql" }));
 const port = process.env.PORT || 5000;
 
 app.listen = function() {
-  const server = http.createServer(this);
+  let server; 
+
+  if (process.env.NODE_ENV === "production") {
+    server = https.createServer({
+      key: fs.readFileSync('/etc/letsencrypt/live/jorgebarreto.dev/privkey.pem'),
+      cert: fs.readFileSync('/etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem')
+    }, this);
+  } else {
+    server = http.createServer(this);
+  }
 
   new SubscriptionServer(
     {
