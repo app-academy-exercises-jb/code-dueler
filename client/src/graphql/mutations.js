@@ -18,3 +18,20 @@ export const SIGNUP_USER = gql `
   }
   ${USER_CREDENTIALS_DATA}
 `;
+
+export const ADD_MESSAGE = gql`
+mutation AddMessage($author: ID!, $body: String!) {
+  addMessage(author: $author, body: $body) {
+    success
+    message
+    messages {
+      _id
+      author {
+        _id
+        username
+      }
+      body
+    }
+  }
+}
+`;
