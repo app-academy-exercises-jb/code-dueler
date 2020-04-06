@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 const SideBarUsers = ({ data, loading, error, subscribeToUserEvents }) => {
   useEffect(() => {
     subscribeToUserEvents();
-  }, [subscribeToUserEvents]);
+  }, []);
   
   if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;
