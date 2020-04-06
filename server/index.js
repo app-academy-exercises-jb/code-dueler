@@ -89,16 +89,18 @@ app.listen = function() {
           // we access pubsub from the resolvers
           if (pubsub.subscribers === undefined) {
             pubsub.subscribers = {
-              [user._id]: user
+              [user._id]: [user]
             }
           } else {
             if (pubsub.subscribers[user._id] === undefined) {
-              pubsub.subscribers[user._id] = user;
+              pubsub.subscribers[user._id] = [user];
 
               pubsub.publish('userLoggedEvent', {
                 _id: user._id,
                 loggedIn: true
               });
+            } else {
+              pubsub.subscribers[user._id].push(user);
             }
           }
           // mark the socket object with the appropriate ID so we can remove it on DC
@@ -112,11 +114,15 @@ app.listen = function() {
       onDisconnect: (ws, context) => {
         if (ws.userId === undefined) return;
         console.log(`${ws.userId} disconnected from the websocket`);
-        delete pubsub.subscribers[ws.userId];
-        pubsub.publish('userLoggedEvent', {
-          _id: ws.userId,
-          loggedIn: false
-        });
+        pubsub.subscribers[ws.userId].pop();
+        
+        if (pubsub.subscribers[ws.userId].length === 0) {
+          delete pubsub.subscribers[ws.userId];
+          pubsub.publish('userLoggedEvent', {
+            _id: ws.userId,
+            loggedIn: false
+          });
+        }
       },
     },
     {
