@@ -1,8 +1,9 @@
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import { split } from 'apollo-link';
 import { HttpLink } from "apollo-link-http";
 import { WebSocketLink } from 'apollo-link-ws';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { getMainDefinition } from 'apollo-utilities';
 import { onError } from "apollo-link-error";
 import { CURRENT_USER } from "./queries";
 import gql from "graphql-tag";
@@ -42,23 +43,48 @@ const createClient = async () => {
     };
   });
 
-  const httpLink = new HttpLink({
+  let httpLink = new HttpLink({
     uri: "http://localhost:5000/graphql",
+    credentials: 'same-origin',
   });
 
-  const subscriptionClient = new SubscriptionClient('ws://localhost:5000/graphql', {
-    reconnect: true,
-    connectionParams: {
-      authToken: localStorage.getItem('token')
-    }
+  const wsLink = new WebSocketLink({
+    uri: 'ws://localhost:5000/graphql',
+    options: {
+      reconnect: true,
+      connectionParams: {
+        authToken: localStorage.getItem('token')
+      },
+    },
   });
-  // const wsLink = new WebSocketLink(subscriptionClient);
+
+  // this middleware captures the authorization header on behalf of
+  // the SubscriptionServer's onOperation callback
+  wsLink.subscriptionClient.use([
+    {
+      applyMiddleware(options, next) {
+        const context = options.getContext();
+        options.authorization = context.headers.authorization;
+        next();
+      }
+    }
+  ]);
+
+  httpLink = split(
+    ({ query }) => {
+      const def = getMainDefinition(query);
+      return (
+        def.kind === 'OperationDefinition' && def.operation === 'subscription'
+      )
+    },
+    wsLink,
+    httpLink
+  );
 
   links.push(
-    authLink, //authLink must be first, as it sets necessary auth headers
+    authLink, // authLink must be first, as it sets necessary auth headers
+    errorLink, // every object in this array must be an ApolloLink
     httpLink,
-    errorLink,
-    // wsLink,
     );
   const link = links.reduce((acc,l) => acc.concat(l));
 

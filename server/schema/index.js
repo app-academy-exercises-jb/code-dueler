@@ -12,7 +12,6 @@ const typeDefs = `
   }
   type Subscription {
     _: String
-    messageAdded: Message
   }
 `;
 
@@ -24,5 +23,4 @@ module.exports = {
   }),
   typeDefs: [...types.map(t => t.typeDefs), typeDefs],
   resolvers: merge(...types.map(t => t.resolvers)),
-  subscriptions: merge(...types.map(t => t.subscriptions))
 };

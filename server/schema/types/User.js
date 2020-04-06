@@ -15,11 +15,18 @@ const typeDefs = `
     signup(username: String!, password: String!): UserCredentials!
     login(username: String!, password: String!): UserCredentials!
   }
+  extend type Subscription {
+    userLoggedEvent: UserUpdate!
+  }
   type UserCredentials {
     _id: ID!
     username: String!
     token: String
     loggedIn: Boolean
+  }
+  type UserUpdate {
+    user: User
+    loggedIn: Boolean!
   }
 `;
 
@@ -29,8 +36,12 @@ const resolvers = {
       // user provided by passport
       return context.user;
     },
-    users(_, __) {
-      return User.find({});
+    users: (_, __, { pubsub }) => {
+      return User.find({
+        _id: { $in: 
+          Object.keys(pubsub.subscribers)
+        }
+      });
     },
   },
   Mutation: {
@@ -41,6 +52,18 @@ const resolvers = {
       return User.login(username, password);
     },
   },
+  Subscription: {
+    userLoggedEvent: {
+      subscribe: (_, __, { pubsub }) => {
+        return pubsub.asyncIterator('userLoggedEvent');
+      },
+      resolve: async payload => {
+        payload.user = await User.findById(payload);
+        delete payload._id;
+        return payload;
+      }
+    }
+  }
 };
 
 module.exports = {

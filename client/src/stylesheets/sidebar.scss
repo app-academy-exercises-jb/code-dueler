@@ -1,8 +1,10 @@
 .sidebar-wrapper {
   display: flex;
   max-height: 100%;;
+  // flex-direction: column;
+  // height: 100%;
   background-color: #E4E6C3;
-  width: 25%;
+  flex: 1;
   max-width: 300px;
   min-width: 200px;
   overflow-y: scroll;
