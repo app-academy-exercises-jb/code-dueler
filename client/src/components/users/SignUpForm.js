@@ -42,6 +42,7 @@ export default () => {
         <div>
           <h2 className="session-label">Username</h2>
           <input
+            autoFocus
             className="session-input"
             type="text"
             value={username}
