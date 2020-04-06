@@ -75,6 +75,7 @@ app.listen = function() {
         // the following line should actually verify that the user passport found
         // is the same as found in connectionParams.authToken
         if (!connectionParams.authToken) {
+          console.log("connection refused")
           return false;
         } else {
           const user = jwt.verify(
@@ -109,6 +110,7 @@ app.listen = function() {
         }
       },
       onDisconnect: (ws, context) => {
+        if (ws.userId === undefined) return;
         console.log(`${ws.userId} disconnected from the websocket`);
         delete pubsub.subscribers[ws.userId];
         pubsub.publish('userLoggedEvent', {
