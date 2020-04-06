@@ -1,12 +1,14 @@
 import React from "react";
 
 const ChatMessageItem = ({ message }) => {
-  date = message.createdAt.toLocaleString();
+  const date = new Date(message.createdAt).toLocaleTimeString();
   return (
     <li key={message._id} className="chat-item">
-      <p>{date}</p>
-      <p>{message.author.username}</p>
-      <p>{message.body}</p>
+      <div className="chat-message-info">
+        <p className="chat-username">{message.author.username}</p>
+        <p className="chat-date">{date}</p>
+      </div>
+      <p className="chat-body">{message.body}</p>
     </li>
   );
 };

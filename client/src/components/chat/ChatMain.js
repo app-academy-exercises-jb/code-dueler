@@ -2,6 +2,7 @@ import React from "react";
 import ChatView from "./ChatView";
 import ChatTextEditor from "./ChatTextEditor";
 import { useQuery } from "@apollo/react-hooks";
+import { CURRENT_USER } from "../../graphql/queries";
 
 const ChatMain = (props) => {
   const { data, loading, error } = useQuery(CURRENT_USER, {

@@ -1,15 +1,12 @@
 import React from "react";
 import NavBar from "../components/nav/NavBar";
-import SideBar from "../components/sidebar/SideBar";
-import ChatBox from "../components/chat/ChatBox";
-
+import GlobalMain from "../components/global/global";
 
 export default () => {
   return (
     <div className="main">
       <NavBar />
-      <SideBar />
-      <ChatBox />
+      <GlobalMain />
     </div>
   );
 };
