@@ -23,3 +23,17 @@ export const GET_ONLINE_USERS = gql`
     }
   }
 `;
+
+export const GET_MESSAGES = gql`
+  query Messages {
+    messages {
+      _id
+      author {
+        _id
+        username
+      }
+      body
+      createdAt
+    }
+  }
+`;

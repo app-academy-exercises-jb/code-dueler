@@ -28,6 +28,7 @@
     "fakergem": "^2.1.0",
     "graphql": "^14.0.0",
     "graphql-playground-middleware-express": "^1.7.12",
+    "graphql-redis-subscriptions": "^2.2.1",
     "graphql-subscriptions": "^1.1.0",
     "graphql-tools": "^4.0.7",
     "jsonwebtoken": "^8.5.1",

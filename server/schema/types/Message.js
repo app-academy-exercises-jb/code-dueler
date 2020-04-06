@@ -1,51 +1,58 @@
 const mongoose = require('mongoose');
-const pubsub = require('../../subscriptions');
-
-// console.log("pubusub:", pubsub)
-// const Message = mongoose.model('Message');
-
-// setTimeout(() => {
-//   console.log("publishing")
-//   pubsub.publish('messageAdded', "hello!")
-// }, 7000);
+const Message = mongoose.model('Message');
 
 const typeDefs = `
+  scalar Date
   type Message {
     _id: ID!
-    body: String
+    author: User
+    body: String!
+    createdAt: Date!
+  }
+  extend type Query {
+    messages: [Message]
+    message(_id: ID!): Message
+  }
+  extend type Mutation {
+    addMessage(author: ID!, body: String!): MessageUpdateResponse!
+  }
+  extend type Subscription {
+    messageAdded: Message
+  }
+  type MessageUpdateResponse {
+    success: Boolean!
+    message: String
+    messages: [Message]
   }
 `;
 
 const resolvers = {
+  Query: {
+    messages(_, __, context) {
+      return Message.find({}).populate('author');
+    },
+    message(_, { _id }) {
+      return Message.findById(_id).populate('author');
+    }
+  },
+  Mutation: {
+    addMessage(_, { author, body }, { user, pubsub }) {
+      return Message.post(author, body, user, pubsub);
+    },
+  },
   Subscription: {
     messageAdded: {
-      resolve: (payload) => {
-        console.log("payload: ", payload);
+      subscribe: (_, __, context) => {
+        return context.pubsub.asyncIterator('messageAdded');
+      },
+      resolve: payload => {
         return payload;
       },
-      subscribe: () => {
-        console.log("subbed");
-        return pubsub.asyncIterator('messageAdded');
-      }
     },
-  }
-};
-
-const subscriptions = {
-  messageAdded: {
-    resolve: (payload) => {
-      console.lod("payload: ", payload);
-      return payload;
-    },
-    subscribe: ({ body }) => {
-      console.log("subbed");
-      return pubsub.asyncIterator('message_added');
-    }
-  }
+  },
 };
 
 module.exports = {
   typeDefs,
-  resolvers,
-  subscriptions
+  resolvers
 };
