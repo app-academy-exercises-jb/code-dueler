@@ -44,12 +44,12 @@ const createClient = async () => {
   });
 
   let httpLink = new HttpLink({
-    uri: "http://localhost:5000/graphql",
+    uri: process.env.REACT_APP_GRAPHQL_URI || "http://localhost:5000/graphql",
     credentials: 'same-origin',
   });
 
   const wsLink = new WebSocketLink({
-    uri: 'ws://localhost:5000/graphql',
+    uri: process.env.REACT_APP_GRAPHQL_WS_URI || 'ws://localhost:5000/graphql',
     options: {
       reconnect: true,
       connectionParams: {
