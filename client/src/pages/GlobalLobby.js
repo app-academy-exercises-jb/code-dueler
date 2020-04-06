@@ -1,14 +1,12 @@
 import React from "react";
 import NavBar from "../components/nav/NavBar.js";
-import UserDetails from "../components/users/UserDetails.js";
-import SideBar from "../components/sidebar/SideBar.js";
+import GlobalMain from "../components/global/global.js";
 
 export default () => {
   return (
     <div className="main">
       <NavBar />
-      <SideBar />
-      <UserDetails />
+      <GlobalMain />
     </div>
   );
 };
