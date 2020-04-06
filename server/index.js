@@ -9,7 +9,8 @@ const express = require('express'),
   cors = require('cors'),
   { SubscriptionServer } = require('subscriptions-transport-ws'),
   { execute, subscribe } = require('graphql'),
-  { ApolloServer } = require('apollo-server-express');
+  { ApolloServer } = require('apollo-server-express'),
+  { pubsub } = require('./subscriptions');
   require('dotenv').config();
   require ('./models');
 
@@ -21,14 +22,15 @@ const { schema, resolvers, typeDefs } = require('./schema'),
 require('./config/passport')(passport);
 app.use(passport.initialize());
 
-console.log("mongo:", mongoURI)
-
 const server = new ApolloServer({
   resolvers,
   typeDefs,
   schema,
-  context: async ({ req }) => {
-    return { user: req.user }
+  context: ({ req }) => {
+    return {
+      user: req.user, 
+      pubsub
+    }
   }
 });
 
@@ -68,17 +70,51 @@ app.listen = function() {
       schema,
       execute,
       subscribe,
-      // keepAlive: 0,
+      keepAlive: 29000,
       onConnect: (connectionParams, ws, context) => {
-        console.log("params:", connectionParams.authToken);
-
+        // the following line should actually verify that the user passport found
+        // is the same as found in connectionParams.authToken
         if (!connectionParams.authToken) {
           return false;
+        } else {
+          const user = jwt.verify(
+            connectionParams.authToken.replace('Bearer ', ''),
+            process.env.SECRET_OR_KEY
+          );
+
+          console.log(`${user._id} connected to the websocket`);
+
+          // save connections to keep track of online users
+          // we access pubsub from the resolvers
+          if (pubsub.subscribers === undefined) {
+            pubsub.subscribers = {
+              [user._id]: user
+            }
+          } else {
+            if (pubsub.subscribers[user._id] === undefined) {
+              pubsub.subscribers[user._id] = user;
+
+              pubsub.publish('userLoggedEvent', {
+                _id: user._id,
+                loggedIn: true
+              });
+            }
+          }
+          // mark the socket object with the appropriate ID so we can remove it on DC
+          ws.userId = user._id;
+
+          return {
+            pubsub
+          }
         }
       },
       onDisconnect: (ws, context) => {
-        console.log("dc'd")
-        // console.log("!disconnected: ", JSON.stringify(context));
+        console.log(`${ws.userId} disconnected from the websocket`);
+        delete pubsub.subscribers[ws.userId];
+        pubsub.publish('userLoggedEvent', {
+          _id: ws.userId,
+          loggedIn: false
+        });
       },
     },
     {
