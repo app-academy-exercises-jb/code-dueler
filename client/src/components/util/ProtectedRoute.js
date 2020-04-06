@@ -6,7 +6,7 @@ import { IS_LOGGED_IN } from "../../graphql/queries";
 export default ({ component: Component, path, exact, redirectTo }) => {
   const { data, loading, error } = useQuery(IS_LOGGED_IN);
 
-  if (!redirectTo) redirectTo = "/signup";
+  if (!redirectTo) redirectTo = "/login";
   if (loading || error || !data) {
     return null;
   } else if (data.isLoggedIn) {
