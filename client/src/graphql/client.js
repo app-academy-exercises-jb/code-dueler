@@ -4,6 +4,7 @@ import { split } from 'apollo-link';
 import { HttpLink } from "apollo-link-http";
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { onError } from "apollo-link-error";
 import { CURRENT_USER } from "./queries";
 import gql from "graphql-tag";
@@ -52,11 +53,20 @@ const createClient = async () => {
     uri: process.env.REACT_APP_GRAPHQL_WS_URI || 'ws://localhost:5000/graphql',
     options: {
       reconnect: true,
-      connectionParams: {
+      lazy: true,
+      connectionParams: () => ({
         authToken: localStorage.getItem('token')
-      },
+      }),
     },
   });
+
+  wsLink.subscriptionClient.onConnecting(function() {
+    wsLink.subscriptionClient.unsubscribeAll();
+  }, undefined);
+
+  wsLink.subscriptionClient.onReconnecting(() => {
+    wsLink.subscriptionClient.unsubscribeAll();
+  }, undefined);
 
   // this middleware captures the authorization header on behalf of
   // the SubscriptionServer's onOperation callback
