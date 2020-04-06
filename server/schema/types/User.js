@@ -37,7 +37,6 @@ const resolvers = {
       return context.user;
     },
     users: (_, __, { pubsub }) => {
-      console.log("subs seen in resolver:", Object.keys(pubsub.subscribers));
       if (!pubsub.subscribers) return [];
       return User.find({
         _id: { $in: 
