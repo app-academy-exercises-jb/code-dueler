@@ -35,7 +35,7 @@
   height: 90%;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-flex-start;
+  align-items: flex-start;
   flex-wrap: wrap;
   overflow-y: scroll;
 }
@@ -43,6 +43,32 @@
 .chat-item {
   width: 100%;
   display: block;
+  padding: 10px;
+}
+
+.chat-message-info {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  width: 50%;
+  padding-bottom: 4px;
+}
+
+.chat-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: #575366;
+}
+
+.chat-username {
+  margin-right: 2rem;
+  font-size: 16px;
+  font-weight: 700;
+  color: #A2ACC9;
+}
+
+.chat-body {
+  font-size: 14px;
 }
 
 .text-editor-wrapper {
