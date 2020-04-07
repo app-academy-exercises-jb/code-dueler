@@ -1,25 +1,26 @@
-import React from "react";
-import ChatView from "../chat/ChatView";
-import ChatTextEditor from "../chat/ChatTextEditor";
-import { useQuery } from "@apollo/react-hooks";
-import { CURRENT_USER } from "../../graphql/queries";
+// import React from "./node_modules/react";
+// import PlayerView from "./PlayerView";
+// import PlayerTextEditor from "./PlayerTextEditor";
+// import { CURRENT_USER } from "../../graphql/queries";
+// import { useQuery } from "@apollo/react-hooks";
 
-const ChatMain = (props) => {
-  const { data, loading, error } = useQuery(CURRENT_USER, {
-    fetchPolicy: "network-only",
-  });
 
-  if (error) console.log(error);
-  if (loading || error) return null;
+// const PlayerMain = (props) => {
+//   const { data, loading, error } = useQuery(CURRENT_USER, {
+//     fetchPolicy: "network-only",
+//   });
 
-  const me = data.me;
+//   if (error) console.log(error);
+//   if (loading || error) return null;
 
-  return (
-    <div className="chat-player">
-      <ChatView />
-      <ChatTextEditor me={me} />
-    </div>
-  );
-};
+//   const me = data.me;
 
-export default ChatMain;
+//   return (
+//     <div className="player-player">
+//       <PlayerView />
+//       <PlayerTextEditor me={me} />
+//     </div>
+//   );
+// };
+
+// export default PlayerMain;
