@@ -1,12 +1,10 @@
 import React from "react";
-import NavBar from "../components/nav/NavBar";
-import GlobalMain from "../components/global/global";
+import Lobby from "../components/global/lobby";
 
 export default () => {
   return (
     <div className="main">
-      <NavBar />
-      <GlobalMain />
+      <Lobby />
     </div>
   );
 };
