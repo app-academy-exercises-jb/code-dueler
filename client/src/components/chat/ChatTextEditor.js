@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/react-hooks";
 import { ADD_MESSAGE } from "../../graphql/mutations";
 
 const ChatTextEditor = ({ me }) => {
-  //
   const [addMessage] = useMutation(ADD_MESSAGE);
   const [chatInput, setChatInput] = useState("");
   const handleChatSubmit = (e) => {
