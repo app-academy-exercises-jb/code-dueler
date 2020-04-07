@@ -3,9 +3,9 @@ import SideBarUsers from "./SideBarUsers";
 import { GET_ONLINE_USERS } from "../../graphql/queries";
 import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
 import { useQuery } from "@apollo/react-hooks";
+import { Link } from "react-router-dom";
 
 const SideBar = (props) => {
-  // debugger
   const { subscribeToMore, ...result } = useQuery(GET_ONLINE_USERS);
 
   return (
@@ -18,11 +18,11 @@ const SideBar = (props) => {
               document: USER_LOGGED_EVENT,
               updateQuery: (prev, { subscriptionData }) => {
                 if (!subscriptionData) return prev;
-                
+
                 const {
-                  user,
-                  loggedIn,
-                } = subscriptionData.data.userLoggedEvent,
+                    user,
+                    loggedIn,
+                  } = subscriptionData.data.userLoggedEvent,
                   next = { users: [...prev.users] },
                   idx = next.users.findIndex((u) => u._id === user._id);
 
@@ -32,12 +32,15 @@ const SideBar = (props) => {
                   if (idx === -1) return prev;
                   next.users.splice(idx, 1);
                 }
-                
+
                 return next;
               },
             })
           }
         />
+        <Link to="/playerscreen" className="logo-nav">
+          challenge this player
+        </Link>
       </div>
     </div>
   );
