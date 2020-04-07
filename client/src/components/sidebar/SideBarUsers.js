@@ -1,9 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-const SideBarUsers = ({ data, loading, error, subscribeToUserEvents }) => {
-  useEffect(() => {
-    subscribeToUserEvents();
-  }, []);
+const SideBarUsers = ({ data, loading, error }) => {
   
   if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;

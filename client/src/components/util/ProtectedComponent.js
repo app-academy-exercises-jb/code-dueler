@@ -13,12 +13,12 @@ import { IS_LOGGED_IN } from "../../graphql/queries";
 //   }
 // };
 
-export default ({ component: Component }) => {
+export default ({ component: Component, ...rest }) => {
   const { data, loading, error } = useQuery(IS_LOGGED_IN);
   if (loading || error || !data) {
     return null;
   } else if (data.isLoggedIn) {
-    return <Component />;
+    return <Component {...rest} />;
   } else {
     return null;
   }
