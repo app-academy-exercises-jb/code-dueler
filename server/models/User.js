@@ -19,7 +19,6 @@ const UserSchema = new Schema({
 });
 
 UserSchema.statics.findLoggedIn = async function(query, pubsub) {
-  if (!pubsub.subscribers) return [];
   const User = this,
     users = await User.find({
     _id: { $in: 

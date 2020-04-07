@@ -39,7 +39,7 @@ const resolvers = {
     },
     users: (_, __, { pubsub }) => {
       console.log("resolving users:", {subscribers: pubsub.subscribers});
-      // if (!pubsub.subscribers) return [];
+      if (!pubsub.subscribers) return [];
       return User.findLoggedIn({
         _id: { $in: 
           Object.keys(pubsub.subscribers)
