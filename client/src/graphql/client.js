@@ -105,11 +105,11 @@ const createClient = async () => {
     resolvers,
   });
 
-  if (process.env.NODE_ENV === "development") {
+  // if (process.env.NODE_ENV === "development") {
     window.client = client;
     window.gql = gql;
     window.CURRENT_USER = CURRENT_USER;
-  }
+  // }
 
   client.onResetStore(() => {
     localStorage.clear();

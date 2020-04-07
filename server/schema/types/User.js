@@ -37,6 +37,7 @@ const resolvers = {
       return context.user;
     },
     users: (_, __, { pubsub }) => {
+
       if (!pubsub.subscribers) return [];
       return User.find({
         _id: { $in: 
@@ -59,8 +60,8 @@ const resolvers = {
         return pubsub.asyncIterator('userLoggedEvent');
       },
       resolve: async payload => {
-        payload.user = await User.findById(payload);
-        delete payload._id;
+        payload.user = await User.findById(payload._id);
+        // payload.userLoggedEvent.user = payload.user;
         return payload;
       }
     }

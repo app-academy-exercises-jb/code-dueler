@@ -62,6 +62,14 @@ server.applyMiddleware({
 
 app.get('/playground', expressPlayground({ endpoint: "/graphql" }));
 
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  app.use(express.static("../client/build"));
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../', 'client', 'build', 'index.html'));
+  });
+}
+
 const port = process.env.PORT || 5000;
 
 app.listen = function() {
@@ -76,18 +84,20 @@ app.listen = function() {
     server = http.createServer(this);
   }
 
+  const users = {};
+
   new SubscriptionServer(
     {
       schema,
       execute,
       subscribe,
       keepAlive: 29000,
-      onOperation(message, params, ws) {
-        console.log("operation:", message.payload.operationName);
-        console.log("subscribers:", Object.values(params.context.pubsub.subscribers));
-        return params;
-      },
-      onOperationComplete(ws, opId) {},
+      // onOperation(message, params, ws) {
+      //   console.log("operation:", message.payload.operationName);
+      //   console.log("subscribers:", Object.values(params.context.pubsub.subscribers));
+      //   return params;
+      // },
+      // onOperationComplete(ws, opId) {},
       onConnect: (connectionParams, ws, context) => {
         console.log("connecting:", pubsub.subscribers)
         // the following line should actually verify that the user passport found
@@ -100,6 +110,8 @@ app.listen = function() {
             connectionParams.authToken.replace('Bearer ', ''),
             process.env.SECRET_OR_KEY
           );
+
+          if (!user._id) return false;
 
           console.log(`${user._id} connected to the websocket`, pubsub.subscribers);
 
@@ -116,7 +128,11 @@ app.listen = function() {
                 console.log("publishing")
                 pubsub.publish('userLoggedEvent', {
                   _id: user._id,
-                  loggedIn: true
+                  loggedIn: true,
+                  // userLoggedEvent: {
+                  //   _id: user._id,
+                  //   loggedIn: true,
+                  // }
                 });
               }, 100);
               
@@ -135,15 +151,21 @@ app.listen = function() {
       },
       onDisconnect: (ws, context) => {
         if (ws.userId === undefined) return;
+
         console.log("disconnecting:", pubsub.subscribers)
         console.log(`${ws.userId} disconnected from the websocket`);
+        
         pubsub.subscribers[ws.userId].pop();
         
         if (pubsub.subscribers[ws.userId].length === 0) {
           delete pubsub.subscribers[ws.userId];
           pubsub.publish('userLoggedEvent', {
             _id: ws.userId,
-            loggedIn: false
+            loggedIn: false,
+            // userLoggedEvent: {
+            //   _id: ws.userId,
+            //   loggedIn: false,
+            // }
           });
         }
       },
