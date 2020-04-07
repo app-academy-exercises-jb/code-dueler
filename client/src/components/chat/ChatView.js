@@ -34,7 +34,7 @@ const ChatView = (props) => {
         top: messagesRef.current.scrollHeight,
         behavior: "auto",
       });
-  }, [messagesRef.current, data]);
+  }, [data]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;

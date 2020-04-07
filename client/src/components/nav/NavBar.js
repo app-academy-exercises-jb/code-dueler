@@ -9,7 +9,7 @@ const NavBar = (props) => {
     <>
       <div className="nav-bar-wrapper">
         <div className="left-nav">
-          <ProtectedComponent component={NavBarPlayerCount} />
+          <ProtectedComponent component={NavBarPlayerCount} data={props.data}/>
         </div>
         <div className="logo-wrapper">
           <Link to="/" className="logo-nav">
