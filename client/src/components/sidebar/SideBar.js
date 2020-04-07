@@ -1,5 +1,5 @@
 import React from "react";
-import SideBarUsers from "./SideBarUsers";
+
 
 const SideBar = ({ data }) => {
   return (
