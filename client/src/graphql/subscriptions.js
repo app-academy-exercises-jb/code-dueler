@@ -20,8 +20,8 @@ subscription userUpdates {
     user {
       _id
       username
+      loggedIn
     }
-    loggedIn
   }
 }
 `;

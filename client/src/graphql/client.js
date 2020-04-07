@@ -4,7 +4,6 @@ import { split } from 'apollo-link';
 import { HttpLink } from "apollo-link-http";
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { onError } from "apollo-link-error";
 import { CURRENT_USER } from "./queries";
 import gql from "graphql-tag";
@@ -60,13 +59,6 @@ const createClient = async () => {
     },
   });
 
-  wsLink.subscriptionClient.onConnecting(function() {
-    wsLink.subscriptionClient.unsubscribeAll();
-  }, undefined);
-
-  wsLink.subscriptionClient.onReconnecting(() => {
-    wsLink.subscriptionClient.unsubscribeAll();
-  }, undefined);
 
   // this middleware captures the authorization header on behalf of
   // the SubscriptionServer's onOperation callback
@@ -105,11 +97,11 @@ const createClient = async () => {
     resolvers,
   });
 
-  // if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development") {
     window.client = client;
     window.gql = gql;
     window.CURRENT_USER = CURRENT_USER;
-  // }
+  }
 
   client.onResetStore(() => {
     localStorage.clear();

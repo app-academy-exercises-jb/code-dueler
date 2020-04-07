@@ -18,6 +18,18 @@ const UserSchema = new Schema({
   }
 });
 
+UserSchema.statics.findLoggedIn = async function(query, pubsub) {
+  if (!pubsub.subscribers) return [];
+  const User = this,
+    users = await User.find({
+    _id: { $in: 
+      Object.keys(pubsub.subscribers)
+    }
+  });
+  users.forEach(u => {u.loggedIn = true});
+  return users;
+};
+
 UserSchema.statics.login = async function (username, password) {
   const User = this,
     user = await User.findOne({ username });

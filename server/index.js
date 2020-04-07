@@ -84,7 +84,15 @@ app.listen = function() {
     server = http.createServer(this);
   }
 
-  const users = {};
+  const publishUserLoggedEvent = (pubsub, user, loggedIn) => {
+    setTimeout(() => {
+      console.log("publishing:", user._id)
+      pubsub.publish('userLoggedEvent', {
+        _id: user._id,
+        loggedIn
+      });
+    }, 100);
+  };
 
   new SubscriptionServer(
     {
@@ -92,12 +100,6 @@ app.listen = function() {
       execute,
       subscribe,
       keepAlive: 29000,
-      // onOperation(message, params, ws) {
-      //   console.log("operation:", message.payload.operationName);
-      //   console.log("subscribers:", Object.values(params.context.pubsub.subscribers));
-      //   return params;
-      // },
-      // onOperationComplete(ws, opId) {},
       onConnect: (connectionParams, ws, context) => {
         console.log("connecting:", pubsub.subscribers)
         // the following line should actually verify that the user passport found
@@ -121,21 +123,11 @@ app.listen = function() {
             pubsub.subscribers = {
               [user._id]: [user]
             }
+            publishUserLoggedEvent(pubsub, user, true);
           } else {
             if (pubsub.subscribers[user._id] === undefined) {
               pubsub.subscribers[user._id] = [user];
-              setTimeout(() => {
-                console.log("publishing")
-                pubsub.publish('userLoggedEvent', {
-                  _id: user._id,
-                  loggedIn: true,
-                  // userLoggedEvent: {
-                  //   _id: user._id,
-                  //   loggedIn: true,
-                  // }
-                });
-              }, 100);
-              
+              publishUserLoggedEvent(pubsub, user, true);
             } else {
               console.log("else: ", pubsub.subscribers)
               pubsub.subscribers[user._id].push(user);
@@ -155,18 +147,12 @@ app.listen = function() {
         console.log("disconnecting:", pubsub.subscribers)
         console.log(`${ws.userId} disconnected from the websocket`);
         
+        const user = pubsub.subscribers[ws.userId][0];
         pubsub.subscribers[ws.userId].pop();
         
         if (pubsub.subscribers[ws.userId].length === 0) {
           delete pubsub.subscribers[ws.userId];
-          pubsub.publish('userLoggedEvent', {
-            _id: ws.userId,
-            loggedIn: false,
-            // userLoggedEvent: {
-            //   _id: ws.userId,
-            //   loggedIn: false,
-            // }
-          });
+          publishUserLoggedEvent(pubsub, user, false);
         }
       },
     },
