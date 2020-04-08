@@ -8,7 +8,7 @@ export default () => {
   return (
     <div className="main">
       <NavBar />
-      {/* <PlayerChat /> */}
+      <PlayerChat />
       <ChallengeQuestion />
       <CodeEditor />
     </div>
