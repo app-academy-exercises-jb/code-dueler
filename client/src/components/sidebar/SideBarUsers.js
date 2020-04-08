@@ -1,10 +1,6 @@
 import React from "react";
-import { useMutation } from "@apollo/react-hooks";
-import { INVITE_PLAYER } from "../../graphql/mutations";
 
-const SideBarUsers = ({ data, loading, error }) => {
-  const [invitePlayer, { invitee }] = useMutation(INVITE_PLAYER);
-  
+const SideBarUsers = ({ data, loading, error, handleModalOpen }) => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;
   if (!data) return <p>Not Found</p>;
@@ -12,13 +8,10 @@ const SideBarUsers = ({ data, loading, error }) => {
 
   let users = data.users;
   let userList = users.map((user) => (
-    <li 
+    <li
+      onClick={() => handleModalOpen(user)}
       key={user._id}
       className="user-list-item"
-      style={{cursor: "pointer"}}
-      onClick={e => {
-        invitePlayer({variables: { invitee: user._id }});
-      }}
     >
       {user.username}
     </li>
