@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo-react-hooks";
 import { ADD_MESSAGE } from "../../graphql/mutations";
 
 const PlayerTextEditor = ({ me }) => {
