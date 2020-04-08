@@ -1,7 +1,6 @@
 import React from "react";
 
-const SideBarUsers = ({ data, loading, error }) => {
-  
+const SideBarUsers = ({ data, loading, error, handleModalOpen }) => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;
   if (!data) return <p>Not Found</p>;
@@ -9,7 +8,11 @@ const SideBarUsers = ({ data, loading, error }) => {
 
   let users = data.users;
   let userList = users.map((user) => (
-    <li key={user._id} className="user-list-item">
+    <li
+      onClick={() => handleModalOpen(user)}
+      key={user._id}
+      className="user-list-item"
+    >
       {user.username}
     </li>
   ));
