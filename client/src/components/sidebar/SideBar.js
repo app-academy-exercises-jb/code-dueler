@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
-import { useMutation } from "@apollo/react-hooks";
-import { INVITE_PLAYER } from "../../graphql/mutations";
+import { useMutation, useSubscription } from "@apollo/react-hooks";
+import { ON_INVITATION } from "../../graphql/subscriptions";
+import { ACCEPT_INVITE, DECLINE_INVITE } from "../../graphql/mutations";
 
 const SideBar = ({ data }) => {
   ReactModal.setAppElement("#root");
@@ -11,22 +12,41 @@ const SideBar = ({ data }) => {
 
   const [selectedUser, setSelectedUser] = useState(data.users[0]);
 
-  const [invitePlayer, { invitee }] = useMutation(INVITE_PLAYER);
+  const [acceptInvite] = useMutation(ACCEPT_INVITE);
+  const [declineInvite] = useMutation(DECLINE_INVITE);
 
-  const handleModalOpen = async (user) => {
-    // Below is commented out while testing
-    // invitePlayer({ variables: { invitee: user._id } });
-    await setSelectedUser(user);
-    modalOpen ? setModalOpen(false) : setModalOpen(true);
+  useSubscription(ON_INVITATION, {
+    fetchPolicy: "network-only",
+    variables: { test: "test" },
+    onSubscriptionData: ({ client, subscriptionData }) => {
+      console.log("onSub data: ", client, subscriptionData);
+      const e = subscriptionData.data.invitationEvent;
+      if (e.status === "inviting") {
+        handleModalOpen(e.inviter);
+      } else if (e.status === "declined") {
+        // setSelectedUser(e.invitee)
+        // setDeclineModalOpen(true)
+        // // => "invitee declined your invite"
+        setModalOpen(false);
+      } else if (e.status === "accepted") {
+        setModalOpen(false);
+        // Go to the game screen
+      }
+    },
+  });
+
+  const handleModalOpen = (user) => {
+    setSelectedUser(user);
+    setModalOpen(true);
   };
 
-  const handleAccept = () => {
-    // Send some acceptance code
+  const handleAccept = (user) => {
+    acceptInvite({ variables: { inviter: user._id } });
     setModalOpen(false);
   };
 
-  const handleDecline = () => {
-    // Send declination code
+  const handleDecline = (user) => {
+    declineInvite({ variables: { inviter: user._id } });
     setModalOpen(false);
   };
   return (

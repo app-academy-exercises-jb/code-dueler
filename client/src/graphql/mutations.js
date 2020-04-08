@@ -1,7 +1,7 @@
-import gql from 'graphql-tag';
-import { USER_CREDENTIALS_DATA } from './fragments';
+import gql from "graphql-tag";
+import { USER_CREDENTIALS_DATA } from "./fragments";
 
-export const LOGIN_USER = gql `
+export const LOGIN_USER = gql`
   mutation LogIn($username: String!, $password: String!) {
     login(username: $username, password: $password) {
       ...UserCredentialsData
@@ -10,7 +10,7 @@ export const LOGIN_USER = gql `
   ${USER_CREDENTIALS_DATA}
 `;
 
-export const SIGNUP_USER = gql `
+export const SIGNUP_USER = gql`
   mutation SignUp($username: String!, $password: String!) {
     signup(username: $username, password: $password) {
       ...UserCredentialsData
@@ -44,6 +44,30 @@ export const INVITE_PLAYER = gql`
         username
       }
       invitee {
+        _id
+        username
+      }
+      status
+    }
+  }
+`;
+
+export const ACCEPT_INVITE = gql`
+  mutation AcceptInvite($inviter: ID!) {
+    acceptInvitation(inviter: $inviter) {
+      inviter {
+        _id
+        username
+      }
+      status
+    }
+  }
+`;
+
+export const DECLINE_INVITE = gql`
+  mutation Decline_Invite($inviter: ID!) {
+    declineInvitation(inviter: $inviter) {
+      inviter {
         _id
         username
       }

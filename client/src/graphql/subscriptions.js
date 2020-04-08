@@ -1,4 +1,4 @@
-import gql from "graphql-tag"
+import gql from "graphql-tag";
 
 export const ON_MESSAGE_ADDED = gql`
   subscription onMessageAdded {
@@ -15,15 +15,15 @@ export const ON_MESSAGE_ADDED = gql`
 `;
 
 export const USER_LOGGED_EVENT = gql`
-subscription userUpdates {
-  userLoggedEvent {
-    user {
-      _id
-      username
-      loggedIn
+  subscription userUpdates {
+    userLoggedEvent {
+      user {
+        _id
+        username
+        loggedIn
+      }
     }
   }
-}
 `;
 
 export const ON_INVITATION = gql`

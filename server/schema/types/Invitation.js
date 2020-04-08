@@ -19,34 +19,76 @@ const typeDefs = `
   }
 `;
 
+const getUser = (user) => ({
+  _id: user._id,
+  username: user.username,
+  loggedIn: user.loggedIn,
+});
+
+const makeInvite = async (options) => {
+  const {
+    status,
+    user,
+    toAwait: { key, awaitedUser },
+  } = options;
+
+  const otherKey = key === "inviter" ? "invitee" : "inviter";
+
+  return {
+    [otherKey]: user,
+    [key]: await User.findById(awaitedUser),
+    status,
+  };
+};
+
 const resolvers = {
   Mutation: {
     invitePlayer: async (_, { invitee }, { user, pubsub }) => {
       if (!user) console.log("no user");
-      const invitation = {
-        inviter: user,
-        invitee: await User.findById(invitee),
-        status: "inviting"
-      };
+      const invitation = await makeInvite({
+        status: "inviting",
+        user,
+        toAwait: { key: "invitee", awaitedUser: invitee },
+      });
       pubsub.publish("invitationEvent", invitation);
       return invitation;
+    },
+    acceptInvitation: async (_, { inviter }, { user, pubsub }) => {
+      const acceptance = await makeInvite({
+        status: "accepted",
+        user,
+        toAwait: { key: "inviter", awaitedUser: inviter },
+      });
+      pubsub.publish("invitationEvent", acceptance);
+    },
+    declineInvitation: async (_, { inviter }, { user, pubsub }) => {
+      const declination = await makeInvite({
+        status: "declined",
+        user,
+        toAwait: { key: "inviter", awaitedUser: inviter },
+      });
+      pubsub.publish("invitationEvent", declination);
     },
   },
   Subscription: {
     invitationEvent: {
       subscribe: withFilter(
         (_, __, { pubsub }) => pubsub.asyncIterator("invitationEvent"),
-        ({ invitee }, _, { user }) => {
-          return invitee._id === user._id;
+        ({ inviter, invitee, status }, _, { user }) => {
+          if (status === "inviting") {
+            return invitee._id === user._id;
+          } else if (status === "declined" || status === "accepted") {
+            return inviter._id === user._id;
+          }
         }
       ),
-      resolve: payload => {
-        console.log("resolving invitation")
+      resolve: (payload) => {
+        console.log("resolving invitation");
         return payload;
-      }
+      },
     },
-  }
-}
+  },
+};
 
 module.exports = {
   typeDefs,
