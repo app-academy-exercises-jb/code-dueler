@@ -16,7 +16,7 @@ const PlayerMain = (props) => {
   const me = data.me;
 
   return (
-    <div className="player-player">
+    <div className="player-main">
       <PlayerView />
       <PlayerTextEditor me={me} />
     </div>

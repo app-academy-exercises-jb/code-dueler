@@ -5,7 +5,7 @@ const PlayerMessageItem = ({ message }) => {
   return (
     <li key={message._id} className="player-item">
       <div className="player-message-info">
-        <p className="playre-username">{message.author.username}</p>
+        <p className="player-username">{message.author.username}</p>
         <p className="player-date">{date}</p>
       </div>
       <p className="player-body">{message.body}</p>

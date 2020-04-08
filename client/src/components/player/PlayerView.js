@@ -46,9 +46,9 @@ const PlayerView = (props) => {
   });
 
   return (
-    <div className="chatview-wrapper">
-      <div className="chatview">
-        <ul className="chatview-inner scroll-bar" ref={setRef}>
+    <div className="playerview-wrapper">
+      <div className="playerview">
+        <ul className="playerview-inner scroll-bar" ref={setRef}>
           {messages}
         </ul>
       </div>
