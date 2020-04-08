@@ -41,9 +41,11 @@ const SideBar = ({ data }) => {
         onRequestClose={handleDecline}
       >
         <div className="modal">
-          <div className="modal info">
+          <div className="modal-info">
             <h1>{selectedUser.username}</h1>
-            <p>has challenged you to a CODE DUEL!</p>
+            <div>
+              has challenged you to a <p>CODE DUEL!</p>
+            </div>
           </div>
           <div className="modal-buttons">
             <button className="modal-decline" onClick={handleDecline}>
