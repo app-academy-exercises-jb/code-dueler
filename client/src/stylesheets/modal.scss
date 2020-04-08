@@ -33,11 +33,29 @@
 }
 
 .modal-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  height: 150px;
+  width: 350px;
   h1 {
-    font-size: 24px;
+    font-size: 50px;
     font-weight: 700;
     margin: 10px 0 0 0;
     font-family: 'VT323', monospace;
+    text-transform: uppercase;
+  }
+  div {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 700;
+    p {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 36px;
+      font-family: 'VT323', monospace;
+    }
   }
 }
 
