@@ -41,7 +41,7 @@ const resolvers = {
     users: (_, __, { pubsub }) => {
       console.log("resolving users:", { subscribers: pubsub.subscribers });
       if (!pubsub.subscribers) return [];
-      return User.findById({
+      return User.find({
         _id: { $in: Object.keys(pubsub.subscribers) },
       });
     },
