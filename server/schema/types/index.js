@@ -1,4 +1,5 @@
 module.exports = [
   require('./User'),
-  require('./Message')
+  require('./Message'),
+  require('./Invitation'),
 ];

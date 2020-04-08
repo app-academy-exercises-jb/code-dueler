@@ -20,18 +20,34 @@ export const SIGNUP_USER = gql `
 `;
 
 export const ADD_MESSAGE = gql`
-mutation AddMessage($author: ID!, $body: String!) {
-  addMessage(author: $author, body: $body) {
-    success
-    message
-    messages {
-      _id
-      author {
+  mutation AddMessage($author: ID!, $body: String!) {
+    addMessage(author: $author, body: $body) {
+      success
+      message
+      messages {
+        _id
+        author {
+          _id
+          username
+        }
+        body
+      }
+    }
+  }
+`;
+
+export const INVITE_PLAYER = gql`
+  mutation InvitePlayer($invitee: ID!) {
+    invitePlayer(invitee: $invitee) {
+      inviter {
         _id
         username
       }
-      body
+      invitee {
+        _id
+        username
+      }
+      status
     }
   }
-}
 `;
