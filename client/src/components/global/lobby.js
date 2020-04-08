@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import NavBar from "../nav/NavBar";
 import GlobalMain from "./global";
 import { GET_ONLINE_USERS } from "../../graphql/queries";
-import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
-import { useQuery } from "@apollo/react-hooks";
+import { USER_LOGGED_EVENT, ON_INVITATION } from "../../graphql/subscriptions";
+import { useQuery, useSubscription } from "@apollo/react-hooks";
 
 const subscribeToUserEvents = (subscribeToMore) => (
   subscribeToMore({
@@ -28,7 +28,15 @@ const subscribeToUserEvents = (subscribeToMore) => (
   })
 );
 
-const Lobby = ({ data, loading, error, subscribeToUserEvents }) => {
+const Lobby = ({ data, loading, error, subscribeToUserEvents,  }) => {
+  useSubscription(ON_INVITATION, {
+    fetchPolicy: "network-only",
+    variables: { test:"test" },
+    onSubscriptionData: data => {
+      alert()
+    },
+  });
+  
   useEffect(() => {
     setTimeout(() => {
       subscribeToUserEvents();

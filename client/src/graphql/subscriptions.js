@@ -25,3 +25,19 @@ subscription userUpdates {
   }
 }
 `;
+
+export const ON_INVITATION = gql`
+  subscription onInvitation {
+    invitationEvent {
+      inviter {
+        _id
+        username
+      }
+      invitee {
+        _id
+        username
+      }
+      status
+    }
+  }
+`;

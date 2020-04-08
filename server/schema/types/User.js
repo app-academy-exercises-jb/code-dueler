@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { withFilter } = require("apollo-server-express");
 
 const User = mongoose.model("User");
 
@@ -75,8 +76,8 @@ const resolvers = {
         console.log({payload});
         return payload;
       }
-    }
-  }
+    },
+  },
 };
 
 module.exports = {
