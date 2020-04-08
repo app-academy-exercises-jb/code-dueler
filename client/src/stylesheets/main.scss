@@ -39,8 +39,8 @@ html, body, #root {
 .global-main {
   box-sizing: content-box;
   display: flex;
-  height: 94vh;
-  max-height: 94vh;
+  height: calc(100% - 56px);
+  max-height: calc(100% - 56px);
   width: 100%;
   overflow-y: hidden;
 }

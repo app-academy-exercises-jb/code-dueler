@@ -9,7 +9,9 @@ const CodeEditor = (props) => {
 
   return (
     <div className="editor">
+
       <div className="editor-text"></div>
+
       <Editor
         value={code}
         onValueChange={(code) => setCode(code)}
