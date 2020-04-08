@@ -13,5 +13,41 @@
   border-radius: 5px;
 }
 
+.stats-form{
+  width: 27%;
+  background-color: #32292F;
+  height: 200px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #0E1428;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+  float: right;
+  position: fixed;
+  font: inherit;
+  right: 5px;
+  margin-top: 70px;
+  h1{
+    background-color:#d1eed0;
+    text-align: center;
+    padding: 7px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+  
+  }
+  h2{
+    color: #d4f2d2;
+    
+  }
+  .stats{
+  // background-color: gray;
+  text-align: left;
+  padding: 5px;
+
+}
+}
+
+
+
 
 
