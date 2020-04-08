@@ -31,6 +31,9 @@ const CodeEditor = (props) => {
       </button>
     </div>
     <div className="editor">
+
+      <div className="editor-text"></div>
+
       <Editor
         value={code}
         onValueChange={(code) => {
