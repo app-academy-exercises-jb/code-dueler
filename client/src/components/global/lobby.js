@@ -2,16 +2,14 @@ import React, { useEffect } from "react";
 import NavBar from "../nav/NavBar";
 import GlobalMain from "./global";
 import { GET_ONLINE_USERS } from "../../graphql/queries";
-import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
-import { useQuery } from "@apollo/react-hooks";
+import { USER_LOGGED_EVENT, ON_INVITATION } from "../../graphql/subscriptions";
+import { useQuery, useSubscription } from "@apollo/react-hooks";
 
-const subscribeToUserEvents = (subscribeToMore) => (
+const subscribeToUserEvents = (subscribeToMore) =>
   subscribeToMore({
     document: USER_LOGGED_EVENT,
     updateQuery: (prev, { subscriptionData }) => {
-      const {
-        user
-      } = subscriptionData.data.userLoggedEvent,
+      const { user } = subscriptionData.data.userLoggedEvent,
         next = { users: Object.assign([], prev.users) },
         idx = next.users.findIndex((u) => u._id === user._id);
 
@@ -22,13 +20,20 @@ const subscribeToUserEvents = (subscribeToMore) => (
         if (idx === -1) return next;
         next.users.splice(idx, 1);
       }
-      
+
       return next;
     },
-  })
-);
+  });
 
 const Lobby = ({ data, loading, error, subscribeToUserEvents }) => {
+  // useSubscription(ON_INVITATION, {
+  //   fetchPolicy: "network-only",
+  //   variables: { test:"test" },
+  //   onSubscriptionData: data => {
+  //     alert()
+  //   },
+  // });
+
   useEffect(() => {
     setTimeout(() => {
       subscribeToUserEvents();
@@ -46,7 +51,7 @@ const Lobby = ({ data, loading, error, subscribeToUserEvents }) => {
       <GlobalMain data={data} />
     </>
   );
-}
+};
 
 export default () => {
   const { subscribeToMore, ...result } = useQuery(GET_ONLINE_USERS, {

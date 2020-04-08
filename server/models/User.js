@@ -1,33 +1,22 @@
-const mongoose = require('mongoose'),
+const mongoose = require("mongoose"),
   Schema = mongoose.Schema,
-  jwt = require('jsonwebtoken'),
-  bcrypt = require('bcryptjs'),
+  jwt = require("jsonwebtoken"),
+  bcrypt = require("bcryptjs"),
   secretOrKey = process.env.SECRET_OR_KEY;
 
 const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
     required: true,
     min: 8,
-    max: 32
-  }
+    max: 32,
+  },
 });
-
-UserSchema.statics.findLoggedIn = async function(query, pubsub) {
-  const User = this,
-    users = await User.find({
-    _id: { $in: 
-      Object.keys(pubsub.subscribers)
-    }
-  });
-  users.forEach(u => {u.loggedIn = true});
-  return users;
-};
 
 UserSchema.statics.login = async function (username, password) {
   const User = this,
@@ -45,12 +34,14 @@ UserSchema.statics.signup = async function (username, password) {
   const User = this,
     user = await User.findOne({ username });
 
-  
   if (user) return null;
 
-  const newUser = new User({username, password: await bcrypt.hash(password, 10)});
+  const newUser = new User({
+    username,
+    password: await bcrypt.hash(password, 10),
+  });
 
-  console.log("hello")
+  console.log("hello");
   await newUser.save();
 
   newUser.token = "Bearer " + jwt.sign({ _id: newUser._id }, secretOrKey);
@@ -60,4 +51,4 @@ UserSchema.statics.signup = async function (username, password) {
   return newUser;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);

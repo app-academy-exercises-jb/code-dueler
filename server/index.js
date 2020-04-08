@@ -137,7 +137,8 @@ app.listen = function() {
           ws.userId = user._id;
 
           return {
-            pubsub
+            pubsub,
+            user
           }
         }
       },

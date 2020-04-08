@@ -59,7 +59,6 @@ const createClient = async () => {
     },
   });
 
-
   // this middleware captures the authorization header on behalf of
   // the SubscriptionServer's onOperation callback
   wsLink.subscriptionClient.use([

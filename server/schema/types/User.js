@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { withFilter } = require("apollo-server-express");
 
 const User = mongoose.model("User");
 
@@ -34,17 +35,15 @@ const resolvers = {
   Query: {
     me(_, __, context) {
       // user provided by passport
-      console.log("querying for current user")
+      console.log("querying for current user");
       return context.user;
     },
     users: (_, __, { pubsub }) => {
-      console.log("resolving users:", {subscribers: pubsub.subscribers});
+      console.log("resolving users:", { subscribers: pubsub.subscribers });
       if (!pubsub.subscribers) return [];
-      return User.findLoggedIn({
-        _id: { $in: 
-          Object.keys(pubsub.subscribers)
-        }
-      }, pubsub);
+      return User.findById({
+        _id: { $in: Object.keys(pubsub.subscribers) },
+      });
     },
   },
   Mutation: {
@@ -58,25 +57,25 @@ const resolvers = {
   Subscription: {
     userLoggedEvent: {
       subscribe: (_, __, { pubsub }) => {
-        console.log("subscribing")
-        return pubsub.asyncIterator('userLoggedEvent');
+        console.log("subscribing");
+        return pubsub.asyncIterator("userLoggedEvent");
       },
-      resolve: async payload => {
+      resolve: async (payload) => {
         const user = await User.findById(payload);
         // payload.userLoggedEvent.user = payload.user;
         delete payload._id;
         payload.user = {
           _id: user._id,
           username: user.username,
-          loggedIn: payload.loggedIn
+          loggedIn: payload.loggedIn,
         };
         payload.id = user._id;
         // delete payload.loggedIn;
-        console.log({payload});
+        console.log({ payload });
         return payload;
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 module.exports = {
