@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Message = mongoose.model('Message');
+const { withFilter } = require('apollo-server-express');
 
 const typeDefs = `
   scalar Date
@@ -8,13 +9,14 @@ const typeDefs = `
     author: User
     body: String!
     createdAt: Date!
+    channelId: String!
   }
   extend type Query {
-    messages: [Message]
+    messages(channelId: String!): [Message]
     message(_id: ID!): Message
   }
   extend type Mutation {
-    addMessage(author: ID!, body: String!): MessageUpdateResponse!
+    addMessage(author: ID!, body: String!, channelId: String): MessageUpdateResponse!
   }
   extend type Subscription {
     messageAdded: Message
@@ -28,24 +30,41 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    messages(_, __, context) {
-      return Message.find({}).populate('author');
+    messages(_, { channelId }, context) {
+      return Message.find({
+        channelId
+      }).populate('author');
     },
     message(_, { _id }) {
       return Message.findById(_id).populate('author');
     }
   },
   Mutation: {
-    addMessage(_, { author, body }, { user, pubsub }) {
-      return Message.post(author, body, user, pubsub);
+    addMessage(_, { author, body, channelId }, { user, pubsub }) {
+      return Message.post({author, body, user, channelId, pubsub});
     },
   },
   Subscription: {
     messageAdded: {
-      subscribe: (_, __, context) => {
-        return context.pubsub.asyncIterator('messageAdded');
-      },
+      subscribe: withFilter(
+        (_, __, context) => context.pubsub.asyncIterator('messageAdded'),
+        (payload, _, {user, pubsub, ws}) => {
+          const game = pubsub.games[payload.channelId];
+
+          if (ws.gameId === undefined && payload.channelId === "global") {
+            return true;
+          }
+
+          if (game && 
+            game.gameId === ws.gameId && 
+            (game.p1._id === user._id || game.p2._id === user._id || game.spectators[user._id])) {
+            return true;
+          }
+          return false;
+        },
+      ),
       resolve: payload => {
+        console.log("resolving message payload")
         return payload;
       },
     },
@@ -56,15 +75,3 @@ module.exports = {
   typeDefs,
   resolvers
 };
-
-// subscribe: withFilter(
-//   (_, __, context) => context.pubsub.asyncIterator('messageAdded'),
-//   (payload, _, {user, pubsub}) => {
-//     if (payload.channelId === "global") return true;
-//     const game = pubsub.games[payload.gameId];
-//     if (game && (game.users[user._id] || game.spectators[user._id])) {
-//       return true;
-//     }
-//     return false;
-//   },
-// ),

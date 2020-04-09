@@ -16,21 +16,30 @@ const MessageSchema = new Schema({
     default: Date.now,
     required: true
   },
+  channelId: {
+    type: String,
+    default: "global",
+    required: true
+  }
 });
 
-MessageSchema.statics.post = async function (author, body, user, pubsub) {
+MessageSchema.statics.post = async function ({author, body, user, channelId, pubsub}) {
   if (author !== user._id.toString()) return {
     success: false,
     message: "User authentication failed: wrong user",
     messages: []
   };
+
+  if (!channelId) channelId = "global";
+
   const Message = this,
-    newMessage = new Message({author: user, body});
+    newMessage = new Message({author: user, body, channelId});
 
   await newMessage.save();
   
   const postedMessage = Object.assign({}, newMessage._doc, {author: user});
   pubsub.publish('messageAdded', postedMessage);
+
   
   return {
     success: true,

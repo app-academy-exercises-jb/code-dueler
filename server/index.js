@@ -72,6 +72,19 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = process.env.PORT || 5000;
 
+const handleGames = pubsub => options => {
+  const {gameId, p1, p2} = options,
+    game = {
+      p1, p2, gameId, subscribers: [], status: "initializing"
+    };
+
+  if (pubsub.games === undefined) {
+    pubsub.games = { [gameId]: game };
+  } else {
+    pubsub.games[gameId] = game;
+  }
+}
+
 app.listen = function() {
   let server; 
 
@@ -114,8 +127,7 @@ app.listen = function() {
           );
 
           if (!user._id) return false;
-
-          console.log(`${user._id} connected to the websocket`, pubsub.subscribers);
+          user.ws = ws;
 
           // save connections to keep track of online users
           // we access pubsub from the resolvers
@@ -123,13 +135,13 @@ app.listen = function() {
             pubsub.subscribers = {
               [user._id]: [user]
             }
+            pubsub.handleGames = handleGames(pubsub);
             publishUserLoggedEvent(pubsub, user, true);
           } else {
             if (pubsub.subscribers[user._id] === undefined) {
               pubsub.subscribers[user._id] = [user];
               publishUserLoggedEvent(pubsub, user, true);
             } else {
-              console.log("else: ", pubsub.subscribers)
               pubsub.subscribers[user._id].push(user);
             }
           }
@@ -138,7 +150,8 @@ app.listen = function() {
 
           return {
             pubsub,
-            user
+            user,
+            ws
           }
         }
       },

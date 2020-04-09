@@ -16,11 +16,12 @@ const typeDefs = `
     inviter: User!
     invitee: User!
     status: String!
+    gameId: String
   }
 `;
 
 const getUser = (user) => ({
-  _id: user._id,
+  _id: user._id.toString(),
   username: user.username,
 });
 
@@ -35,28 +36,36 @@ const makeInvite = async (options) => {
 
   return {
     [otherKey]: getUser(user),
-    [key]: await User.findById(awaitedUser),
+    [key]: getUser(await User.findById(awaitedUser)),
     status,
   };
 };
 
 const resolvers = {
   Mutation: {
-    invitePlayer: async (_, { invitee }, { user, pubsub }) => {
+    invitePlayer: async (_, { invitee }, { user, pubsub, ws }) => {
       if (!user) console.log("no user");
       const invitation = await makeInvite({
         status: "inviting",
         user,
         toAwait: { key: "invitee", awaitedUser: invitee },
       });
+      ws.inviting = true;
       pubsub.publish("invitationEvent", invitation);
       return invitation;
     },
-    acceptInvitation: async (_, { inviter }, { user, pubsub }) => {
+    acceptInvitation: async (_, { inviter }, { user, pubsub, ws }) => {
       const acceptance = await makeInvite({
         status: "accepted",
         user,
         toAwait: { key: "inviter", awaitedUser: inviter },
+      });
+      acceptance.gameId = inviter + user._id + Date.now().toString();
+      ws.accepting = true;
+      pubsub.handleGames({
+        gameId: acceptance.gameId,
+        p1: acceptance.inviter,
+        p2: user
       });
       pubsub.publish("invitationEvent", acceptance);
       return acceptance;
@@ -75,13 +84,21 @@ const resolvers = {
     invitationEvent: {
       subscribe: withFilter(
         (_, __, { pubsub }) => pubsub.asyncIterator("invitationEvent"),
-        ({ inviter, invitee, status }, _, { user }) => {
+        ({ inviter, invitee, status, gameId }, _, { user, ws, pubsub }) => {
+          console.log("i go off 3 times")
           if (status === "inviting") {
+            if (invitee._id === user._id) {console.log("marking ws as invited"); ws.invited = true;}
             return invitee._id === user._id;
           } else if (status === "declined") {
             return inviter._id === user._id;
           } else if (status === "accepted") {
-            return inviter._id === user._id || invitee._id === user._id;;
+            const shouldSend = (ws.inviting || (ws.invited && ws.accepting));
+            if (shouldSend) ws.gameId = gameId;
+
+            delete ws.inviting;
+            delete ws.invited;
+            delete ws.accepting
+            return shouldSend && (inviter._id === user._id || invitee._id === user._id);
           }
         }
       ),
