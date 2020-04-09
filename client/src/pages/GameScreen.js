@@ -4,7 +4,7 @@ import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/player/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
 import Stats from "../components/player/Stats";
-import { useSubscription } from "@apollo/react-hooks";
+import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
 
@@ -19,9 +19,15 @@ export default ({ onlineUsers: { data, loading, error } }) => {
       const e = subscriptionData.data.gameEvent;
       if (e.status === "initializing") {
         alert("initializing")
+
       } else if (e.status === "ready") {
+
       } else if (e.status === "ongoing") {
+
+        
+
       } else if (e.status === "over") {
+
       }
     },
   });

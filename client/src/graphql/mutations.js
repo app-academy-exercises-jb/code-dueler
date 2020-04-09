@@ -85,14 +85,36 @@ export const UPDATE_GAME_LAST_SUBMITTED = gql`
   ${GAME_USER_DETAILS}
 `;
 
+export const UPDATE_GAME_USER_CODE = gql`
+  mutation UpdateGameUserCurrentCode(
+    $player: ID!,
+    $charCount: Int!,
+    $lineCount: Int!,
+    $currentCode: String!
+  ) { 
+    updateGameUserCurrentCode(
+      player: $player
+      charCount: $charCount
+      lineCount: $lineCount
+      currentCode: $currentCode
+    ) {
+      ...GameUserDetails
+    }
+  }
+  ${GAME_USER_DETAILS}
+`;
 
-// updateGameUserLastSubmitted(
-//   player: ID!,
-//   lastSubmittedResult: String!
-// ): GameUser!
-// updateGameUserCurrentCode(
-//   player: ID!,
-//   charCount: Int!,
-//   lineCount: Int!,
-//   currentCode: String!
-// ): GameUser!
+export const UPDATE_GAME_USER_STATUS = gql`
+  mutation UpdateGameUserStatus(
+    $player: ID!,
+    $status: String!
+  ) {
+    updateGameUserStatus(
+      player: $player
+      status: $status
+    ) {
+      ...GameUserDetails
+    }
+  }
+  ${GAME_USER_DETAILS}
+`;

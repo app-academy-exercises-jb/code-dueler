@@ -15,6 +15,10 @@ const typeDefs = `
       lineCount: Int!,
       currentCode: String!
     ): GameUser!
+    updateGameUserStatus(
+      player: ID!,
+      status: String!
+    ): GameUser!
   }
   extend type Subscription {
     gameEvent(gameId: String!): GameUpdate!
