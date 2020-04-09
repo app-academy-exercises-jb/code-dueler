@@ -5,10 +5,19 @@ const User = mongoose.model("User");
 
 const typeDefs = `
   extend type Mutation {
-    updateGameUser(user: GameUser!): GameUser!
+    updateGameUserLastSubmitted(
+      player: ID!,
+      lastSubmittedResult: String!
+    ): GameUser!
+    updateGameUserCurrentCode(
+      player: ID!,
+      charCount: Int!,
+      lineCount: Int!,
+      currentCode: String!
+    ): GameUser!
   }
   extend type Subscription {
-    gameEvent: GameUpdate!
+    gameEvent(gameId: String!): GameUpdate!
   }
   type GameUpdate {
     p1: GameUser!
@@ -17,8 +26,8 @@ const typeDefs = `
     status: String!
     gameId: String!
   }
-  scalar GameUser {
-    player: User
+  type GameUser {
+    player: User!
     lastSubmittedResult: String
     charCount: Int
     lineCount: Int
@@ -28,15 +37,24 @@ const typeDefs = `
 
 const resolvers = {
   Mutation: {
-    updateGameUser: (_, input, { user }) => {
-      const { player, lastSubmittedResult, charCount, lineCount, currentCode } = input;
+    updateGameUserLastSubmitted: (_, input, { user }) => {
+      const { player, lastSubmittedResult } = input;
       
-    }
+    },
+    updateGameUserCurrentCode: (_, input, { user }) => {
+      const { player, charCount, lineCount, currentCode } = input;
+      
+    },
+
   },
   Subscription: {
     gameEvent: {
       subscribe: withFilter(
-        (_, __, { pubsub, ws }) => {
+        (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
+          if (ws.gameId === undefined && user._id === ws.userId) {
+            ws.gameId = gameId;
+          }
+
           const game = pubsub.games[ws.gameId];
           game.connections += 1;
 
@@ -46,7 +64,7 @@ const resolvers = {
 
           return pubsub.asyncIterator("gameEvent");
         },
-        ({ p1, p2, spectators, status, gameId }, _, { user, pubsub }) => {
+        ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
           return pubsub.games[gameId].users[user._id] > 0;
         },
       ),

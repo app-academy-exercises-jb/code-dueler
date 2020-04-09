@@ -12,11 +12,8 @@ export default ({ onlineUsers: { data, loading, error } }) => {
   const { id: gameId } = useParams();
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
-    context: {
-      test: "test"
-    },
     variables: {
-      test: "test"
+      gameId
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;

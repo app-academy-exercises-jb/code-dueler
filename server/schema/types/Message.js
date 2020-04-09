@@ -49,15 +49,16 @@ const resolvers = {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator('messageAdded'),
         (payload, _, {user, pubsub, ws}) => {
-          const game = pubsub.games[payload.channelId];
 
           if (ws.gameId === undefined && payload.channelId === "global") {
             return true;
           }
 
+          const game = pubsub.games[payload.channelId];
+
           if (game && 
             game.gameId === ws.gameId && 
-            (game.p1._id === user._id || game.p2._id === user._id || game.spectators[user._id])) {
+            (game.users[user._id] || game.spectators[user._id])) {
             return true;
           }
           return false;
