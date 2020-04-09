@@ -4,6 +4,7 @@ const { withFilter } = require("apollo-server-express");
 const User = mongoose.model("User");
 
 const typeDefs = `
+<<<<<<< HEAD
 extend type Subscription {
   gameEvent: GameUpdate!
 }
@@ -14,6 +15,41 @@ type GameUpdate {
   status: String!
   gameId: String!
 }
+=======
+  extend type Mutation {
+    updateGameUserLastSubmitted(
+      player: ID!,
+      lastSubmittedResult: String!
+    ): GameUser!
+    updateGameUserCurrentCode(
+      player: ID!,
+      charCount: Int!,
+      lineCount: Int!,
+      currentCode: String!
+    ): GameUser!
+    updateGameUserStatus(
+      player: ID!,
+      status: String!
+    ): GameUser!
+  }
+  extend type Subscription {
+    gameEvent(gameId: String!): GameUpdate!
+  }
+  type GameUpdate {
+    p1: GameUser!
+    p2: GameUser!
+    spectators: [User]
+    status: String!
+    gameId: String!
+  }
+  type GameUser {
+    player: User!
+    lastSubmittedResult: String
+    charCount: Int
+    lineCount: Int
+    currentCode: String
+  }
+>>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
 `;
 
 // extend type Mutation {
@@ -29,6 +65,7 @@ type GameUpdate {
 
 const resolvers = {
   Mutation: {
+<<<<<<< HEAD
     // updateGameUser: (_, input, { user }) => {
     //   const {
     //     player,
@@ -38,11 +75,26 @@ const resolvers = {
     //     currentCode,
     //   } = input;
     // },
+=======
+    updateGameUserLastSubmitted: (_, input, { user }) => {
+      const { player, lastSubmittedResult } = input;
+      
+    },
+    updateGameUserCurrentCode: (_, input, { user }) => {
+      const { player, charCount, lineCount, currentCode } = input;
+      
+    },
+
+>>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
   },
   Subscription: {
     gameEvent: {
       subscribe: withFilter(
-        (_, __, { pubsub, ws }) => {
+        (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
+          if (ws.gameId === undefined && user._id === ws.userId) {
+            ws.gameId = gameId;
+          }
+
           const game = pubsub.games[ws.gameId];
           game.connections += 1;
 
@@ -52,7 +104,7 @@ const resolvers = {
 
           return pubsub.asyncIterator("gameEvent");
         },
-        ({ p1, p2, spectators, status, gameId }, _, { user, pubsub }) => {
+        ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
           return pubsub.games[gameId].users[user._id] > 0;
         }
       ),

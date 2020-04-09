@@ -133,7 +133,14 @@ app.listen = function () {
       subscribe,
       keepAlive: 29000,
       onOperation: (message, params, ws) => {
+<<<<<<< HEAD
         return params;
+=======
+        // console.log({message})
+        // console.log({params})
+
+        return {...params, test: "test"};
+>>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
       },
       onConnect: (connectionParams, ws, context) => {
         console.log("connecting:", pubsub.subscribers);
