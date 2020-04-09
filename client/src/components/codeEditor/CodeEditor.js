@@ -30,7 +30,31 @@ const CodeEditor = (props) => {
             <p className="editor-count">charCount: {charCount}</p>
             <p className="editor-count">lineCount: {lineCount}</p>
           </div>
-          <button className="code-submit" onClick={(e) => {}}>
+          <button
+            className="code-submit"
+            onClick={(e) => {
+              fetch(
+                "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
+                {
+                  method: "POST",
+                  mode: "cors",
+                  // e.target.value must have text which defines a function fizzBuzz
+                  body: JSON.stringify({
+                    data: { codeToRun: e.target.value },
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                    authorization: localStorage.getItem("token"),
+                  },
+                }
+              )
+                .then((res) => res.json())
+                .then((res) => {
+                  // res is the server response
+                })
+                .catch((err) => console.log(err));
+            }}
+          >
             Submit Code
           </button>
         </div>
