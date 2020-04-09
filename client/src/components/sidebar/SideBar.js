@@ -61,7 +61,7 @@ const SideBar = ({ data }) => {
         isOpen={modalOpen}
         className="modal-overlay"
         shouldCloseOnEsc={true}
-        onRequestClose={handleDecline}
+        onRequestClose={() => setModalOpen(false)}
       >
         <div className="modal">
           <div className="modal-info">

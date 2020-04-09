@@ -38,6 +38,28 @@ export const ON_INVITATION = gql`
         username
       }
       status
+      gameId
+    }
+  }
+`;
+
+export const ON_GAME = gql`
+  subscription onGame {
+    gameEvent {
+      p1 {
+        _id
+        username
+      }
+      p2 {
+        _id
+        username
+      }
+      spectators {
+        _id
+        username
+      }
+      status
+      gameId
     }
   }
 `;

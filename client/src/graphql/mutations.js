@@ -20,8 +20,8 @@ export const SIGNUP_USER = gql`
 `;
 
 export const ADD_MESSAGE = gql`
-  mutation AddMessage($author: ID!, $body: String!) {
-    addMessage(author: $author, body: $body) {
+  mutation AddMessage($author: ID!, $body: String!, $channelId: String) {
+    addMessage(author: $author, body: $body, channelId: $channelId) {
       success
       message
       messages {
