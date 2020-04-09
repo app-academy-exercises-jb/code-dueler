@@ -21,7 +21,6 @@ export default ({ onlineUsers: { data, loading, error } }) => {
       }
     },
   });
-
   return (
     <div className="main">
       {data && <NavBar data={data} />}
