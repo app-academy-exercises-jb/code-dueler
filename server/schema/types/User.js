@@ -70,8 +70,6 @@ const resolvers = {
           loggedIn: payload.loggedIn,
         };
         payload.id = user._id;
-        // delete payload.loggedIn;
-        console.log({ payload });
         return payload;
       },
     },
