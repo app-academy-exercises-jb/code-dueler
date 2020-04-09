@@ -74,7 +74,6 @@ const createClient = async () => {
   httpLink = split(
     ({ query }) => {
       const def = getMainDefinition(query);
-      console.log({def})
       return (
         def.kind === 'OperationDefinition' && 
           (def.operation === 'subscription' || 
