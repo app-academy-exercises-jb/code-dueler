@@ -4,10 +4,12 @@ import { ON_MESSAGE_ADDED } from "../../graphql/subscriptions";
 import { GET_MESSAGES } from "../../graphql/queries";
 import ChatMessageItem from "./ChatMessageItem";
 
-const ChatView = (props) => {
+const ChatView = ({ channelId }) => {
   const messagesRef = useRef(null);
 
-  const { data, loading, error, subscribeToMore } = useQuery(GET_MESSAGES);
+  const { data, loading, error, subscribeToMore } = useQuery(GET_MESSAGES, {
+    variables: { channelId }
+  });
 
   const setRef = useCallback((node) => {
     if (node !== null) {
