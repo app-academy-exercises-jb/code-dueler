@@ -62,11 +62,24 @@ const resolvers = {
       });
       acceptance.gameId = inviter + user._id + Date.now().toString();
       ws.accepting = true;
+
+      const newP1 = {...acceptance.inviter, ws};
+
       pubsub.handleGames({
         gameId: acceptance.gameId,
-        p1: acceptance.inviter,
-        p2: user
+        p1: newP1,
+        p2: user,
+        initializeGame: pubsub => setTimeout(() => {
+          pubsub.publish("gameEvent", {
+            p1: newP1,
+            p2: user,
+            spectators: [],
+            status: "initializing",
+            gameId: acceptance.gameId
+          })
+        }, 0)
       });
+
       pubsub.publish("invitationEvent", acceptance);
       return acceptance;
     },
@@ -85,7 +98,6 @@ const resolvers = {
       subscribe: withFilter(
         (_, __, { pubsub }) => pubsub.asyncIterator("invitationEvent"),
         ({ inviter, invitee, status, gameId }, _, { user, ws, pubsub }) => {
-          console.log("i go off 3 times")
           if (status === "inviting") {
             if (invitee._id === user._id) {console.log("marking ws as invited"); ws.invited = true;}
             return invitee._id === user._id;
@@ -97,10 +109,10 @@ const resolvers = {
 
             delete ws.inviting;
             delete ws.invited;
-            delete ws.accepting
+            delete ws.accepting;
             return shouldSend && (inviter._id === user._id || invitee._id === user._id);
           }
-        }
+        },
       ),
       resolve: (payload) => {
         console.log("resolving invitation");
@@ -117,10 +129,3 @@ module.exports = {
 
 
 // handle pubsub.games
-// pubsub.publish("gameEvent", {
-//   p1: inviter,
-//   p2: invitee,
-//   spectators: [],
-//   status: "initializing",
-//   gameId: inviter._id + invitee._id + Date.now()
-// })

@@ -12,9 +12,16 @@ export default ({ onlineUsers: { data, loading, error } }) => {
   const { id: gameId } = useParams();
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
+    context: {
+      test: "test"
+    },
+    variables: {
+      test: "test"
+    },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
       if (e.status === "initializing") {
+        alert("initializing")
       } else if (e.status === "ready") {
       } else if (e.status === "ongoing") {
       } else if (e.status === "over") {

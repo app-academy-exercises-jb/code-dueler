@@ -72,10 +72,20 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = process.env.PORT || 5000;
 
-const handleGames = pubsub => options => {
-  const {gameId, p1, p2} = options,
-    game = {
-      p1, p2, gameId, subscribers: [], status: "initializing"
+const handleGames = pubsub => ({gameId, p1, p2, initializeGame}) => {
+
+  const game = {
+      p1,
+      p2,
+      gameId,
+      users: {
+        [p1._id]: 1,
+        [p2._id]: 1,
+      },
+      subscribers: [],
+      status: "initializing",
+      connections: 0,
+      initializeGame,
     };
 
   if (pubsub.games === undefined) {
@@ -113,6 +123,9 @@ app.listen = function() {
       execute,
       subscribe,
       keepAlive: 29000,
+      onOperation: (message, params, ws) => {
+        console.log({message})
+      },
       onConnect: (connectionParams, ws, context) => {
         console.log("connecting:", pubsub.subscribers)
         // the following line should actually verify that the user passport found
