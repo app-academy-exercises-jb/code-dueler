@@ -4,34 +4,40 @@ const { withFilter } = require("apollo-server-express");
 const User = mongoose.model("User");
 
 const typeDefs = `
-  extend type Mutation {
-    updateGameUser(user: GameUser!): GameUser!
-  }
-  extend type Subscription {
-    gameEvent: GameUpdate!
-  }
-  type GameUpdate {
-    p1: GameUser!
-    p2: GameUser!
-    spectators: [User]
-    status: String!
-    gameId: String!
-  }
-  scalar GameUser {
-    player: User
-    lastSubmittedResult: String
-    charCount: Int
-    lineCount: Int
-    currentCode: String
-  }
+extend type Subscription {
+  gameEvent: GameUpdate!
+}
+type GameUpdate {
+  p1: User!
+  p2: User!
+  spectators: [User]
+  status: String!
+  gameId: String!
+}
 `;
+
+// extend type Mutation {
+//   updateGameUser(user: GameUser!): GameUser!
+// }
+// scalar GameUser {
+//   player: User
+//   lastSubmittedResult: String
+//   charCount: Int
+//   lineCount: Int
+//   currentCode: String
+// }
 
 const resolvers = {
   Mutation: {
-    updateGameUser: (_, input, { user }) => {
-      const { player, lastSubmittedResult, charCount, lineCount, currentCode } = input;
-      
-    }
+    // updateGameUser: (_, input, { user }) => {
+    //   const {
+    //     player,
+    //     lastSubmittedResult,
+    //     charCount,
+    //     lineCount,
+    //     currentCode,
+    //   } = input;
+    // },
   },
   Subscription: {
     gameEvent: {
@@ -48,30 +54,37 @@ const resolvers = {
         },
         ({ p1, p2, spectators, status, gameId }, _, { user, pubsub }) => {
           return pubsub.games[gameId].users[user._id] > 0;
-        },
+        }
       ),
-      resolve: ({p1, p2, spectators, status, gameId}) => {
+      resolve: ({ p1, p2, spectators, status, gameId }) => {
         if (p1.charCount === undefined) {
           const details = {
             lastSubmittedResult: "",
             charCount: 0,
             lineCount: 0,
-            currentCode: ""
+            currentCode: "",
           };
           return {
             p1: {
               player: p1,
-              ...details
+              ...details,
             },
             p2: {
               player: p2,
-              ...details
+              ...details,
             },
-            spectators, status, gameId
-          }
-        } else return {
-          p1, p2, spectators, status, gameId
-        };
+            spectators,
+            status,
+            gameId,
+          };
+        } else
+          return {
+            p1,
+            p2,
+            spectators,
+            status,
+            gameId,
+          };
       },
     },
   },
@@ -79,5 +92,5 @@ const resolvers = {
 
 module.exports = {
   typeDefs,
-  resolvers
+  resolvers,
 };
