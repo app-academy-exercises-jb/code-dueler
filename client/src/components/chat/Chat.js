@@ -4,7 +4,7 @@ import ChatTextEditor from "./ChatTextEditor";
 import { useQuery } from "@apollo/react-hooks";
 import { CURRENT_USER } from "../../graphql/queries";
 
-const ChatMain = () => {
+const Chat = ({ channelId }) => {
   const { data, loading, error } = useQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
   });
@@ -14,12 +14,14 @@ const ChatMain = () => {
 
   const me = data.me;
 
+  if (!channelId) channelId = "global";
+
   return (
     <div className="chat-main">
-      <ChatView />
-      <ChatTextEditor me={me} />
+      <ChatView channelId={channelId} />
+      <ChatTextEditor channelId={channelId} me={me} />
     </div>
   );
 };
 
-export default ChatMain;
+export default Chat;
