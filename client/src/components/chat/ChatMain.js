@@ -4,7 +4,7 @@ import ChatTextEditor from "./ChatTextEditor";
 import { useQuery } from "@apollo/react-hooks";
 import { CURRENT_USER } from "../../graphql/queries";
 
-const ChatMain = (props) => {
+const ChatMain = () => {
   const { data, loading, error } = useQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
   });

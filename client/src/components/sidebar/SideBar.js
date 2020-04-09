@@ -5,6 +5,7 @@ import ReactModal from "react-modal";
 import { useMutation, useSubscription } from "@apollo/react-hooks";
 import { ON_INVITATION } from "../../graphql/subscriptions";
 import { ACCEPT_INVITE, DECLINE_INVITE } from "../../graphql/mutations";
+import { useHistory } from "react-router-dom";
 
 const SideBar = ({ data }) => {
   ReactModal.setAppElement("#root");
@@ -16,11 +17,11 @@ const SideBar = ({ data }) => {
   const [acceptInvite] = useMutation(ACCEPT_INVITE);
   const [declineInvite] = useMutation(DECLINE_INVITE);
 
+  const history = useHistory();
+
   useSubscription(ON_INVITATION, {
     fetchPolicy: "network-only",
-    variables: { test: "test" },
     onSubscriptionData: ({ client, subscriptionData }) => {
-      console.log("onSub data: ", client, subscriptionData);
       const e = subscriptionData.data.invitationEvent;
       if (e.status === "inviting") {
         handleModalOpen(e.inviter);
@@ -30,8 +31,8 @@ const SideBar = ({ data }) => {
         // // => "invitee declined your invite"
         alert(`${e.invitee.username} declined`)
       } else if (e.status === "accepted") {
-        alert(`${e.invitee.username} accepted`)
         // Go to the game screen
+        history.push(`/game/${e.gameId}`);
       }
     },
   });

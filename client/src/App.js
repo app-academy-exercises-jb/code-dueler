@@ -14,9 +14,9 @@ export default () => {
     <BrowserRouter>
       <Switch>
         <ProtectedRoute exact path="/" component={GlobalLobby} />
-        <ProtectedRoute exact path="/playerscreen" component={PlayerScreen} />
-        <AuthRoute exact path="/login" component={Login} />
-        <AuthRoute exact path="/signup" component={SignUp} />
+        <ProtectedRoute path="/game/:id" component={PlayerScreen} />
+        <AuthRoute path="/login" component={Login} />
+        <AuthRoute path="/signup" component={SignUp} />
         <Route path="/" component={ErrorPage} />
       </Switch>
     </BrowserRouter>
