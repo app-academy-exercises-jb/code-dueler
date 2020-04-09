@@ -28,9 +28,9 @@ const SideBar = ({ data }) => {
         // setSelectedUser(e.invitee)
         // setDeclineModalOpen(true)
         // // => "invitee declined your invite"
-        setModalOpen(false);
+        alert(`${e.invitee.username} declined`)
       } else if (e.status === "accepted") {
-        setModalOpen(false);
+        alert(`${e.invitee.username} accepted`)
         // Go to the game screen
       }
     },
@@ -50,6 +50,7 @@ const SideBar = ({ data }) => {
     declineInvite({ variables: { inviter: user._id } });
     setModalOpen(false);
   };
+
   return (
     <div className="sidebar-wrapper">
       <div className="user-list-wrapper">
@@ -63,16 +64,16 @@ const SideBar = ({ data }) => {
       >
         <div className="modal">
           <div className="modal-info">
-            <h1>{selectedUser.username}</h1>
+            <h1>{selectedUser && selectedUser.username}</h1>
             <div>
               has challenged you to a <p>CODE DUEL!</p>
             </div>
           </div>
           <div className="modal-buttons">
-            <button className="modal-decline" onClick={handleDecline}>
+            <button className="modal-decline" onClick={() => handleDecline(selectedUser)}>
               Decline
             </button>
-            <button className="modal-accept" onClick={handleAccept}>
+            <button className="modal-accept" onClick={() => handleAccept(selectedUser)}>
               Accept
             </button>
           </div>

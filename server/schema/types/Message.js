@@ -56,3 +56,15 @@ module.exports = {
   typeDefs,
   resolvers
 };
+
+// subscribe: withFilter(
+//   (_, __, context) => context.pubsub.asyncIterator('messageAdded'),
+//   (payload, _, {user, pubsub}) => {
+//     if (payload.channelId === "global") return true;
+//     const game = pubsub.games[payload.gameId];
+//     if (game && (game.users[user._id] || game.spectators[user._id])) {
+//       return true;
+//     }
+//     return false;
+//   },
+// ),

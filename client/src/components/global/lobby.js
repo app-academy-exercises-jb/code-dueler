@@ -26,14 +26,6 @@ const subscribeToUserEvents = (subscribeToMore) =>
   });
 
 const Lobby = ({ data, loading, error, subscribeToUserEvents }) => {
-  // useSubscription(ON_INVITATION, {
-  //   fetchPolicy: "network-only",
-  //   variables: { test:"test" },
-  //   onSubscriptionData: data => {
-  //     alert()
-  //   },
-  // });
-
   useEffect(() => {
     setTimeout(() => {
       subscribeToUserEvents();

@@ -27,14 +27,15 @@ MessageSchema.statics.post = async function (author, body, user, pubsub) {
   const Message = this,
     newMessage = new Message({author: user, body});
 
-
   await newMessage.save();
-  pubsub.publish('messageAdded', newMessage);
+  
+  const postedMessage = Object.assign({}, newMessage._doc, {author: user});
+  pubsub.publish('messageAdded', postedMessage);
   
   return {
     success: true,
     message: "Message posted",
-    messages: [newMessage]
+    messages: [postedMessage]
   };
 }
   

@@ -74,8 +74,12 @@ const createClient = async () => {
   httpLink = split(
     ({ query }) => {
       const def = getMainDefinition(query);
+      console.log({def})
       return (
-        def.kind === 'OperationDefinition' && def.operation === 'subscription'
+        def.kind === 'OperationDefinition' && 
+          (def.operation === 'subscription' || 
+            (def.operation === 'mutation' && def.name.value !== "LogIn")
+          )
       )
     },
     wsLink,

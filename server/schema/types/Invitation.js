@@ -22,7 +22,6 @@ const typeDefs = `
 const getUser = (user) => ({
   _id: user._id,
   username: user.username,
-  loggedIn: user.loggedIn,
 });
 
 const makeInvite = async (options) => {
@@ -35,7 +34,7 @@ const makeInvite = async (options) => {
   const otherKey = key === "inviter" ? "invitee" : "inviter";
 
   return {
-    [otherKey]: user,
+    [otherKey]: getUser(user),
     [key]: await User.findById(awaitedUser),
     status,
   };
@@ -60,6 +59,7 @@ const resolvers = {
         toAwait: { key: "inviter", awaitedUser: inviter },
       });
       pubsub.publish("invitationEvent", acceptance);
+      return acceptance;
     },
     declineInvitation: async (_, { inviter }, { user, pubsub }) => {
       const declination = await makeInvite({
@@ -68,6 +68,7 @@ const resolvers = {
         toAwait: { key: "inviter", awaitedUser: inviter },
       });
       pubsub.publish("invitationEvent", declination);
+      return declination;
     },
   },
   Subscription: {
@@ -77,8 +78,10 @@ const resolvers = {
         ({ inviter, invitee, status }, _, { user }) => {
           if (status === "inviting") {
             return invitee._id === user._id;
-          } else if (status === "declined" || status === "accepted") {
+          } else if (status === "declined") {
             return inviter._id === user._id;
+          } else if (status === "accepted") {
+            return inviter._id === user._id || invitee._id === user._id;;
           }
         }
       ),
@@ -94,3 +97,13 @@ module.exports = {
   typeDefs,
   resolvers,
 };
+
+
+// handle pubsub.games
+// pubsub.publish("gameEvent", {
+//   p1: inviter,
+//   p2: invitee,
+//   spectators: [],
+//   status: "initializing",
+//   gameId: inviter._id + invitee._id + Date.now()
+// })
