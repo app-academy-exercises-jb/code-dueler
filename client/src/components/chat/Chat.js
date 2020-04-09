@@ -4,7 +4,7 @@ import ChatTextEditor from "./ChatTextEditor";
 import { useQuery } from "@apollo/react-hooks";
 import { CURRENT_USER } from "../../graphql/queries";
 
-const Chat = ({ channelId }) => {
+const Chat = ({ channelId, id }) => {
   const { data, loading, error } = useQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
   });
@@ -19,7 +19,7 @@ const Chat = ({ channelId }) => {
   return (
     <div className="chat-main">
       <ChatView channelId={channelId} />
-      <ChatTextEditor channelId={channelId} me={me} />
+      <ChatTextEditor channelId={channelId} id={id} me={me} />
     </div>
   );
 };

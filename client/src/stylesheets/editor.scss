@@ -1,8 +1,37 @@
 .editor {
   background-color: #f5f2f0;
-  width: 70%;
+  width: 90%;
   min-height: 400px;
-  margin: 6px;
-  margin-bottom: 10px;
   border-radius: 5px;
+  display: flex;
+  align-items: space-around;
+  flex-direction: column;
+  height: 90%;
+}
+
+.editor-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.editorPre {
+  min-height: 420px;
+  min-width: 500px;
+  width: 100%;
+}
+
+.editor-counts {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding-left: 10px;
+}
+
+.editor-count {
+  padding-right: 10px;
+}
+
+.code-submit {
+  padding-right: 10px;
 }

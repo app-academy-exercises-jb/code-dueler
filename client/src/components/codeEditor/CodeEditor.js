@@ -9,47 +9,32 @@ const CodeEditor = (props) => {
 
   return (
     <>
-    <div className="editor-info">
-      <p>
-        charCount: {charCount}
-      </p>
-      <p>
-        lineCount: {lineCount}
-      </p>
-      <button 
-        style={{
-          background: "white",
-          border: "1px solid black",
-          borderRadius: "4px",
-          margin: "1rem",
-        }}
-        onClick={e => {
-          
-        }}
-      >
-        Submit Code
-      </button>
-    </div>
-    <div className="editor">
-
-      <div className="editor-text"></div>
-
-      <Editor
-        value={code}
-        onValueChange={(code) => {
-          setCharCount(code.length);
-          setLineCount(code.split(/\r*\n/).length);
-          setCode(code);
-        }}
-        highlight={(code) => Prism.highlight(code, Prism.languages.js)}
-        padding={10}
-        textareaClassName="editor"
-        style={{
-          fontFamily: '"Fira code", "Fira Mono", monospace',
-          fontSize: 12,
-        }}
-      />
-    </div>
+      <div className="editor">
+        <Editor
+          value={code}
+          onValueChange={(code) => {
+            setCharCount(code.length);
+            setLineCount(code.split(/\r*\n/).length);
+            setCode(code);
+          }}
+          highlight={(code) => Prism.highlight(code, Prism.languages.js)}
+          padding={10}
+          preClassName="editorPre"
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+          }}
+        />
+        <div className="editor-info">
+          <div className="editor-counts">
+            <p className="editor-count">charCount: {charCount}</p>
+            <p className="editor-count">lineCount: {lineCount}</p>
+          </div>
+          <button className="code-submit" onClick={(e) => {}}>
+            Submit Code
+          </button>
+        </div>
+      </div>
     </>
   );
 };

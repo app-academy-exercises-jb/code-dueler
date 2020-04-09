@@ -5,9 +5,11 @@ import NavBar from "../components/nav/NavBar";
 export default () => {
   return (
     <div className="main">
-      <NavBar />
-      <div className="signup-page">
-        <SignUpForm />
+      <div className="main-sub">
+        <NavBar />
+        <div className="signup-page">
+          <SignUpForm />
+        </div>
       </div>
     </div>
   );
