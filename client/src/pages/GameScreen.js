@@ -36,7 +36,7 @@ export default ({ onlineUsers: { data, loading, error } }) => {
   });
   return (
     <div className="main">
-      {data && <NavBar data={data} />}
+      <NavBar noData={true} />
       <div className="game-screen">
         <div className="game-left">
           <div className="challenge-question-wrapper">

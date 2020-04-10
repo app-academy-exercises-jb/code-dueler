@@ -1,5 +1,15 @@
 version: '3'
 services: 
+  fake-gcp:
+    build: ./fake-gcp
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+    volumes:
+      - ./fake-gcp:/usr/src/app
+    command: npm run dev
+
   server:
     build: ./server
     depends_on: 

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import { useMutation } from "@apollo/react-hooks";
 import { UPDATE_GAME_USER_CODE } from "../../graphql/mutations";
 
 const CodeEditor = ({ gameId }) => {
+  const editorRef = useRef(null);
   const [code, setCode] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
@@ -22,6 +23,7 @@ const CodeEditor = ({ gameId }) => {
     <>
       <div className="editor">
         <Editor
+          ref={editorRef}
           value={code}
           onValueChange={(code) => {
             handleValueChange(code);
@@ -42,14 +44,21 @@ const CodeEditor = ({ gameId }) => {
           <button
             className="code-submit"
             onClick={(e) => {
+              console.log(
+                "sending:",
+                JSON.stringify({
+                  data: { codeToRun: editorRef.current.props.value },
+                })
+              );
               fetch(
-                "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
+                // "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
+                "http://localhost:8000",
                 {
                   method: "POST",
                   mode: "cors",
                   // e.target.value must have text which defines a function fizzBuzz
                   body: JSON.stringify({
-                    data: { codeToRun: e.target.value },
+                    data: { codeToRun: editorRef.current.props.value },
                   }),
                   headers: {
                     "Content-Type": "application/json",
