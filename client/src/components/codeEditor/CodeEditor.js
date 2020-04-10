@@ -2,14 +2,18 @@ import React, { useState, useRef } from "react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import { useMutation } from "@apollo/react-hooks";
-import { UPDATE_GAME_USER_CODE } from "../../graphql/mutations";
+import { UPDATE_GAME_USER_CODE, UPDATE_GAME_LAST_SUBMITTED } from "../../graphql/mutations";
 
-const CodeEditor = ({ gameId }) => {
+const CodeEditor = ({ gameId, me }) => {
   const editorRef = useRef(null);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(`var fizzBuzz = (n) => {
+
+  };`);
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
+
   const [updateUserCode] = useMutation(UPDATE_GAME_USER_CODE);
+  const [updateLastSubmission] = useMutation(UPDATE_GAME_LAST_SUBMITTED);
 
   const handleValueChange = (code) => {
     setCharCount(code.length);
@@ -44,19 +48,11 @@ const CodeEditor = ({ gameId }) => {
           <button
             className="code-submit"
             onClick={(e) => {
-              console.log(
-                "sending:",
-                JSON.stringify({
-                  data: { codeToRun: editorRef.current.props.value },
-                })
-              );
               fetch(
-                // "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
-                "http://localhost:8000",
+                "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
                 {
                   method: "POST",
                   mode: "cors",
-                  // e.target.value must have text which defines a function fizzBuzz
                   body: JSON.stringify({
                     data: { codeToRun: editorRef.current.props.value },
                   }),
@@ -67,8 +63,12 @@ const CodeEditor = ({ gameId }) => {
                 }
               )
                 .then((res) => res.json())
-                .then((res) => {
-                  // res is the server response
+                .then(({ data: { ...result } }) => {
+                  updateLastSubmission({ variables: { 
+                    lastSubmittedResult: JSON.stringify(result),
+                    player: me._id,
+                    gameId 
+                   }});
                 })
                 .catch((err) => console.log(err));
             }}

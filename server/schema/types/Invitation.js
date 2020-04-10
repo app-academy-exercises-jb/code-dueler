@@ -68,15 +68,6 @@ const resolvers = {
         gameId: acceptance.gameId,
         p1: newP1,
         p2: user,
-        initializeGame: pubsub => setTimeout(() => {
-          pubsub.publish("gameEvent", {
-            p1: newP1,
-            p2: user,
-            spectators: [],
-            status: "initializing",
-            gameId: acceptance.gameId
-          })
-        }, 0)
       });
 
       pubsub.publish("invitationEvent", acceptance);

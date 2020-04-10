@@ -21,6 +21,11 @@ const endGame = (pubsub) => (input, player) =>
     }
   }, 2500);
 
+const initializeGame = game => pubsub => 
+  setTimeout(() => {
+    pubsub.publish("gameEvent", game);
+  }, 0);
+
 const ensureUserDetail = (user) => {
   if (user.charCount === undefined) {
     const details = {
@@ -37,7 +42,7 @@ const ensureUserDetail = (user) => {
   }
 };
 
-const handleGames = (pubsub) => ({ gameId, p1, p2, initializeGame }) => {
+const handleGames = (pubsub) => ({ gameId, p1, p2 }) => {
   pubsub.updateSubscribers = (action, players) => {
     players.forEach((p) => {
       const game = pubsub.games[gameId];
@@ -64,9 +69,10 @@ const handleGames = (pubsub) => ({ gameId, p1, p2, initializeGame }) => {
     spectators: [],
     status: "initializing",
     connections: 0,
-    initializeGame,
     endGame: endGame(pubsub),
   };
+
+  game.initializeGame = initializeGame(game);
 
   if (pubsub.games === undefined) {
     pubsub.games = { [gameId]: game };

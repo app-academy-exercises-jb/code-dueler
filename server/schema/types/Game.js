@@ -43,12 +43,38 @@ const typeDefs = `
 
 const resolvers = {
   Mutation: {
-    updateGameUserLastSubmitted: (_, input, { user, pubsub }) => {
-      const { player, lastSubmittedResult, gameId } = input;
+    updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
+      const { player: _id, lastSubmittedResult, gameId } = input;
+
+      const game = pubsub.games[gameId];
+      game.status = "ongoing";
+      
+      let player;
+      if (game.p1.player._id === user._id) {
+        player = "p1";
+      } else if (game.p2.player._id === user._id) {
+        player = "p2";
+      }
+
+      const gameUser = Object.assign(
+        {...game[player]},
+        { ...input },
+        {player: user});
+
+        if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
+          Object.assign(game, { [player]: { ...gameUser } });
+          console.log("publishing game:", {game})
+          pubsub.publish("gameEvent", game);
+        }
+  
+        return gameUser;
+  
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
       const { charCount, lineCount, currentCode, gameId } = input;
       const game = pubsub.games[gameId];
+
+      game.status = "ongoing";
 
       let player;
       if (game.p1.player._id === user._id) {

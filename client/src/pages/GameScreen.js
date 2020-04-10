@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../components/nav/NavBar";
 import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/player/ChallengeQuestion";
@@ -8,9 +8,12 @@ import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams, useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
 
-export default ({ onlineUsers: { data, loading, error } }) => {
+export default ({ onlineUsers, me}) => {
+  const {loading, error, data} = me;
   const { id: gameId } = useParams();
   const history = useHistory();
+  const [opponentStats, setOpponentStats] = useState(null);
+  const [ownStats, setownStats] = useState(null);
 
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
@@ -19,21 +22,32 @@ export default ({ onlineUsers: { data, loading, error } }) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
-      console.log({ data: e });
-      // debugger;
+      let self, opponent;
+      if (data && e.p1.player._id === data.me) {
+        self = "p1";
+        opponent = "p2";
+      } else {
+        opponent = "p1";
+        self = "p2";
+      }
+      
       if (e.status === "initializing") {
-        alert("initializing");
+        console.log("initializing")
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
         console.log("ongoing");
+        setownStats(e[self]);
+        setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
-        console.log("over");
-        alert("Your opponent has left the game!");
         history.push("/");
       }
     },
   });
+
+
+  if (loading || error || !data) return null;
+
   return (
     <div className="main">
       <NavBar noData={true} />
@@ -43,20 +57,20 @@ export default ({ onlineUsers: { data, loading, error } }) => {
             <ChallengeQuestion />
           </div>
           <div className="code-editor-wrapper">
-            <CodeEditor gameId={gameId} />
+            <CodeEditor gameId={gameId} me={data.me} />
           </div>
         </div>
         <div className="game-right">
           <div className="stats-wrapper">
             <div className="stats-players">
-              <Stats />
+              <Stats ownStats={ownStats} />
             </div>
             <div className="stats-players">
-              <Stats />
+              <Stats opponentStats={opponentStats} />
             </div>
           </div>
           <div className="game-chat-wrapper">
-            <Chat channelId={gameId} id={"game-chat"} />
+            <Chat channelId={gameId} id={"game-chat"} me={me}/>
           </div>
         </div>
       </div>
