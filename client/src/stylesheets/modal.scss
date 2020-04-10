@@ -93,3 +93,14 @@
   align-items: center;
   border-radius: 3px;
 }
+
+.center {
+  text-align: center;
+}
+
+.decline-hover {
+  &:hover {
+    color: #32292F;
+    background-color: #D4F2D2;
+  }
+}

@@ -75,9 +75,7 @@ const CodeEditor = ({ gameId, me }) => {
             .catch((err) => console.log(err));
         }}
       >
-        <h1>
-          <p>Submit your code</p>
-        </h1>
+        <h1>Submit your code</h1>
       </button>
     </>
   );

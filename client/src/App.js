@@ -8,11 +8,13 @@ import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import AuthRoute from "./components/util/AuthRoute";
 import "./stylesheets/application.scss";
+import Test from "./pages/Test";
 
 export default () => {
   return (
     <BrowserRouter>
       <Switch>
+        <Route path="/" component={Test} />
         <ProtectedRoute exact path="/" component={GlobalLobby} />
         <ProtectedRoute path="/game/:id" component={GameScreen} />
         <AuthRoute path="/login" component={Login} />

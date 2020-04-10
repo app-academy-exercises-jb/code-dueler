@@ -24,6 +24,7 @@ const Stats = ({ ownStats, opponentStats, defStats }) => {
             {(parsed && parsed.passedTests && parsed.passedTests.toString()) ||
               "None"}
           </h2>
+          {parsed && parsed.error && <h2>ERROR: {parsed.error}</h2>}
         </div>
       </div>
     </>

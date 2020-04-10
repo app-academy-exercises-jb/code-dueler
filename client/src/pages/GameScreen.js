@@ -14,6 +14,8 @@ export default ({ onlineUsers, me }) => {
   const history = useHistory();
   const [opponentStats, setOpponentStats] = useState(null);
   const [ownStats, setownStats] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [gameOverMessage, setGameOverMessage] = useState("");
 
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
@@ -47,6 +49,20 @@ export default ({ onlineUsers, me }) => {
 
   if (loading || error || !data) return null;
 
+  const handleGameOver = (wincon) => {
+    if (wincon === "defeat") {
+      setGameOverMessage("You have been defeated!");
+    } else {
+      setGameOverMessage("You are victorious!");
+    }
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    history.push("/");
+    // setModalOpen(false);
+  };
+
   return (
     <div className="main">
       <NavBar noData={true} />
@@ -76,6 +92,32 @@ export default ({ onlineUsers, me }) => {
           </div>
         </div>
       </div>
+      <ReactModal
+        isOpen={modalOpen}
+        className={`modal-overlay`}
+        shouldCloseOnEsc={true}
+        onRequestClose={() => setModalOpen(false)}
+      >
+        <div className={`modal`}>
+          <div className={`modal-info center`}>
+            <h1>{gameOverMessage}</h1>
+          </div>
+          <div className="modal-buttons">
+            <button
+              className="modal-decline decline-hover"
+              onClick={handleModalClose}
+            >
+              Go back to the lobby
+            </button>
+            {/* <button className="game-over-stay">
+            Hang out here
+          </button>
+          <button className="game-over-challenge">
+            Rematch!
+          </button> */}
+          </div>
+        </div>
+      </ReactModal>
     </div>
   );
 };
