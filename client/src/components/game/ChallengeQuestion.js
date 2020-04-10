@@ -6,8 +6,8 @@ const ChallengeQuestion = (props) => {
       <h1>Challenge Question</h1>
 
       <p>
-        Write a program that outputs the string representation of numbers from 1
-        to n.
+        Write a function that outputs the string representation of numbers from
+        1 to n.
       </p>
 
       <p>

@@ -6,7 +6,7 @@
   display: flex;
   align-items: space-around;
   flex-direction: column;
-  height: 90%;
+  height: 75%;
 }
 
 .editor-info {
@@ -35,5 +35,29 @@
 }
 
 .code-submit {
-  padding-right: 10px;
+  background-color: #D4F2D2;
+  color: #32292F;
+  width: 300px;
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  align-items: center;
+  border-radius: 3px;
+  margin-top: 25px;
+  border: 2px solid #32292F;
+  text-transform: uppercase;
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  &:hover {
+    color: #D4F2D2;
+    background-color: #32292F;
+    border: 2px solid #D4F2D2;
+  }
+}
+
+.judgement {
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  font-weight: 500;
 }

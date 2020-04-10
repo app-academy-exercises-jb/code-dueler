@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import NavBar from "../components/nav/NavBar";
 import Chat from "../components/chat/Chat";
-import ChallengeQuestion from "../components/player/ChallengeQuestion";
+import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
-import Stats from "../components/player/Stats";
+import Stats from "../components/game/Stats";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams, useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
 
-export default ({ onlineUsers, me}) => {
-  const {loading, error, data} = me;
+export default ({ onlineUsers, me }) => {
+  const { loading, error, data } = me;
   const { id: gameId } = useParams();
   const history = useHistory();
   const [opponentStats, setOpponentStats] = useState(null);
@@ -30,9 +30,9 @@ export default ({ onlineUsers, me}) => {
         opponent = "p1";
         self = "p2";
       }
-      
+
       if (e.status === "initializing") {
-        console.log("initializing")
+        console.log("initializing");
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
@@ -45,7 +45,6 @@ export default ({ onlineUsers, me}) => {
     },
   });
 
-
   if (loading || error || !data) return null;
 
   return (
@@ -53,24 +52,27 @@ export default ({ onlineUsers, me}) => {
       <NavBar noData={true} />
       <div className="game-screen">
         <div className="game-left">
-          <div className="challenge-question-wrapper">
-            <ChallengeQuestion />
-          </div>
           <div className="code-editor-wrapper">
             <CodeEditor gameId={gameId} me={data.me} />
           </div>
-        </div>
-        <div className="game-right">
           <div className="stats-wrapper">
             <div className="stats-players">
-              <Stats ownStats={ownStats} />
+              <Stats ownStats={ownStats} defStats={"Own Stats"} />
             </div>
             <div className="stats-players">
-              <Stats opponentStats={opponentStats} />
+              <Stats
+                opponentStats={opponentStats}
+                defStats={"Opponent Stats"}
+              />
             </div>
           </div>
+        </div>
+        <div className="game-right">
+          <div className="challenge-question-wrapper">
+            <ChallengeQuestion />
+          </div>
           <div className="game-chat-wrapper">
-            <Chat channelId={gameId} id={"game-chat"} me={me}/>
+            <Chat channelId={gameId} id={"game-chat"} me={me} />
           </div>
         </div>
       </div>

@@ -2,13 +2,16 @@ import React, { useState, useRef } from "react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import { useMutation } from "@apollo/react-hooks";
-import { UPDATE_GAME_USER_CODE, UPDATE_GAME_LAST_SUBMITTED } from "../../graphql/mutations";
+import {
+  UPDATE_GAME_USER_CODE,
+  UPDATE_GAME_LAST_SUBMITTED,
+} from "../../graphql/mutations";
 
 const CodeEditor = ({ gameId, me }) => {
   const editorRef = useRef(null);
   const [code, setCode] = useState(`var fizzBuzz = (n) => {
 
-  };`);
+};`);
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
 
@@ -27,6 +30,7 @@ const CodeEditor = ({ gameId, me }) => {
     <>
       <div className="editor">
         <Editor
+          autoFocus
           ref={editorRef}
           value={code}
           onValueChange={(code) => {
@@ -40,43 +44,41 @@ const CodeEditor = ({ gameId, me }) => {
             fontSize: 12,
           }}
         />
-        <div className="editor-info">
-          <div className="editor-counts">
-            <p className="editor-count">charCount: {charCount}</p>
-            <p className="editor-count">lineCount: {lineCount}</p>
-          </div>
-          <button
-            className="code-submit"
-            onClick={(e) => {
-              fetch(
-                "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
-                {
-                  method: "POST",
-                  mode: "cors",
-                  body: JSON.stringify({
-                    data: { codeToRun: editorRef.current.props.value },
-                  }),
-                  headers: {
-                    "Content-Type": "application/json",
-                    authorization: localStorage.getItem("token"),
-                  },
-                }
-              )
-                .then((res) => res.json())
-                .then(({ data: { ...result } }) => {
-                  updateLastSubmission({ variables: { 
-                    lastSubmittedResult: JSON.stringify(result),
-                    player: me._id,
-                    gameId 
-                   }});
-                })
-                .catch((err) => console.log(err));
-            }}
-          >
-            Submit Code
-          </button>
-        </div>
       </div>
+      <button
+        className="code-submit"
+        onClick={(e) => {
+          fetch(
+            "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
+            {
+              method: "POST",
+              mode: "cors",
+              body: JSON.stringify({
+                data: { codeToRun: editorRef.current.props.value },
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                authorization: localStorage.getItem("token"),
+              },
+            }
+          )
+            .then((res) => res.json())
+            .then(({ data: { ...result } }) => {
+              updateLastSubmission({
+                variables: {
+                  lastSubmittedResult: JSON.stringify(result),
+                  player: me._id,
+                  gameId,
+                },
+              });
+            })
+            .catch((err) => console.log(err));
+        }}
+      >
+        <h1>
+          <p>Submit your code</p>
+        </h1>
+      </button>
     </>
   );
 };
