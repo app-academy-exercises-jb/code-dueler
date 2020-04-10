@@ -31,7 +31,6 @@ const typeDefs = `
     status: String!
     gameId: String!
     winner: String
-    you: String
     connections: Int
   }
   type GameUser {
@@ -54,8 +53,7 @@ const getPlayer = (game, user) => {
 const generatePublishGame = ({pubsub, ws, gameId, player, _id, game, input, user}) => ({
     publishGame: gameUser => {
       if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
-        Object.assign(game, { [player]: { ...gameUser }, you: player });
-        console.log({game})
+        Object.assign(game, { [player]: { ...gameUser } });
         pubsub.publish("gameEvent", game);
       }
     },

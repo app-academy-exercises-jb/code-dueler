@@ -22,14 +22,22 @@ export default ({ onlineUsers, me }) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
-      const self = e.you,
-        opponent = self === "p1" ? "p2" : "p1";
+
+      let self, opponent;
+      if (data && e.p1.player._id === data.me) {
+        self = "p1";
+        opponent = "p2";
+      } else {
+        opponent = "p1";
+        self = "p2";
+      }
 
       if (e.status === "initializing") {
         console.log("initializing");
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
+        console.log("ongoing");
         setownStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
@@ -51,13 +59,10 @@ export default ({ onlineUsers, me }) => {
           </div>
           <div className="stats-wrapper">
             <div className="stats-players">
-              <Stats ownStats={ownStats} defStats={"Own Stats"} />
+              <Stats ownStats={ownStats} />
             </div>
             <div className="stats-players">
-              <Stats
-                opponentStats={opponentStats}
-                defStats={"Opponent Stats"}
-              />
+              <Stats opponentStats={opponentStats} />
             </div>
           </div>
         </div>

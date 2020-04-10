@@ -1,7 +1,6 @@
 import React from "react";
 
 
-
 const Stats = ({ownStats, opponentStats}) => {
     const stats = ownStats ? ownStats : opponentStats;
     let parsed;

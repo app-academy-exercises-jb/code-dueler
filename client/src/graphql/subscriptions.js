@@ -60,7 +60,6 @@ export const ON_GAME = gql`
       status
       gameId
       connections
-      you
       winner
     }
   }
