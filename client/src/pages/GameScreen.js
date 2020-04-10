@@ -5,11 +5,13 @@ import ChallengeQuestion from "../components/player/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
 import Stats from "../components/player/Stats";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
 
 export default ({ onlineUsers: { data, loading, error } }) => {
   const { id: gameId } = useParams();
+  const history = useHistory();
+
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
     variables: {
@@ -24,10 +26,9 @@ export default ({ onlineUsers: { data, loading, error } }) => {
 
       } else if (e.status === "ongoing") {
 
-        
-
       } else if (e.status === "over") {
-
+        alert("Your opponent has left the game!")
+        history.push("/");
       }
     },
   });

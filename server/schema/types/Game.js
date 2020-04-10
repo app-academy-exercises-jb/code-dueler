@@ -49,7 +49,10 @@ const resolvers = {
       const { player, charCount, lineCount, currentCode } = input;
       
     },
+    updateGameUserStatus: (_, input, { user }) => {
+      const { player, status } = input; 
 
+    }
   },
   Subscription: {
     gameEvent: {

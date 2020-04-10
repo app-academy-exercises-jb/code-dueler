@@ -10,7 +10,8 @@ const express = require('express'),
   { SubscriptionServer } = require('subscriptions-transport-ws'),
   { execute, subscribe } = require('graphql'),
   { ApolloServer } = require('apollo-server-express'),
-  { pubsub } = require('./subscriptions');
+  { pubsub } = require('./subscriptions'),
+  handleGames = require('./game_server');
   require('dotenv').config();
   require ('./models');
 
@@ -72,28 +73,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = process.env.PORT || 5000;
 
-const handleGames = pubsub => ({gameId, p1, p2, initializeGame}) => {
 
-  const game = {
-      p1,
-      p2,
-      gameId,
-      users: {
-        [p1._id]: 1,
-        [p2._id]: 1,
-      },
-      subscribers: [],
-      status: "initializing",
-      connections: 0,
-      initializeGame,
-    };
-
-  if (pubsub.games === undefined) {
-    pubsub.games = { [gameId]: game };
-  } else {
-    pubsub.games[gameId] = game;
-  }
-}
 
 app.listen = function() {
   let server; 
@@ -109,7 +89,6 @@ app.listen = function() {
 
   const publishUserLoggedEvent = (pubsub, user, loggedIn) => {
     setTimeout(() => {
-      console.log("publishing:", user._id)
       pubsub.publish('userLoggedEvent', {
         _id: user._id,
         loggedIn
@@ -124,13 +103,10 @@ app.listen = function() {
       subscribe,
       keepAlive: 29000,
       onOperation: (message, params, ws) => {
-        // console.log({message})
-        // console.log({params})
-
         return {...params, test: "test"};
       },
       onConnect: (connectionParams, ws, context) => {
-        console.log("connecting:", pubsub.subscribers)
+        // console.log("connecting:", pubsub.subscribers)
         // the following line should actually verify that the user passport found
         // is the same as found in connectionParams.authToken
         if (!connectionParams.authToken) {
@@ -143,6 +119,7 @@ app.listen = function() {
           );
 
           if (!user._id) return false;
+          console.log(`${user._id} connected to the websocket`)
           user.ws = ws;
 
           // save connections to keep track of online users
@@ -173,12 +150,19 @@ app.listen = function() {
       },
       onDisconnect: (ws, context) => {
         if (ws.userId === undefined) return;
-
-        console.log("disconnecting:", pubsub.subscribers)
+        // console.log("disconnecting:", pubsub.subscribers)
         console.log(`${ws.userId} disconnected from the websocket`);
+
+        const userIdx = pubsub.subscribers[ws.userId].findIndex(s => (
+          s.ws === ws
+        ));
+        const user = pubsub.subscribers[ws.userId][userIdx];
         
-        const user = pubsub.subscribers[ws.userId][0];
-        pubsub.subscribers[ws.userId].pop();
+        pubsub.subscribers[ws.userId].splice(userIdx, 1);
+
+        if (user.ws.gameId && pubsub.updateSubscribers) {
+          pubsub.updateSubscribers("remove", [user]);
+        }
         
         if (pubsub.subscribers[ws.userId].length === 0) {
           delete pubsub.subscribers[ws.userId];

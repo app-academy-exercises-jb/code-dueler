@@ -65,7 +65,6 @@ const resolvers = {
         },
       ),
       resolve: payload => {
-        console.log("resolving message payload")
         return payload;
       },
     },
