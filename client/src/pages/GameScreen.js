@@ -7,6 +7,7 @@ import Stats from "../components/game/Stats";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams, useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
+import ReactModal from "react-modal";
 
 export default ({ onlineUsers, me }) => {
   const { loading, error, data } = me;
@@ -26,7 +27,7 @@ export default ({ onlineUsers, me }) => {
       const e = subscriptionData.data.gameEvent;
 
       let self, opponent;
-      if (data && e.p1.player._id === data.me) {
+      if (data && e.p1.player._id === data.me._id) {
         self = "p1";
         opponent = "p2";
       } else {
@@ -39,12 +40,14 @@ export default ({ onlineUsers, me }) => {
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
-        console.log("ongoing");
         setownStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
-        // display victory/loss modal
-        history.push("/");
+        if (e.winner === self) {
+          handleGameOver("victory");
+        } else {
+          handleGameOver("defeat");
+        }
       }
     },
   });
@@ -75,10 +78,13 @@ export default ({ onlineUsers, me }) => {
           </div>
           <div className="stats-wrapper">
             <div className="stats-players">
-              <Stats ownStats={ownStats} />
+              <Stats ownStats={ownStats} defStats={"Own Stats"} />
             </div>
             <div className="stats-players">
-              <Stats opponentStats={opponentStats} />
+              <Stats
+                opponentStats={opponentStats}
+                defStats={"Opponent Stats"}
+              />
             </div>
           </div>
         </div>
