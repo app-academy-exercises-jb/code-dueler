@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const { withFilter } = require("apollo-server-express");
 
-const User = mongoose.model("User");
-
 const typeDefs = `
   extend type Mutation {
     updateGameUserLastSubmitted(
@@ -11,6 +9,7 @@ const typeDefs = `
       gameId: String!
     ): GameUser!
     updateGameUserCurrentCode(
+      player: ID!,
       charCount: Int!,
       lineCount: Int!,
       currentCode: String!,
@@ -31,6 +30,8 @@ const typeDefs = `
     spectators: [User]
     status: String!
     gameId: String!
+    winner: String
+    connections: Int
   }
   type GameUser {
     player: User!
@@ -41,6 +42,28 @@ const typeDefs = `
   }
 `;
 
+const getPlayer = (game, user) => {
+  if (game.p1.player._id === user._id) {
+    return "p1";
+  } else if (game.p2.player._id === user._id) {
+    return "p2";
+  }
+};
+
+const generatePublishGame = ({pubsub, ws, gameId, player, _id, game, input, user}) => ({
+    publishGame: gameUser => {
+      if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
+        Object.assign(game, { [player]: { ...gameUser } });
+        pubsub.publish("gameEvent", game);
+      }
+    },
+    gameUser: Object.assign(
+      {...game[player]},
+      { ...input },
+      {player: user}
+    )
+  });
+
 const resolvers = {
   Mutation: {
     updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
@@ -49,50 +72,34 @@ const resolvers = {
       const game = pubsub.games[gameId];
       game.status = "ongoing";
       
-      let player;
-      if (game.p1.player._id === user._id) {
-        player = "p1";
-      } else if (game.p2.player._id === user._id) {
-        player = "p2";
+      const player = getPlayer(game, user);
+
+      const parsedResult = JSON.parse(lastSubmittedResult);
+      if (parsedResult.passed === true) {
+        game.status = "over";
+        game.winner = player;
       }
-
-      const gameUser = Object.assign(
-        {...game[player]},
-        { ...input },
-        {player: user});
-
-        if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
-          Object.assign(game, { [player]: { ...gameUser } });
-          console.log("publishing game:", {game})
-          pubsub.publish("gameEvent", game);
-        }
-  
-        return gameUser;
-  
+      
+      const {gameUser, publishGame} = generatePublishGame({
+        pubsub, ws, gameId, player, _id, game, input, user
+      });
+    
+      publishGame(gameUser);
+      return gameUser;
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
-      const { charCount, lineCount, currentCode, gameId } = input;
-      const game = pubsub.games[gameId];
+      const { player: _id, gameId } = input;
 
+      const game = pubsub.games[gameId];
       game.status = "ongoing";
 
-      let player;
-      if (game.p1.player._id === user._id) {
-        player = "p1";
-      } else if (game.p2.player._id === user._id) {
-        player = "p2";
-      }
+      const player = getPlayer(game, user);
 
-      const gameUser = {
-        player: user,
-        ...input,
-      };
+      const {gameUser, publishGame} = generatePublishGame({
+        pubsub, ws, gameId, player, _id, game, input, user
+      });
 
-      if (ws.gameId === gameId && player !== undefined) {
-        Object.assign(game, { [player]: { ...gameUser } });
-        pubsub.publish("gameEvent", game);
-      }
-
+      publishGame(gameUser);
       return gameUser;
     },
   },
@@ -114,18 +121,10 @@ const resolvers = {
           return pubsub.asyncIterator("gameEvent");
         },
         ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
-          return pubsub.games[gameId].users[user._id] > 0;
+          return pubsub.games && pubsub.games[gameId].users[user._id] > 0;
         }
       ),
-      resolve: ({ p1, p2, spectators, status, gameId }) => {
-        return {
-          p1,
-          p2,
-          spectators,
-          status,
-          gameId,
-        };
-      },
+      resolve: payload => payload
     },
   },
 };

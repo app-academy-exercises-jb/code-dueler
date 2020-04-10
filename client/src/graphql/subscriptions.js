@@ -59,6 +59,8 @@ export const ON_GAME = gql`
       }
       status
       gameId
+      connections
+      winner
     }
   }
   ${GAME_USER_DETAILS}

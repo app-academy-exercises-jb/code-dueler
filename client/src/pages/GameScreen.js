@@ -24,6 +24,7 @@ export default ({ onlineUsers, me }) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
+
       let self, opponent;
       if (data && e.p1.player._id === data.me) {
         self = "p1";
@@ -42,6 +43,7 @@ export default ({ onlineUsers, me }) => {
         setownStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
+        // display victory/loss modal
         history.push("/");
       }
     },
@@ -73,13 +75,10 @@ export default ({ onlineUsers, me }) => {
           </div>
           <div className="stats-wrapper">
             <div className="stats-players">
-              <Stats ownStats={ownStats} defStats={"Own Stats"} />
+              <Stats ownStats={ownStats} />
             </div>
             <div className="stats-players">
-              <Stats
-                opponentStats={opponentStats}
-                defStats={"Opponent Stats"}
-              />
+              <Stats opponentStats={opponentStats} />
             </div>
           </div>
         </div>
