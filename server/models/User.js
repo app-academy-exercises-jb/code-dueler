@@ -41,13 +41,11 @@ UserSchema.statics.signup = async function (username, password) {
     password: await bcrypt.hash(password, 10),
   });
 
-  console.log("hello");
   await newUser.save();
 
   newUser.token = "Bearer " + jwt.sign({ _id: newUser._id }, secretOrKey);
   newUser.loggedIn = true;
 
-  console.log(newUser);
   return newUser;
 };
 

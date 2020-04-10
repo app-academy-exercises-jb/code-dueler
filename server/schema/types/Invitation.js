@@ -44,7 +44,6 @@ const makeInvite = async (options) => {
 const resolvers = {
   Mutation: {
     invitePlayer: async (_, { invitee }, { user, pubsub, ws }) => {
-      if (!user) console.log("no user");
       const invitation = await makeInvite({
         status: "inviting",
         user,
@@ -99,13 +98,15 @@ const resolvers = {
         (_, __, { pubsub }) => pubsub.asyncIterator("invitationEvent"),
         ({ inviter, invitee, status, gameId }, _, { user, ws, pubsub }) => {
           if (status === "inviting") {
-            if (invitee._id === user._id) {console.log("marking ws as invited"); ws.invited = true;}
+            if (invitee._id === user._id) ws.invited = true;
             return invitee._id === user._id;
           } else if (status === "declined") {
             return inviter._id === user._id;
           } else if (status === "accepted") {
             const shouldSend = (ws.inviting || (ws.invited && ws.accepting));
-            if (shouldSend) ws.gameId = gameId;
+            if (shouldSend && (inviter._id === user._id || invitee._id === user._id)) {
+              ws.gameId = gameId;
+            }
 
             delete ws.inviting;
             delete ws.invited;
@@ -115,7 +116,6 @@ const resolvers = {
         },
       ),
       resolve: (payload) => {
-        console.log("resolving invitation");
         return payload;
       },
     },

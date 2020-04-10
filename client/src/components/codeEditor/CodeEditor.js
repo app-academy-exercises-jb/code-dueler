@@ -14,10 +14,8 @@ const CodeEditor = ({ gameId }) => {
     setCharCount(code.length);
     setLineCount(code.split(/\r*\n/).length);
     setCode(code);
-    console.log("attempting to mutate");
-    updateUserCode({
-      variables: { charCount, lineCount, currentCode: code, gameId },
-    });
+    const variables = { charCount, lineCount, currentCode: code, gameId };
+    updateUserCode({ variables });
   };
 
   return (

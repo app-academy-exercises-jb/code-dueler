@@ -9,7 +9,6 @@ const Chat = ({ channelId, id }) => {
     fetchPolicy: "network-only",
   });
 
-  if (error) console.log(error);
   if (loading || error) return null;
 
   const me = data.me;

@@ -48,18 +48,12 @@ const resolvers = {
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
       const { charCount, lineCount, currentCode, gameId } = input;
-
       const game = pubsub.games[gameId];
 
-      console.log({ game });
-
       let player;
-
       if (game.p1.player._id === user._id) {
-        // player = game.p1.player;
         player = "p1";
       } else if (game.p2.player._id === user._id) {
-        // player = game.p2.player;
         player = "p2";
       }
 
@@ -69,7 +63,7 @@ const resolvers = {
       };
 
       if (ws.gameId === gameId && player !== undefined) {
-        Object.assign(game, { [player]: { ...input } });
+        Object.assign(game, { [player]: { ...gameUser } });
         pubsub.publish("gameEvent", game);
       }
 
@@ -98,34 +92,13 @@ const resolvers = {
         }
       ),
       resolve: ({ p1, p2, spectators, status, gameId }) => {
-        if (p1.charCount === undefined) {
-          const details = {
-            lastSubmittedResult: "",
-            charCount: 0,
-            lineCount: 0,
-            currentCode: "",
-          };
-          return {
-            p1: {
-              player: p1,
-              ...details,
-            },
-            p2: {
-              player: p2,
-              ...details,
-            },
-            spectators,
-            status,
-            gameId,
-          };
-        } else
-          return {
-            p1,
-            p2,
-            spectators,
-            status,
-            gameId,
-          };
+        return {
+          p1,
+          p2,
+          spectators,
+          status,
+          gameId,
+        };
       },
     },
   },
