@@ -4,32 +4,22 @@ const { withFilter } = require("apollo-server-express");
 const User = mongoose.model("User");
 
 const typeDefs = `
-<<<<<<< HEAD
-extend type Subscription {
-  gameEvent: GameUpdate!
-}
-type GameUpdate {
-  p1: User!
-  p2: User!
-  spectators: [User]
-  status: String!
-  gameId: String!
-}
-=======
   extend type Mutation {
     updateGameUserLastSubmitted(
       player: ID!,
-      lastSubmittedResult: String!
+      lastSubmittedResult: String!,
+      gameId: String!
     ): GameUser!
     updateGameUserCurrentCode(
-      player: ID!,
       charCount: Int!,
       lineCount: Int!,
-      currentCode: String!
+      currentCode: String!,
+      gameId: String!
     ): GameUser!
     updateGameUserStatus(
       player: ID!,
-      status: String!
+      status: String!,
+      gameId: String!
     ): GameUser!
   }
   extend type Subscription {
@@ -49,43 +39,42 @@ type GameUpdate {
     lineCount: Int
     currentCode: String
   }
->>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
 `;
-
-// extend type Mutation {
-//   updateGameUser(user: GameUser!): GameUser!
-// }
-// scalar GameUser {
-//   player: User
-//   lastSubmittedResult: String
-//   charCount: Int
-//   lineCount: Int
-//   currentCode: String
-// }
 
 const resolvers = {
   Mutation: {
-<<<<<<< HEAD
-    // updateGameUser: (_, input, { user }) => {
-    //   const {
-    //     player,
-    //     lastSubmittedResult,
-    //     charCount,
-    //     lineCount,
-    //     currentCode,
-    //   } = input;
-    // },
-=======
-    updateGameUserLastSubmitted: (_, input, { user }) => {
-      const { player, lastSubmittedResult } = input;
-      
+    updateGameUserLastSubmitted: (_, input, { user, pubsub }) => {
+      const { player, lastSubmittedResult, gameId } = input;
     },
-    updateGameUserCurrentCode: (_, input, { user }) => {
-      const { player, charCount, lineCount, currentCode } = input;
-      
-    },
+    updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
+      const { charCount, lineCount, currentCode, gameId } = input;
 
->>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
+      const game = pubsub.games[gameId];
+
+      console.log({ game });
+
+      let player;
+
+      if (game.p1.player._id === user._id) {
+        // player = game.p1.player;
+        player = "p1";
+      } else if (game.p2.player._id === user._id) {
+        // player = game.p2.player;
+        player = "p2";
+      }
+
+      const gameUser = {
+        player: user,
+        ...input,
+      };
+
+      if (ws.gameId === gameId && player !== undefined) {
+        Object.assign(game, { [player]: { ...input } });
+        pubsub.publish("gameEvent", game);
+      }
+
+      return gameUser;
+    },
   },
   Subscription: {
     gameEvent: {

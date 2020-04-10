@@ -77,8 +77,16 @@ export const DECLINE_INVITE = gql`
 `;
 
 export const UPDATE_GAME_LAST_SUBMITTED = gql`
-  mutation UpdateGameUserLastSubmitted($player: ID!, $lastSubmittedResult: String!) {
-    updateGameUserLastSubmitted(player: $player, lastSubmittedResult: $lastSubmittedResult) {
+  mutation UpdateGameUserLastSubmitted(
+    $player: ID!
+    $lastSubmittedResult: String!
+    $gameId: String!
+  ) {
+    updateGameUserLastSubmitted(
+      player: $player
+      gameId: $gameId
+      lastSubmittedResult: $lastSubmittedResult
+    ) {
       ...GameUserDetails
     }
   }
@@ -87,16 +95,16 @@ export const UPDATE_GAME_LAST_SUBMITTED = gql`
 
 export const UPDATE_GAME_USER_CODE = gql`
   mutation UpdateGameUserCurrentCode(
-    $player: ID!,
-    $charCount: Int!,
-    $lineCount: Int!,
+    $charCount: Int!
+    $lineCount: Int!
     $currentCode: String!
-  ) { 
+    $gameId: String!
+  ) {
     updateGameUserCurrentCode(
-      player: $player
       charCount: $charCount
       lineCount: $lineCount
       currentCode: $currentCode
+      gameId: $gameId
     ) {
       ...GameUserDetails
     }
@@ -106,13 +114,11 @@ export const UPDATE_GAME_USER_CODE = gql`
 
 export const UPDATE_GAME_USER_STATUS = gql`
   mutation UpdateGameUserStatus(
-    $player: ID!,
+    $player: ID!
     $status: String!
+    $gameId: String!
   ) {
-    updateGameUserStatus(
-      player: $player
-      status: $status
-    ) {
+    updateGameUserStatus(player: $player, status: $status, gameId: $gameId) {
       ...GameUserDetails
     }
   }

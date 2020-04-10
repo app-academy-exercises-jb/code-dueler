@@ -47,35 +47,19 @@ const resolvers = {
   Subscription: {
     messageAdded: {
       subscribe: withFilter(
-<<<<<<< HEAD
         (_, __, context) => context.pubsub.asyncIterator("messageAdded"),
         (payload, _, { user, pubsub, ws }) => {
-=======
-        (_, __, context) => context.pubsub.asyncIterator('messageAdded'),
-        (payload, _, {user, pubsub, ws}) => {
-
->>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
           if (ws.gameId === undefined && payload.channelId === "global") {
             return true;
           }
 
-<<<<<<< HEAD
-          const game = pubsub.games && pubsub.games[payload.channelId];
+          const game = pubsub.games[payload.channelId];
 
           if (
             game &&
             game.gameId === ws.gameId &&
-            (game.p1._id === user._id ||
-              game.p2._id === user._id ||
-              game.spectators[user._id])
+            (game.users[user._id] || game.spectators[user._id])
           ) {
-=======
-          const game = pubsub.games[payload.channelId];
-
-          if (game && 
-            game.gameId === ws.gameId && 
-            (game.users[user._id] || game.spectators[user._id])) {
->>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
             return true;
           }
           return false;

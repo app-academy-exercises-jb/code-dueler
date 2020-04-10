@@ -1,11 +1,24 @@
 import React, { useState } from "react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
+import { useMutation } from "@apollo/react-hooks";
+import { UPDATE_GAME_USER_CODE } from "../../graphql/mutations";
 
-const CodeEditor = (props) => {
+const CodeEditor = ({ gameId }) => {
   const [code, setCode] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
+  const [updateUserCode] = useMutation(UPDATE_GAME_USER_CODE);
+
+  const handleValueChange = (code) => {
+    setCharCount(code.length);
+    setLineCount(code.split(/\r*\n/).length);
+    setCode(code);
+    console.log("attempting to mutate");
+    updateUserCode({
+      variables: { charCount, lineCount, currentCode: code, gameId },
+    });
+  };
 
   return (
     <>
@@ -13,9 +26,7 @@ const CodeEditor = (props) => {
         <Editor
           value={code}
           onValueChange={(code) => {
-            setCharCount(code.length);
-            setLineCount(code.split(/\r*\n/).length);
-            setCode(code);
+            handleValueChange(code);
           }}
           highlight={(code) => Prism.highlight(code, Prism.languages.js)}
           padding={10}

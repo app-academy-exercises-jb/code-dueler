@@ -13,21 +13,20 @@ export default ({ onlineUsers: { data, loading, error } }) => {
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
     variables: {
-      gameId
+      gameId,
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
+      console.log({ data: e });
+      // debugger;
       if (e.status === "initializing") {
-        alert("initializing")
-
+        alert("initializing");
       } else if (e.status === "ready") {
-
+        console.log("ready");
       } else if (e.status === "ongoing") {
-
-        
-
+        console.log("ongoing");
       } else if (e.status === "over") {
-
+        console.log("over");
       }
     },
   });
@@ -40,7 +39,7 @@ export default ({ onlineUsers: { data, loading, error } }) => {
             <ChallengeQuestion />
           </div>
           <div className="code-editor-wrapper">
-            <CodeEditor />
+            <CodeEditor gameId={gameId} />
           </div>
         </div>
         <div className="game-right">

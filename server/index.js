@@ -84,7 +84,7 @@ const handleGames = (pubsub) => ({ gameId, p1, p2, initializeGame }) => {
       [p1._id]: 1,
       [p2._id]: 1,
     },
-    subscribers: [],
+    spectators: [],
     status: "initializing",
     connections: 0,
     initializeGame,
@@ -133,14 +133,7 @@ app.listen = function () {
       subscribe,
       keepAlive: 29000,
       onOperation: (message, params, ws) => {
-<<<<<<< HEAD
         return params;
-=======
-        // console.log({message})
-        // console.log({params})
-
-        return {...params, test: "test"};
->>>>>>> ed078ea271ea64ce88aad6d69db9f3656a4e62dd
       },
       onConnect: (connectionParams, ws, context) => {
         console.log("connecting:", pubsub.subscribers);

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
@@ -29,11 +28,15 @@ const SideBar = ({ data }) => {
         // setSelectedUser(e.invitee)
         // setDeclineModalOpen(true)
         // // => "invitee declined your invite"
-        alert(`${e.invitee.username} declined`)
+        alert(`${e.invitee.username} declined`);
       } else if (e.status === "accepted") {
         // Go to the game screen
         history.push(`/game/${e.gameId}`);
       }
+
+      // add "rejected" option
+      // /game/id
+      // history.push("/game/id")
     },
   });
 
@@ -71,10 +74,16 @@ const SideBar = ({ data }) => {
             </div>
           </div>
           <div className="modal-buttons">
-            <button className="modal-decline" onClick={() => handleDecline(selectedUser)}>
+            <button
+              className="modal-decline"
+              onClick={() => handleDecline(selectedUser)}
+            >
               Decline
             </button>
-            <button className="modal-accept" onClick={() => handleAccept(selectedUser)}>
+            <button
+              className="modal-accept"
+              onClick={() => handleAccept(selectedUser)}
+            >
               Accept
             </button>
           </div>
