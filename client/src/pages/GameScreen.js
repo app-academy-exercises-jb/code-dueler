@@ -22,24 +22,18 @@ export default ({ onlineUsers, me }) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
-      let self, opponent;
-      if (data && e.p1.player._id === data.me) {
-        self = "p1";
-        opponent = "p2";
-      } else {
-        opponent = "p1";
-        self = "p2";
-      }
+      const self = e.you,
+        opponent = self === "p1" ? "p2" : "p1";
 
       if (e.status === "initializing") {
         console.log("initializing");
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
-        console.log("ongoing");
         setownStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
+        // display victory/loss modal
         history.push("/");
       }
     },

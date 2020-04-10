@@ -99,12 +99,14 @@ export const UPDATE_GAME_USER_CODE = gql`
     $lineCount: Int!
     $currentCode: String!
     $gameId: String!
+    $player: ID!
   ) {
     updateGameUserCurrentCode(
       charCount: $charCount
       lineCount: $lineCount
       currentCode: $currentCode
       gameId: $gameId
+      player: $player
     ) {
       ...GameUserDetails
     }

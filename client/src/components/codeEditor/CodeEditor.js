@@ -22,7 +22,7 @@ const CodeEditor = ({ gameId, me }) => {
     setCharCount(code.length);
     setLineCount(code.split(/\r*\n/).length);
     setCode(code);
-    const variables = { charCount, lineCount, currentCode: code, gameId };
+    const variables = { charCount, lineCount, currentCode: code, gameId, player: me._id };
     updateUserCode({ variables });
   };
 
