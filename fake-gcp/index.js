@@ -1,18 +1,45 @@
 const express = require("express"),
   jwt = require("jsonwebtoken"),
   cors = require("cors"),
-  app = express();
+  app = express(),
+  bodyParser = require('body-parser');
 
+app.use(bodyParser.json())
 app.use(cors({ origin: "http://localhost:3000" }));
+
+
+app.use(
+  "/",
+  async (req, res, next) => {
+    if (!req.headers.authorization) return res.end();
+
+    const user = jwt.verify(
+      req.headers.authorization.replace('Bearer ', ''),
+      process.env.SECRET
+    );
+
+    if (user) {
+      next();
+    } else {
+      res.end();
+    }
+  },
+);
+
+const checkEquality = (arr1, arr2) => {
+  return (
+    Array.isArray(arr1) && Array.isArray(arr2) &&
+    arr1.length == arr2.length &&
+    arr1.every((v,i) => v === arr2[i])
+  )
+}
 
 app.post("/", (req, res) => {
   res.set("Content-Type", "application/json");
 
-  console.log({ body: req });
-
-  const {
-    data: { codeToRun },
-  } = req.body;
+  // console.log(Object.keys(req));
+  // console.log(Object.keys(req.res))
+  const { data: { codeToRun } } = req.body;
 
   const fizzBuzzReference = function (n) {
     let ans = [];
@@ -30,44 +57,56 @@ app.post("/", (req, res) => {
     return ans;
   };
 
-  const testCases = [1, 3, 5, 15, 20, 35];
-  testCases.map((t) => ({
-    t: fizzBuzzReference(t),
-  }));
+  const tests = [1, 3, 5, 15, 20, 35];
+  const testCases = {};
+  
+  tests.forEach((t) => {
+    testCases[t] = fizzBuzzReference(t);
+  });
 
-  const checkedTests = [];
+  const passedTests = [],
+    checkedTests = [];
 
   try {
     eval(codeToRun);
+    let expected, output, passed;
 
-    testCases.forEach((test) => {
-      const testCase = Object.keys(test)[0],
-        output = fizzBuzz(testCase),
-        expected = testCases[test];
+    for (let i = 0; i < tests.length; i++) {
+      const test = tests[i];
+      output = fizzBuzz(test);
+      expected = testCases[test];
+      passed = checkEquality(output, expected);
+      checkedTests.push(test);
 
-      if (output !== expected) {
-        return res.status(200).send({
-          data: {
-            passed: output === expected,
-            output,
-            expected,
-          },
-        });
-      }
+      if (!passed) {
+        console.log({expected})
+        break;
+      } 
 
-      checkedTests.push();
-    });
+      passedTests.push(test);
+    }
+
+    if (passedTests.length === Object.keys(testCases).length) {
+      passed = true;
+    }
+    
     return res.status(200).send({
       data: {
-        passed: true,
-      },
+        passed,
+        output: output ? output : "undefined",
+        expected,
+        checkedTests,
+        passedTests
+      }
     });
   } catch (error) {
-    console.log({ error });
+    var util = require('util');
+    const output = util.format.apply(util, [error]);
+
     return res.status(200).send({
       data: {
         passed: false,
-        error: error.toString(),
+        error: output,
       },
     });
   }

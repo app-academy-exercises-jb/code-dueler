@@ -6,6 +6,7 @@ services:
       - 8000:8000
     environment:
       PORT: 8000
+      SECRET: ${SECRET_OR_KEY}
     volumes:
       - ./fake-gcp:/usr/src/app
     command: npm run dev
