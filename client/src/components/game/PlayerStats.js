@@ -3,47 +3,74 @@ import Stats from "./Stats";
 import ErrorModal from './ErrorModal';
 import ResultsModal from './ResultsModal';
 
-export default ({me, ownStats, opponentStats}) => {
-  const openTestResults = () => {
+export default ({ownStats, opponentStats}) => {
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const setResultsProps = parsed => {
+    if (!parsed) return;
+    setProps({ 
+      test: parsed.checkedTests[parsed.checkedTests.length - 1],
+      expected: parsed.expected,
+      output: parsed.output,
+      handleModalClose
+    });
+  }
+
+  const setErrorProps = parsed => {
+    if (!parsed) return;
+    setProps({ error: parsed.error, handleModalClose });
+  }
+  
+  const openTestResults = (stats) => {
+    const parsed = stats === "own" ? ownParsed : opponentParsed;
+    setResultsProps(parsed);
     setModalToOpen("results");
     setModalOpen(true);
   };
 
-  const openErrorResults = () => {
+  const openErrorResults = (stats) => {
+    const parsed = stats === "own" ? ownParsed : opponentParsed;
     setModalToOpen("error");
+    setErrorProps(parsed);
     setModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
   };
 
   const statsProps = { openErrorResults, openTestResults };
   const [props, setProps] = useState({ handleModalClose });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalToOpen, setModalToOpen] = useState("results");
+  const [ownParsed, setOwnParsed] = useState(null);
+  const [opponentParsed, setOpponentParsed] = useState(null);
 
   useEffect(() => {
-    // debugger
     if (ownStats && ownStats.lastSubmittedResult) {
         const parsed = JSON.parse(ownStats.lastSubmittedResult);
+        
+        setOwnParsed(parsed);
         if (parsed.error) {
           setModalToOpen("error");
-          setProps({ error: parsed.error, handleModalClose });
+          setErrorProps(parsed);
         } else {
           setModalToOpen("results");
-          setProps({ 
-            test: parsed.checkedTests[parsed.checkedTests.length - 1],
-            expected: parsed.expected,
-            output: parsed.output,
-            handleModalClose
-          });
+          setResultsProps(parsed);
         }
+
         if (modalOpen === false) {
           setModalOpen(true);
         }
       }
+    return () => setModalOpen(false);
   }, [ownStats && ownStats.lastSubmittedResult]);
+
+  useEffect(() => {
+    if (opponentStats && opponentStats.lastSubmittedResult) {
+        setOpponentParsed(JSON.parse(opponentStats.lastSubmittedResult));
+      }
+  }, [opponentStats && opponentStats.lastSubmittedResult]);
+
+  useEffect(() => setModalOpen(false), []);
 
   return (<>
     <div className="stats-wrapper">

@@ -1,9 +1,15 @@
 import React from "react";
 
 export default ({ ownStats, opponentStats, title, openTestResults, openErrorResults }) => {
+  let stats, name, parsed;
 
-  const stats = ownStats ? ownStats : opponentStats;
-  let parsed;
+  if (ownStats) {
+    stats = ownStats;
+    name = "own";
+  } else {
+    stats = opponentStats;
+    name = "opponent";
+  }
 
   return (
     <>
@@ -23,14 +29,11 @@ export default ({ ownStats, opponentStats, title, openTestResults, openErrorResu
               "None"}
           </h2>
           <div className="stats-results">
-            <h2 onClick={openTestResults}>Results</h2>
-            <h2 onClick={openErrorResults}>Errors</h2>
+            <h2 onClick={() => openTestResults(name)}>Results</h2>
+            <h2 onClick={() => openErrorResults(name)}>Errors</h2>
           </div>
         </div>
       </div>
     </>
   );
 };
-
-// export default Stats;
-
