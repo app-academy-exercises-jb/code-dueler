@@ -32,11 +32,9 @@ const SideBar = ({ data }) => {
       } else if (e.status === "accepted") {
         // Go to the game screen
         history.push(`/game/${e.gameId}`);
+      } else if (e.status === "rejected") {
+        alert(`Sorry! ${e.reason}`)
       }
-
-      // add "rejected" option
-      // /game/id
-      // history.push("/game/id")
     },
   });
 
@@ -64,7 +62,7 @@ const SideBar = ({ data }) => {
         isOpen={modalOpen}
         className="modal-overlay"
         shouldCloseOnEsc={true}
-        onRequestClose={() => setModalOpen(false)}
+        onRequestClose={() => handleDecline(selectedUser)}
       >
         <div className="modal">
           <div className="modal-info">

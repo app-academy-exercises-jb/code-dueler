@@ -39,6 +39,7 @@ export const ON_INVITATION = gql`
         username
       }
       status
+      reason
       gameId
     }
   }

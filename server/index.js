@@ -10,8 +10,7 @@ const express = require("express"),
   { SubscriptionServer } = require("subscriptions-transport-ws"),
   { execute, subscribe } = require("graphql"),
   { ApolloServer } = require("apollo-server-express"),
-  { pubsub } = require("./subscriptions"),
-  handleGames = require("./game_server");
+  { pubsub } = require("./subscriptions");
 require("dotenv").config();
 require("./models");
 
@@ -94,15 +93,7 @@ app.listen = function () {
   } else {
     server = http.createServer(this);
   }
-
-  const publishUserLoggedEvent = (pubsub, user, loggedIn) => {
-    setTimeout(() => {
-      pubsub.publish("userLoggedEvent", {
-        _id: user._id,
-        loggedIn,
-      });
-    }, 100);
-  };
+  
 
   new SubscriptionServer(
     {
@@ -129,25 +120,18 @@ app.listen = function () {
           if (!user._id) return false;
           console.log(`${user._id} connected to the websocket`);
           user.ws = ws;
+          // mark the socket object with the appropriate ID so we can remove it on DC
+          ws.userId = user._id;
 
           // save connections to keep track of online users
           // we access pubsub from the resolvers
-          if (pubsub.subscribers === undefined) {
-            pubsub.subscribers = {
-              [user._id]: [user],
-            };
-            pubsub.handleGames = handleGames(pubsub);
-            publishUserLoggedEvent(pubsub, user, true);
+          if (pubsub.subscribers[user._id] === undefined) {
+            pubsub.subscribers[user._id] = [user];
+            pubsub.publishUserLoggedEvent(user, true);
           } else {
-            if (pubsub.subscribers[user._id] === undefined) {
-              pubsub.subscribers[user._id] = [user];
-              publishUserLoggedEvent(pubsub, user, true);
-            } else {
-              pubsub.subscribers[user._id].push(user);
-            }
+            pubsub.subscribers[user._id].push(user);
           }
-          // mark the socket object with the appropriate ID so we can remove it on DC
-          ws.userId = user._id;
+          
 
           return {
             pubsub,
@@ -168,13 +152,13 @@ app.listen = function () {
 
         pubsub.subscribers[ws.userId].splice(userIdx, 1);
 
-        if (user.ws.gameId && pubsub.updateSubscribers) {
-          pubsub.updateSubscribers("remove", [user]);
+        if (user.ws.gameId) {
+          pubsub.updateSubscribers("remove", [user], user.ws.gameId);
         }
 
         if (pubsub.subscribers[ws.userId].length === 0) {
           delete pubsub.subscribers[ws.userId];
-          publishUserLoggedEvent(pubsub, user, false);
+          pubsub.publishUserLoggedEvent(user, false);
         }
       },
     },
