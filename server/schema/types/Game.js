@@ -58,11 +58,6 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
     {player: user}
   ),
   publishGameUpdate = gameUser => {
-    // console.log(ws.gameId === gameId && player !== undefined && _id === ws.userId);
-    // console.log({ws: ws.gameId})
-    // console.log({gameId})
-    // console.log({player})
-    // console.log({_id})
     if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
       Object.assign(game, { [player]: { ...gameUser } });
       pubsub.publish("gameEvent", game);
@@ -80,7 +75,7 @@ const resolvers = {
       const game = pubsub.games[gameId];
       pubsub.games.inGame[_id] = false;
       delete ws.gameId;
-      
+
       if (!game || 
         game.users[_id] === undefined || 
         user._id !== _id) return "ok";

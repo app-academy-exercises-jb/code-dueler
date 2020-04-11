@@ -45,7 +45,7 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
 
 
   if (!redirectTo) redirectTo = "/login";
-  if (loading || error || !data) {
+  if (loading || error || !data || !me.data || me.loading) {
     return null;
   } else if (data.isLoggedIn) {
     return <Route path={path} {...rest} render={() => {

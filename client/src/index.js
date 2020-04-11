@@ -5,6 +5,7 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import createClient from "./graphql/client";
 
 createClient().then((client) => {
+  console.log(client);
   ReactDOM.render(
     <ApolloProvider client={client}>
       <App />
