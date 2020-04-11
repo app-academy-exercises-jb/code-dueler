@@ -17,6 +17,7 @@ const typeDefs = `
     invitee: User!
     status: String!
     gameId: String
+    reason: String
   }
 `;
 
@@ -50,7 +51,7 @@ const resolvers = {
         toAwait: { key: "invitee", awaitedUser: invitee },
       });
       ws.inviting = true;
-      pubsub.publish("invitationEvent", invitation);
+      pubsub.handleInvite(invitation.invitee, "inviting", invitation);
       return invitation;
     },
     acceptInvitation: async (_, { inviter }, { user, pubsub, ws }) => {
@@ -64,13 +65,13 @@ const resolvers = {
 
       const newP1 = {...acceptance.inviter, ws};
 
-      pubsub.handleGames({
+      pubsub.handleGame({
         gameId: acceptance.gameId,
         p1: newP1,
         p2: user,
       });
-
-      pubsub.publish("invitationEvent", acceptance);
+      
+      pubsub.handleInvite(acceptance.invitee, "accepted", acceptance);
       return acceptance;
     },
     declineInvitation: async (_, { inviter }, { user, pubsub }) => {
@@ -79,7 +80,9 @@ const resolvers = {
         user,
         toAwait: { key: "inviter", awaitedUser: inviter },
       });
-      pubsub.publish("invitationEvent", declination);
+
+      
+      pubsub.handleInvite(declination.invitee, "declined", declination);
       return declination;
     },
   },
@@ -97,12 +100,15 @@ const resolvers = {
             const shouldSend = (ws.inviting || (ws.invited && ws.accepting));
             if (shouldSend && (inviter._id === user._id || invitee._id === user._id)) {
               ws.gameId = gameId;
+              pubsub.updateSubscribers("add", [user], gameId);
             }
 
             delete ws.inviting;
             delete ws.invited;
             delete ws.accepting;
             return shouldSend && (inviter._id === user._id || invitee._id === user._id);
+          } else if (status === "rejected") {
+            return ws.inviting && user._id === inviter._id;
           }
         },
       ),

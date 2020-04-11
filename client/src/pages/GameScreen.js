@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/nav/NavBar";
 import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/game/ChallengeQuestion";
@@ -7,13 +7,26 @@ import Stats from "../components/game/Stats";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams, useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
+import { LEAVE_GAME } from "../graphql/mutations";
+
 
 export default ({ onlineUsers, me }) => {
   const { loading, error, data } = me;
   const { id: gameId } = useParams();
   const history = useHistory();
+  const [gameEvent, setGameEvent] = useState(null);
   const [opponentStats, setOpponentStats] = useState(null);
   const [ownStats, setownStats] = useState(null);
+  const [leaveGame] = useMutation(LEAVE_GAME)
+
+  // function returned from useEffect will run on component unmount
+  useEffect(() => () => {
+    if (!data) return;
+    leaveGame({variables: {
+      player: data.me._id,
+      gameId
+    }});
+  }, []);
 
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
@@ -22,6 +35,7 @@ export default ({ onlineUsers, me }) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
+      setGameEvent(e);
 
       let self, opponent;
       if (data && e.p1.player._id === data.me) {

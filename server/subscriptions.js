@@ -1,3 +1,4 @@
+const handleGames = require("./game_server");
 let pubsub;
 
 if (process.env.DOCKERIZED === 'true') {
@@ -14,5 +15,7 @@ if (process.env.DOCKERIZED === 'true') {
   const { PubSub } = require('graphql-subscriptions');
   pubsub = new PubSub();
 }
+
+handleGames(pubsub);
 
 module.exports = { pubsub };

@@ -48,6 +48,7 @@ export const INVITE_PLAYER = gql`
         username
       }
       status
+      reason
     }
   }
 `;
@@ -125,4 +126,10 @@ export const UPDATE_GAME_USER_STATUS = gql`
     }
   }
   ${GAME_USER_DETAILS}
+`;
+
+export const LEAVE_GAME = gql `
+  mutation LeaveGame($player: ID!, $gameId: String!) {
+    leaveGame(player: $player, gameId: $gameId)
+  }
 `;

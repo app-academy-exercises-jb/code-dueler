@@ -3,6 +3,7 @@ const { withFilter } = require("apollo-server-express");
 
 const typeDefs = `
   extend type Mutation {
+    leaveGame(player: ID!, gameId: String!): String!
     updateGameUserLastSubmitted(
       player: ID!,
       lastSubmittedResult: String!,
@@ -50,22 +51,43 @@ const getPlayer = (game, user) => {
   }
 };
 
-const generatePublishGame = ({pubsub, ws, gameId, player, _id, game, input, user}) => ({
-    publishGame: gameUser => {
-      if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
-        Object.assign(game, { [player]: { ...gameUser } });
-        pubsub.publish("gameEvent", game);
-      }
-    },
-    gameUser: Object.assign(
-      {...game[player]},
-      { ...input },
-      {player: user}
-    )
-  });
+const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input, user}) => {
+  const gameUser = Object.assign(
+    {...game[player]},
+    { ...input },
+    {player: user}
+  ),
+  publishGameUpdate = gameUser => {
+    // console.log(ws.gameId === gameId && player !== undefined && _id === ws.userId);
+    // console.log({ws: ws.gameId})
+    // console.log({gameId})
+    // console.log({player})
+    // console.log({_id})
+    if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
+      Object.assign(game, { [player]: { ...gameUser } });
+      pubsub.publish("gameEvent", game);
+    }
+  };
+
+  return [gameUser, publishGameUpdate];
+}
+
 
 const resolvers = {
   Mutation: {
+    leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
+      //please leave game.
+      const game = pubsub.games[gameId];
+      pubsub.games.inGame[_id] = false;
+      delete ws.gameId;
+      
+      if (!game || 
+        game.users[_id] === undefined || 
+        user._id !== _id) return "ok";
+
+      game.endGame({_id});
+      return "ok";
+    },
     updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
       const { player: _id, lastSubmittedResult, gameId } = input;
 
@@ -80,26 +102,30 @@ const resolvers = {
         game.winner = player;
       }
       
-      const {gameUser, publishGame} = generatePublishGame({
+      const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
         pubsub, ws, gameId, player, _id, game, input, user
       });
     
-      publishGame(gameUser);
+      publishGameUpdate(gameUser);
       return gameUser;
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
       const { player: _id, gameId } = input;
 
       const game = pubsub.games[gameId];
+
+      if (game === undefined) return false;
+
       game.status = "ongoing";
 
       const player = getPlayer(game, user);
 
-      const {gameUser, publishGame} = generatePublishGame({
+      const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
         pubsub, ws, gameId, player, _id, game, input, user
       });
 
-      publishGame(gameUser);
+
+      publishGameUpdate(gameUser);
       return gameUser;
     },
   },
@@ -112,16 +138,20 @@ const resolvers = {
           }
 
           const game = pubsub.games[ws.gameId];
-          game.connections += 1;
 
           if (game.connections === 2) {
-            game.initializeGame(pubsub);
+            game.initializeGame();
           }
 
           return pubsub.asyncIterator("gameEvent");
         },
         ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
-          return pubsub.games && pubsub.games[gameId].users[user._id] > 0;
+          return (
+            user._id === ws.userId &&
+            p1.player._id === user._id ||
+            p2.player._id === user._id ||
+            spectators.some(s => s._id === user._id)
+          );
         }
       ),
       resolve: payload => payload
