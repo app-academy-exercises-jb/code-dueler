@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import { GAME_USER_DETAILS } from "./fragments";
 
 export const ON_MESSAGE_ADDED = gql`
   subscription onMessageAdded {
@@ -38,21 +39,20 @@ export const ON_INVITATION = gql`
         username
       }
       status
+      reason
       gameId
     }
   }
 `;
 
 export const ON_GAME = gql`
-  subscription onGame {
-    gameEvent {
+  subscription onGame($gameId: String!) {
+    gameEvent(gameId: $gameId) {
       p1 {
-        _id
-        username
+        ...GameUserDetails
       }
       p2 {
-        _id
-        username
+        ...GameUserDetails
       }
       spectators {
         _id
@@ -60,6 +60,9 @@ export const ON_GAME = gql`
       }
       status
       gameId
+      connections
+      winner
     }
   }
+  ${GAME_USER_DETAILS}
 `;

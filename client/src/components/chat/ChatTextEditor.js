@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { ADD_MESSAGE } from "../../graphql/mutations";
 
-const ChatTextEditor = ({ me, channelId }) => {
+const ChatTextEditor = ({ me, channelId, id }) => {
   const [addMessage] = useMutation(ADD_MESSAGE);
   const [chatInput, setChatInput] = useState("");
   const handleChatSubmit = (e) => {
@@ -11,14 +11,14 @@ const ChatTextEditor = ({ me, channelId }) => {
     setChatInput("");
   };
   return (
-    <div className="text-editor-wrapper">
+    <div className="text-editor-wrapper" id={id}>
       <form onSubmit={handleChatSubmit} className="text-editor-form">
         <input
-          autoFocus
           type="text"
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
           className="text-input-area"
+          placeholder="Type to chat"
         />
       </form>
     </div>

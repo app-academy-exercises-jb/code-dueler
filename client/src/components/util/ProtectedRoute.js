@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
-import { IS_LOGGED_IN, GET_ONLINE_USERS } from "../../graphql/queries";
+import { CURRENT_USER, IS_LOGGED_IN, GET_ONLINE_USERS } from "../../graphql/queries";
 import { USER_LOGGED_EVENT, ON_INVITATION } from "../../graphql/subscriptions";
 
 const subscribeToUserEvents = (subscribeToMore) =>
@@ -26,9 +26,15 @@ const subscribeToUserEvents = (subscribeToMore) =>
 
 export default ({ component: Component, path, redirectTo, ...rest }) => {
   const { data, loading, error } = useQuery(IS_LOGGED_IN);
+
+  const { refetch, ...me } = useQuery(CURRENT_USER, {
+    fetchPolicy: "network-only",
+  });
+
   const { subscribeToMore, ...onlineUsers } = useQuery(GET_ONLINE_USERS, {
     fetchPolicy: "network-only",
   });
+
   useEffect(() => {
     if (data && data.isLoggedIn && onlineUsers.loading === false) {
       setTimeout(() => {
@@ -37,12 +43,13 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
     }
   }, [data, onlineUsers.loading]);
 
+
   if (!redirectTo) redirectTo = "/login";
   if (loading || error || !data) {
     return null;
   } else if (data.isLoggedIn) {
     return <Route path={path} {...rest} render={() => {
-      return <Component onlineUsers={onlineUsers} />
+      return <Component onlineUsers={onlineUsers} me={me} refetchMe={refetch}/>
     }} />;
   } else {
     return <Route path={path} render={() => <Redirect to={redirectTo} />} {...rest}/>;

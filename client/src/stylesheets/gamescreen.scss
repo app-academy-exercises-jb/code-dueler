@@ -1,0 +1,142 @@
+.question-text-box {
+  color: #D4F2D2;
+  text-align: center;
+  background-color: #575366;
+  box-sizing:border-box;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 90%;
+  width: 90%;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+  padding: 7px;
+  font-size: 18px;
+}
+
+.stats-wrapper {
+  height: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.stats-players {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 100%;
+}
+
+.stats-form{
+  width: 80%;
+  background-color: #32292F;
+  height: 80%;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #0E1428;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+  h1{
+    background-color:#d1eed0;
+    text-align: center;
+    padding: 7px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+  
+  }
+  h2{
+    color: #d4f2d2;
+    
+  }
+  .stats{
+  // background-color: gray;
+  text-align: left;
+  padding: 5px;
+  }
+}
+
+.game-screen {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  height: 893px;
+}
+
+.game-left {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  min-width: 500px;
+  width: 50%;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 600px;
+}
+
+.game-right {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  min-width: 500px;
+  box-sizing: border-box;
+}
+
+.game-chat-wrapper {
+  height: 50%;
+  min-height: 400px;
+  width: 100%;
+}
+
+#game-chat {
+  border-left: #0E1428 4px solid;
+}
+
+.code-editor-wrapper {
+  width: 100%;
+  height: 55%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.challenge-question-wrapper {
+  display: flex;
+  height: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stats-results {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  height: 80px;
+  flex-wrap: wrap;
+  h2 {
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-self: center;
+    font-size: 16px;
+    background-color: #D4F2D2;
+    color: #0E1428;
+    border-radius: 4px;
+    padding: 3px 0;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

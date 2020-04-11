@@ -1,69 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
+import { useMutation } from "@apollo/react-hooks";
+import {
+  UPDATE_GAME_USER_CODE,
+  UPDATE_GAME_LAST_SUBMITTED,
+} from "../../graphql/mutations";
 
-const CodeEditor = (props) => {
-  const [code, setCode] = useState("");
+const CodeEditor = ({ gameId, me }) => {
+  const editorRef = useRef(null);
+  const [code, setCode] = useState(`var fizzBuzz = (n) => {
+
+};`);
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
 
+  const [updateUserCode] = useMutation(UPDATE_GAME_USER_CODE);
+  const [updateLastSubmission] = useMutation(UPDATE_GAME_LAST_SUBMITTED);
+
+  const handleValueChange = (code) => {
+    setCharCount(code.length);
+    setLineCount(code.split(/\r*\n/).length);
+    setCode(code);
+    const variables = { charCount, lineCount, currentCode: code, gameId, player: me._id };
+    updateUserCode({ variables });
+  };
+
   return (
     <>
-    <div className="editor-info">
-      <p>
-        charCount: {charCount}
-      </p>
-      <p>
-        lineCount: {lineCount}
-      </p>
-      <button 
-        style={{
-          background: "white",
-          border: "1px solid black",
-          borderRadius: "4px",
-          margin: "1rem",
-        }}
-        onClick={e => {
-          fetch("https://us-central1-code-dueler.cloudfunctions.net/parseCode", {
-            method: 'POST',
-            mode: 'cors',
-            // e.target.value must have text which defines a function fizzBuzz
-            body: JSON.stringify({data: { codeToRun: e.target.value }}),
-            headers: {
-              'Content-Type': 'application/json',
-              authorization: localStorage.getItem('token'),
+      <div className="editor">
+        <Editor
+          autoFocus
+          ref={editorRef}
+          value={code}
+          onValueChange={(code) => {
+            handleValueChange(code);
+          }}
+          highlight={(code) => Prism.highlight(code, Prism.languages.js)}
+          padding={10}
+          preClassName="editorPre"
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+          }}
+        />
+      </div>
+      <button
+        className="code-submit"
+        onClick={(e) => {
+          fetch(
+            "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
+            {
+              method: "POST",
+              mode: "cors",
+              body: JSON.stringify({
+                data: { codeToRun: editorRef.current.props.value },
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                authorization: localStorage.getItem("token"),
+              },
             }
-          })
-            .then(res => res.json())
-            .then(res => {
-              // res is the server response
+          )
+            .then((res) => res.json())
+            .then(({ data: { ...result } }) => {
+              updateLastSubmission({
+                variables: {
+                  lastSubmittedResult: JSON.stringify(result),
+                  player: me._id,
+                  gameId,
+                },
+              });
             })
-            .catch(err => console.log(err))
+            .catch((err) => console.log(err));
         }}
       >
-        Submit Code
+        <h1>Submit your code</h1>
       </button>
-    </div>
-    <div className="editor">
-
-      <div className="editor-text"></div>
-
-      <Editor
-        value={code}
-        onValueChange={(code) => {
-          setCharCount(code.length);
-          setLineCount(code.split(/\r*\n/).length);
-          setCode(code);
-        }}
-        highlight={(code) => Prism.highlight(code, Prism.languages.js)}
-        padding={10}
-        textareaClassName="editor"
-        style={{
-          fontFamily: '"Fira code", "Fira Mono", monospace',
-          fontSize: 12,
-        }}
-      />
-    </div>
     </>
   );
 };

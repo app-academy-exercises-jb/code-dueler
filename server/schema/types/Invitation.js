@@ -17,6 +17,7 @@ const typeDefs = `
     invitee: User!
     status: String!
     gameId: String
+    reason: String
   }
 `;
 
@@ -44,14 +45,13 @@ const makeInvite = async (options) => {
 const resolvers = {
   Mutation: {
     invitePlayer: async (_, { invitee }, { user, pubsub, ws }) => {
-      if (!user) console.log("no user");
       const invitation = await makeInvite({
         status: "inviting",
         user,
         toAwait: { key: "invitee", awaitedUser: invitee },
       });
       ws.inviting = true;
-      pubsub.publish("invitationEvent", invitation);
+      pubsub.handleInvite(invitation.invitee, "inviting", invitation);
       return invitation;
     },
     acceptInvitation: async (_, { inviter }, { user, pubsub, ws }) => {
@@ -62,12 +62,16 @@ const resolvers = {
       });
       acceptance.gameId = inviter + user._id + Date.now().toString();
       ws.accepting = true;
-      pubsub.handleGames({
+
+      const newP1 = {...acceptance.inviter, ws};
+
+      pubsub.handleGame({
         gameId: acceptance.gameId,
-        p1: acceptance.inviter,
-        p2: user
+        p1: newP1,
+        p2: user,
       });
-      pubsub.publish("invitationEvent", acceptance);
+      
+      pubsub.handleInvite(acceptance.invitee, "accepted", acceptance);
       return acceptance;
     },
     declineInvitation: async (_, { inviter }, { user, pubsub }) => {
@@ -76,7 +80,9 @@ const resolvers = {
         user,
         toAwait: { key: "inviter", awaitedUser: inviter },
       });
-      pubsub.publish("invitationEvent", declination);
+
+      
+      pubsub.handleInvite(declination.invitee, "declined", declination);
       return declination;
     },
   },
@@ -85,25 +91,28 @@ const resolvers = {
       subscribe: withFilter(
         (_, __, { pubsub }) => pubsub.asyncIterator("invitationEvent"),
         ({ inviter, invitee, status, gameId }, _, { user, ws, pubsub }) => {
-          console.log("i go off 3 times")
           if (status === "inviting") {
-            if (invitee._id === user._id) {console.log("marking ws as invited"); ws.invited = true;}
+            if (invitee._id === user._id) ws.invited = true;
             return invitee._id === user._id;
           } else if (status === "declined") {
             return inviter._id === user._id;
           } else if (status === "accepted") {
             const shouldSend = (ws.inviting || (ws.invited && ws.accepting));
-            if (shouldSend) ws.gameId = gameId;
+            if (shouldSend && (inviter._id === user._id || invitee._id === user._id)) {
+              ws.gameId = gameId;
+              pubsub.updateSubscribers("add", [user], gameId);
+            }
 
             delete ws.inviting;
             delete ws.invited;
-            delete ws.accepting
+            delete ws.accepting;
             return shouldSend && (inviter._id === user._id || invitee._id === user._id);
+          } else if (status === "rejected") {
+            return ws.inviting && user._id === inviter._id;
           }
-        }
+        },
       ),
       resolve: (payload) => {
-        console.log("resolving invitation");
         return payload;
       },
     },
@@ -117,10 +126,3 @@ module.exports = {
 
 
 // handle pubsub.games
-// pubsub.publish("gameEvent", {
-//   p1: inviter,
-//   p2: invitee,
-//   spectators: [],
-//   status: "initializing",
-//   gameId: inviter._id + invitee._id + Date.now()
-// })

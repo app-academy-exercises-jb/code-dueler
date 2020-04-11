@@ -35,11 +35,11 @@ const resolvers = {
   Query: {
     me(_, __, context) {
       // user provided by passport
-      console.log("querying for current user");
+      // console.log("querying for current user");
       return context.user;
     },
     users: (_, __, { pubsub }) => {
-      console.log("resolving users:", { subscribers: pubsub.subscribers });
+      // console.log("resolving users:", { subscribers: pubsub.subscribers });
       if (!pubsub.subscribers) return [];
       return User.find({
         _id: { $in: Object.keys(pubsub.subscribers) },
@@ -56,8 +56,7 @@ const resolvers = {
   },
   Subscription: {
     userLoggedEvent: {
-      subscribe: (_, __, { pubsub }) => {
-        console.log("subscribing");
+      subscribe: (_, __, { pubsub, ws }) => {
         return pubsub.asyncIterator("userLoggedEvent");
       },
       resolve: async (payload) => {
