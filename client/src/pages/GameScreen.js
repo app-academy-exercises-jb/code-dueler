@@ -19,16 +19,21 @@ export default ({ onlineUsers, me }) => {
   const [ownStats, setOwnStats] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState("");
-  const [leaveGame] = useMutation(LEAVE_GAME)
+  const [leaveGame] = useMutation(LEAVE_GAME);
 
   // function returned from useEffect will run on component unmount
-  useEffect(() => () => {
-    if (!data) return;
-    leaveGame({variables: {
-      player: data.me._id,
-      gameId
-    }});
-  }, []);
+  useEffect(
+    () => () => {
+      if (!data) return;
+      leaveGame({
+        variables: {
+          player: data.me._id,
+          gameId,
+        },
+      });
+    },
+    []
+  );
 
   useSubscription(ON_GAME, {
     fetchPolicy: "network-only",
@@ -53,7 +58,7 @@ export default ({ onlineUsers, me }) => {
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
-        console.log(data)
+        console.log(data);
         setOwnStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
@@ -94,7 +99,11 @@ export default ({ onlineUsers, me }) => {
           <div className="code-editor-wrapper">
             <CodeEditor gameId={gameId} me={data.me} />
           </div>
-          <PlayerStats me={data.me} ownStats={ownStats} opponentStats={opponentStats} />
+          <PlayerStats
+            me={data.me}
+            ownStats={ownStats}
+            opponentStats={opponentStats}
+          />
         </div>
         <div className="game-right">
           <div className="challenge-question-wrapper">

@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
-import { CURRENT_USER, IS_LOGGED_IN, GET_ONLINE_USERS } from "../../graphql/queries";
+import {
+  CURRENT_USER,
+  IS_LOGGED_IN,
+  GET_ONLINE_USERS,
+} from "../../graphql/queries";
 import { USER_LOGGED_EVENT, ON_INVITATION } from "../../graphql/subscriptions";
 
 const subscribeToUserEvents = (subscribeToMore) =>
@@ -43,15 +47,29 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
     }
   }, [data, onlineUsers.loading]);
 
-
   if (!redirectTo) redirectTo = "/login";
   if (loading || error || !data || !me.data || me.loading) {
     return null;
   } else if (data.isLoggedIn) {
-    return <Route path={path} {...rest} render={() => {
-      return <Component onlineUsers={onlineUsers} me={me} refetchMe={refetch}/>
-    }} />;
+    console.log(me);
+    return (
+      <Route
+        path={path}
+        {...rest}
+        render={() => {
+          return (
+            <Component onlineUsers={onlineUsers} me={me} refetchMe={refetch} />
+          );
+        }}
+      />
+    );
   } else {
-    return <Route path={path} render={() => <Redirect to={redirectTo} />} {...rest}/>;
+    return (
+      <Route
+        path={path}
+        render={() => <Redirect to={redirectTo} />}
+        {...rest}
+      />
+    );
   }
 };
