@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { USER_CREDENTIALS_DATA } from "./fragments";
+import { USER_CREDENTIALS_DATA, GAME_USER_DETAILS } from "./fragments";
 
 export const LOGIN_USER = gql`
   mutation LogIn($username: String!, $password: String!) {
@@ -48,6 +48,7 @@ export const INVITE_PLAYER = gql`
         username
       }
       status
+      reason
     }
   }
 `;
@@ -65,7 +66,7 @@ export const ACCEPT_INVITE = gql`
 `;
 
 export const DECLINE_INVITE = gql`
-  mutation Decline_Invite($inviter: ID!) {
+  mutation DeclineInvite($inviter: ID!) {
     declineInvitation(inviter: $inviter) {
       inviter {
         _id
@@ -73,5 +74,62 @@ export const DECLINE_INVITE = gql`
       }
       status
     }
+  }
+`;
+
+export const UPDATE_GAME_LAST_SUBMITTED = gql`
+  mutation UpdateGameUserLastSubmitted(
+    $player: ID!
+    $lastSubmittedResult: String!
+    $gameId: String!
+  ) {
+    updateGameUserLastSubmitted(
+      player: $player
+      gameId: $gameId
+      lastSubmittedResult: $lastSubmittedResult
+    ) {
+      ...GameUserDetails
+    }
+  }
+  ${GAME_USER_DETAILS}
+`;
+
+export const UPDATE_GAME_USER_CODE = gql`
+  mutation UpdateGameUserCurrentCode(
+    $charCount: Int!
+    $lineCount: Int!
+    $currentCode: String!
+    $gameId: String!
+    $player: ID!
+  ) {
+    updateGameUserCurrentCode(
+      charCount: $charCount
+      lineCount: $lineCount
+      currentCode: $currentCode
+      gameId: $gameId
+      player: $player
+    ) {
+      ...GameUserDetails
+    }
+  }
+  ${GAME_USER_DETAILS}
+`;
+
+export const UPDATE_GAME_USER_STATUS = gql`
+  mutation UpdateGameUserStatus(
+    $player: ID!
+    $status: String!
+    $gameId: String!
+  ) {
+    updateGameUserStatus(player: $player, status: $status, gameId: $gameId) {
+      ...GameUserDetails
+    }
+  }
+  ${GAME_USER_DETAILS}
+`;
+
+export const LEAVE_GAME = gql `
+  mutation LeaveGame($player: ID!, $gameId: String!) {
+    leaveGame(player: $player, gameId: $gameId)
   }
 `;

@@ -8,3 +8,16 @@ export const USER_CREDENTIALS_DATA = gql`
     loggedIn
   }
 `;
+
+export const GAME_USER_DETAILS = gql`
+  fragment GameUserDetails on GameUser {
+    player {
+      _id
+      username
+    }
+    lastSubmittedResult
+    charCount
+    lineCount
+    currentCode
+  }
+`;

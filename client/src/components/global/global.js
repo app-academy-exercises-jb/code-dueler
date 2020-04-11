@@ -2,11 +2,11 @@ import React from "react";
 import SideBar from "../sidebar/SideBar";
 import Chat from "../chat/Chat";
 
-const GlobalMain = ({ data }) => {
+const GlobalMain = ({ data, me }) => {
   return (
     <div className="global-main">
       <SideBar data={data} />
-      <Chat />
+      <Chat me={me} />
     </div>
   );
 };

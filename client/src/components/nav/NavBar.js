@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 
-const NavBar = (props) => {
+const NavBar = ({ data, noData }) => {
   return (
     <>
       <div className="nav-bar-wrapper">
         <div className="left-nav">
-          <ProtectedComponent component={NavBarPlayerCount} data={props.data}/>
+          {!noData && (
+            <ProtectedComponent component={NavBarPlayerCount} data={data} />
+          )}
         </div>
         <div className="logo-wrapper">
           <Link to="/" className="logo-nav">

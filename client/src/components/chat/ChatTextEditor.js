@@ -14,11 +14,11 @@ const ChatTextEditor = ({ me, channelId, id }) => {
     <div className="text-editor-wrapper" id={id}>
       <form onSubmit={handleChatSubmit} className="text-editor-form">
         <input
-          autoFocus
           type="text"
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
           className="text-input-area"
+          placeholder="Type to chat"
         />
       </form>
     </div>
