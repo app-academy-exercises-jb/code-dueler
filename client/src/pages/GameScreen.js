@@ -3,12 +3,12 @@ import NavBar from "../components/nav/NavBar";
 import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
-import Stats from "../components/game/Stats";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams, useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
 import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../graphql/mutations";
+import PlayerStats from "../components/game/PlayerStats";
 
 export default ({ onlineUsers, me }) => {
   const { loading, error, data } = me;
@@ -16,7 +16,7 @@ export default ({ onlineUsers, me }) => {
   const history = useHistory();
   const [gameEvent, setGameEvent] = useState(null);
   const [opponentStats, setOpponentStats] = useState(null);
-  const [ownStats, setownStats] = useState(null);
+  const [ownStats, setOwnStats] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState("");
   const [leaveGame] = useMutation(LEAVE_GAME)
@@ -40,7 +40,7 @@ export default ({ onlineUsers, me }) => {
       setGameEvent(e);
 
       let self, opponent;
-      if (data && e.p1.player._id === data.me._id) {
+      if (e.p1.player._id === data.me._id) {
         self = "p1";
         opponent = "p2";
       } else {
@@ -53,10 +53,13 @@ export default ({ onlineUsers, me }) => {
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
-        setownStats(e[self]);
+        console.log(data)
+        setOwnStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {
-        if (e.winner === self) {
+        if (e.winner === null) {
+          handleGameOver("disconnect");
+        } else if (e.winner === self) {
           handleGameOver("victory");
         } else {
           handleGameOver("defeat");
@@ -70,8 +73,10 @@ export default ({ onlineUsers, me }) => {
   const handleGameOver = (wincon) => {
     if (wincon === "defeat") {
       setGameOverMessage("You have been defeated!");
-    } else {
+    } else if (wincon === "victory") {
       setGameOverMessage("You are victorious!");
+    } else if (wincon === "disconnect") {
+      setGameOverMessage("Looks like your opponent left early...");
     }
     setModalOpen(true);
   };
@@ -89,17 +94,7 @@ export default ({ onlineUsers, me }) => {
           <div className="code-editor-wrapper">
             <CodeEditor gameId={gameId} me={data.me} />
           </div>
-          <div className="stats-wrapper">
-            <div className="stats-players">
-              <Stats ownStats={ownStats} defStats={"Own Stats"} />
-            </div>
-            <div className="stats-players">
-              <Stats
-                opponentStats={opponentStats}
-                defStats={"Opponent Stats"}
-              />
-            </div>
-          </div>
+          <PlayerStats me={data.me} ownStats={ownStats} opponentStats={opponentStats} />
         </div>
         <div className="game-right">
           <div className="challenge-question-wrapper">

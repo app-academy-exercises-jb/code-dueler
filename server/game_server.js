@@ -122,7 +122,7 @@ const handleGames = (pubsub) => {
       let invitable = true, 
         result = {};
       
-      if (user._id === doc.invitee._id) {
+      if (doc.inviter._id === doc.invitee._id) {
         invitable = false;
         result = {
           status: "rejected",
