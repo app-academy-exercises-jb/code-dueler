@@ -1,31 +1,57 @@
 import React, { useState } from "react";
-import ReactModal from "react-modal";
 
 const Stats = ({ ownStats, opponentStats, defStats }) => {
-  ReactModal.setAppElement("#root");
-  const [count, setCount] = useState(0);
-  const [maxCount, setMaxCount] = useState(1);
-  const [errorOpen, setErrorOpen] = useState(false);
-  const [resultsOpen, setResultsOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState("error-hidden");
+  const [resultsOpen, setResultsOpen] = useState("results-hidden");
   const stats = ownStats ? ownStats : opponentStats;
   let parsed;
   stats &&
     stats.lastSubmittedResult &&
     (parsed = JSON.parse(stats.lastSubmittedResult));
-  if (parsed) console.log(parsed);
+
+  let error = parsed && parsed.error ? parsed.error.stackTrace : null;
+  let test, expected, result;
+  if (parsed && parsed.checkedTests) {
+    test = parsed.checkedTests[parsed.checkedTests.length - 1];
+  }
+  if (parsed && parsed.expected) {
+    expected = parsed.expected.map((el, i) => {
+      if (i !== parsed.expected.length - 1) {
+        return `"${el}", `;
+      } else {
+        return `"${el}"`;
+      }
+    });
+  }
+  if (parsed && parsed.output) {
+    result = parsed.output.map((el, i) => {
+      if (i !== parsed.output.length - 1) {
+        return `"${el}", `;
+      } else {
+        return `"${el}"`;
+      }
+    });
+  }
+
+  console.log(parsed);
 
   const openTestResults = () => {
-    setResultsOpen(true);
+    if (expected) {
+      setResultsOpen("results-block");
+    }
   };
 
   const openErrorResults = () => {
-    setErrorOpen(true);
+    if (error) {
+      setErrorOpen("error-block");
+    }
   };
 
   const handleModalClose = () => {
-    setErrorOpen(false);
-    setResultsOpen(false);
+    setErrorOpen("error-hidden");
+    setResultsOpen("results-hidden");
   };
+
   return (
     <>
       <div className="stats-form">
@@ -49,17 +75,10 @@ const Stats = ({ ownStats, opponentStats, defStats }) => {
           </div>
         </div>
       </div>
-      <ReactModal
-        isOpen={errorOpen}
-        className={`modal-overlay`}
-        shouldCloseOnEsc={true}
-        onRequestClose={() => setErrorOpen(false)}
-      >
-        <div className={`modal`}>
-          <div className={`modal-info center`}>
-            <h1></h1>
-          </div>
-          <div className="modal-buttons">
+      <div className={`stats-modal-overlay ${errorOpen}`}>
+        <div className={`stats-modal ${errorOpen}`}>
+          <div className={`stats-modal-info center`}>{error}</div>
+          <div className="stats-modal-buttons">
             <button
               className="modal-decline decline-hover"
               onClick={handleModalClose}
@@ -68,7 +87,29 @@ const Stats = ({ ownStats, opponentStats, defStats }) => {
             </button>
           </div>
         </div>
-      </ReactModal>
+      </div>
+      <div className={`stats-modal-overlay ${resultsOpen}`}>
+        <div className={`stats-modal ${resultsOpen}`}>
+          <div className={`stats-modal-info center`}>
+            <div className="stats-modal-results">
+              Test case = {test}
+              <br />
+              Expected result = <code>[{expected}]</code>
+              <br />
+              Submitted code result = ["{result}"]
+              <br />
+            </div>
+          </div>
+          <div className="stats-modal-buttons">
+            <button
+              className="modal-decline decline-hover"
+              onClick={handleModalClose}
+            >
+              Close Results
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

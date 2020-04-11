@@ -121,5 +121,22 @@
 .stats-results {
   display: flex;
   justify-content: center;
-  align-self: center;
+  margin-top: 10px;
+  height: 80px;
+  flex-wrap: wrap;
+  h2 {
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-self: center;
+    font-size: 16px;
+    background-color: #D4F2D2;
+    color: #0E1428;
+    border-radius: 4px;
+    padding: 3px 0;
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }

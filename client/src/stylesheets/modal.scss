@@ -104,3 +104,83 @@
     background-color: #D4F2D2;
   }
 }
+
+// =========Stats Modal==========
+
+.stats-modal-overlay {
+  // position: fixed;
+  // top: 0;
+  // left: 0;
+  // width: 100%;
+  // height: 100%;
+  // z-index: 50;
+  // background: rgba(110, 125, 171, 0);
+}
+
+.stats-modal {
+  display: block;
+  // width: 600px;
+  // max-width: 100%;
+  // height: 500px;
+  // max-height: 100%;
+  height: fit-content;
+  width: fit-content;
+  position: fixed;
+  z-index: -100;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #E4E6C3;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  color: #D4F2D2;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;;
+  font-family: 'Roboto', sans-serif;
+}
+
+.error-block {
+  display: flex;
+  z-index: 50;
+}
+
+.error-hidden {
+  display: none;
+}
+
+.results-block {
+  display: flex;
+  z-index: 50;
+}
+
+.results-hidden {
+  display: none;
+}
+
+.stats-modal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  height: fit-content;
+  width: 100%;
+  color: maroon;
+
+}
+
+.stats-modal-buttons {
+  z-index: 200;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 80%;
+}
+
+.stats-modal-results {
+  font-size: 22px;
+}
