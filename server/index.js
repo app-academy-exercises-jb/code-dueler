@@ -153,7 +153,7 @@ app.listen = function () {
         pubsub.subscribers[ws.userId].splice(userIdx, 1);
 
         if (user.ws.gameId) {
-          pubsub.updateSubscribers("remove", [user], user.ws.gameId);
+          pubsub.updateSubscribersGameId("remove", [user], user.ws.gameId);
         }
 
         if (pubsub.subscribers[ws.userId].length === 0) {

@@ -9,7 +9,7 @@ export default ({ownStats, opponentStats}) => {
   };
 
   const setResultsProps = parsed => {
-    if (!parsed) return;
+    if (!parsed || (parsed && parsed.error !== undefined)) return;
     setProps({ 
       test: parsed.checkedTests[parsed.checkedTests.length - 1],
       expected: parsed.expected,
