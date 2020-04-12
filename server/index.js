@@ -118,20 +118,8 @@ app.listen = function () {
           );
 
           if (!user._id) return false;
-          console.log(`${user._id} connected to the websocket`);
-          user.ws = ws;
-          // mark the socket object with the appropriate ID so we can remove it on DC
-          ws.userId = user._id;
 
-          // save connections to keep track of online users
-          // we access pubsub from the resolvers
-          if (pubsub.subscribers[user._id] === undefined) {
-            pubsub.subscribers[user._id] = [user];
-            pubsub.publishUserLoggedEvent(user, true);
-          } else {
-            pubsub.subscribers[user._id].push(user);
-          }
-          
+          pubsub.addWs({ws, user});
 
           return {
             pubsub,
@@ -140,26 +128,11 @@ app.listen = function () {
           };
         }
       },
-      onDisconnect: (ws, context) => {
+      onDisconnect: (ws) => {
         if (ws.userId === undefined) return;
         // console.log("disconnecting:", pubsub.subscribers)
         console.log(`${ws.userId} disconnected from the websocket`);
-
-        const userIdx = pubsub.subscribers[ws.userId].findIndex(
-          (s) => s.ws === ws
-        );
-        const user = pubsub.subscribers[ws.userId][userIdx];
-
-        pubsub.subscribers[ws.userId].splice(userIdx, 1);
-
-        if (user.ws.gameId) {
-          pubsub.updateSubscribersGameId("remove", [user], user.ws.gameId);
-        }
-
-        if (pubsub.subscribers[ws.userId].length === 0) {
-          delete pubsub.subscribers[ws.userId];
-          pubsub.publishUserLoggedEvent(user, false);
-        }
+        pubsub.removeWs(ws);
       },
     },
     {

@@ -77,8 +77,11 @@ const createClient = async () => {
       return (
         def.kind === 'OperationDefinition' && 
           (def.operation === 'subscription'
-            || (def.operation === 'mutation' && def.name.value !== "LogIn")
-            || (def.operation === 'query' && def.name.value === "InGameInfo")
+            || (def.operation === 'mutation' 
+              && def.name.value !== 'LogIn'
+              && def.name.value !== 'SignUp')
+            || (def.operation === 'query'
+              && def.name.value === "InGameInfo")
           )
       )
     },
@@ -116,6 +119,8 @@ const createClient = async () => {
       if (!data || !data.me) client.resetStore();
     });
   }
+
+  client.subscriptionClient = wsLink.subscriptionClient;
 
   return client;
 };

@@ -4,13 +4,13 @@ import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
-import { useParams, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { ON_GAME } from "../graphql/subscriptions";
 import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
 
-export default ({ onlineUsers, me, gameId }) => {
+export default ({ me, gameId }) => {
   const { loading, error, data } = me;
   const history = useHistory();
   const [gameEvent, setGameEvent] = useState(null);

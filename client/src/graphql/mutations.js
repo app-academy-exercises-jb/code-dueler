@@ -10,6 +10,12 @@ export const LOGIN_USER = gql`
   ${USER_CREDENTIALS_DATA}
 `;
 
+export const LOGOUT_USER = gql`
+  mutation LogOut {
+    logout
+  }
+`;
+
 export const SIGNUP_USER = gql`
   mutation SignUp($username: String!, $password: String!) {
     signup(username: $username, password: $password) {

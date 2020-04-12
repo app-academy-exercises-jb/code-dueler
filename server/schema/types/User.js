@@ -16,6 +16,7 @@ const typeDefs = `
   extend type Mutation {
     signup(username: String!, password: String!): UserCredentials!
     login(username: String!, password: String!): UserCredentials!
+    logout: String!
   }
   extend type Subscription {
     userLoggedEvent: UserUpdate!
@@ -53,6 +54,15 @@ const resolvers = {
     login(_, { username, password }) {
       return User.login(username, password);
     },
+    logout(_, __, { user, pubsub, ws}) {
+      if (user._id !== ws.userId
+          || pubsub.subscribers[user._id] === undefined
+          || pubsub.subscribers[user._id].every(s =>
+            s.ws !== ws) ) return "not ok";
+
+      pubsub.logoutUser({user, ws});
+      return "ok";
+    }
   },
   Subscription: {
     userLoggedEvent: {

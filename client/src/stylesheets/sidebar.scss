@@ -11,11 +11,21 @@
 }
 
 .user-list-wrapper {
-  padding-left: 2rem;
+  width: 100%;
   color: #0E1428;
 } 
 
+.user-list-item:hover {
+  background-color: #45495a;
+  color: #e4e6c3;
+}
+
 .user-list-item {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  padding-left: 2rem;
   cursor: pointer;
 }
 

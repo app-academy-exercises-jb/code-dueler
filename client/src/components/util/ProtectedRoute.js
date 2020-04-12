@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import {
   CURRENT_USER,
   IS_LOGGED_IN,
   GET_ONLINE_USERS,
 } from "../../graphql/queries";
-import { USER_LOGGED_EVENT, ON_INVITATION } from "../../graphql/subscriptions";
+import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
 
-const subscribeToUserEvents = (subscribeToMore) =>
+const subscribeToUserEvents = (subscribeToMore, { data: { me }}, client) =>
   subscribeToMore({
     document: USER_LOGGED_EVENT,
     updateQuery: (prev, { subscriptionData }) => {
@@ -20,7 +20,13 @@ const subscribeToUserEvents = (subscribeToMore) =>
         // if we have a brand new user, splice them in
         next.users.splice(0, 0, user);
       } else if (user.loggedIn === false) {
+        
         if (idx === -1) return next;
+        if (me._id === next.users[idx]._id) {
+          client.subscriptionClient.unsubscribeAll();
+          client.subscriptionClient.close();
+          client.resetStore();
+        }
         next.users.splice(idx, 1);
       }
 
@@ -29,6 +35,7 @@ const subscribeToUserEvents = (subscribeToMore) =>
   });
 
 export default ({ component: Component, path, redirectTo, ...rest }) => {
+  const client = useApolloClient();
   const { data, loading, error } = useQuery(IS_LOGGED_IN);
 
   const { refetch, ...me } = useQuery(CURRENT_USER, {
@@ -40,12 +47,13 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
   });
 
   useEffect(() => {
-    if (data && data.isLoggedIn && onlineUsers.loading === false) {
+    if (data && data.isLoggedIn && onlineUsers.loading === false && me.loading === false) {
       setTimeout(() => {
-        subscribeToUserEvents(subscribeToMore);
+        console.log("subscribing to user events")
+        subscribeToUserEvents(subscribeToMore, me, client);
       }, 10);
     }
-  }, [data, onlineUsers.loading]);
+  }, [data, onlineUsers.loading, me.loading]);
 
   if (!redirectTo) redirectTo = "/login";
   if (loading || error || !data || !me.data || me.loading) {
