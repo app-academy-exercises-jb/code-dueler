@@ -44,6 +44,7 @@ export default ({ownStats, opponentStats, spectator}) => {
   const [ownParsed, setOwnParsed] = useState(null);
   const [opponentParsed, setOpponentParsed] = useState(null);
 
+  const shouldUpdateOnLastOwnSubmitted = ownStats && ownStats.lastSubmittedResult;
   useEffect(() => {
     if (ownStats && ownStats.lastSubmittedResult && !spectator) {
         const parsed = JSON.parse(ownStats.lastSubmittedResult);
@@ -65,13 +66,14 @@ export default ({ownStats, opponentStats, spectator}) => {
         setOwnParsed(parsed);
       }
     return () => setModalOpen(false);
-  }, [ownStats && ownStats.lastSubmittedResult]);
+  }, [shouldUpdateOnLastOwnSubmitted]);
 
+  const shouldUpdateOnLastOppSubmitted = opponentStats && opponentStats.lastSubmittedResult;
   useEffect(() => {
     if (opponentStats && opponentStats.lastSubmittedResult) {
         setOpponentParsed(JSON.parse(opponentStats.lastSubmittedResult));
       }
-  }, [opponentStats && opponentStats.lastSubmittedResult]);
+  }, [shouldUpdateOnLastOppSubmitted]);
 
   useEffect(() => setModalOpen(false), []);
 

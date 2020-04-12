@@ -15,12 +15,15 @@ export default ({ ...props }) => {
 
   const [spectateGame] = useMutation(SPECTATE_GAME);
 
+  const shouldUpdateSpectator = data && data.isSpectator;
+  const shouldUpdateInGame = data && data.isInGame;
+
   useEffect(() => {
     if (data && !data.isInGame && !data.isSpectator) {
       debugger
       spectateGame({ variables: { gameId }});
     }
-  }, [data && data.isSpectator, data && data.isInGame]);
+  }, [shouldUpdateSpectator, shouldUpdateInGame]);
 
   if (loading || error || !data) return null;
 

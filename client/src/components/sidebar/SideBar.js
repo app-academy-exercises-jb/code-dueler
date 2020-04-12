@@ -35,7 +35,7 @@ const SideBar = ({ data }) => {
         // Go to the game screen
         history.push(`/game/${e.gameId}`);
       } else if (e.status === "rejected") {
-        if (e.reason == "That player's already in another game!") {
+        if (e.reason === "That player's already in another game!") {
           setSelectedUser(e.invitee);
           setSpectateModalOpen(true);
         } else {
