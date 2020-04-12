@@ -1,12 +1,10 @@
 .editor {
   background-color: #f5f2f0;
   width: 90%;
-  min-height: 400px;
   border-radius: 5px;
   display: flex;
   align-items: space-around;
   flex-direction: column;
-  height: 75%;
 }
 
 .editor-info {
@@ -16,7 +14,6 @@
 }
 
 .editorPre {
-  min-height: 420px;
   min-width: 500px;
   width: 100%;
   font-size: 13px;

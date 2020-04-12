@@ -82,7 +82,7 @@ export default ({ me }) => {
   // console.log(player1Stats);
 
   return (
-    <div className="main">
+    <div className="main-spectator">
       <div className="spectator-wrapper">
         <div className="screen-top">
           <div className="spectator-player1">

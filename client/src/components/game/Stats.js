@@ -20,7 +20,7 @@ export default ({
   return (
     <>
       <div className="stats-form">
-        <h1>{}</h1>
+        <h1>these are stats</h1>
         <br />
         <div className="stats">
           <h2>Character Count: {(stats && stats.charCount) || 0}</h2>
