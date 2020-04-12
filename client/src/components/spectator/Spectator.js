@@ -42,7 +42,7 @@ export default ({ me }) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const { p1, p2, status, winner } = subscriptionData.data.gameEvent;
-
+      console.log("inside the onSubscriptionData");
       if (status === "initializing") {
         console.log("initializing");
       } else if (status === "ready") {
@@ -79,31 +79,45 @@ export default ({ me }) => {
     history.push("/");
   };
 
+  // console.log(player1Stats);
+
   return (
     <div className="main">
       <div className="spectator-wrapper">
         <div className="screen-top">
           <div className="spectator-player1">
-            <div className="code-editor-wrapper">
-              <CodeEditor gameId={gameId} ownStats={player1Stats} />
+            <div className="player-components">
+              <div className="code-editor-wrapper-spectator">
+                <CodeEditor
+                  gameId={gameId}
+                  ownStats={player1Stats}
+                  spectator={true}
+                />
+              </div>
+              <div className="player-stats">
+                <PlayerStats
+                  me={data.me}
+                  player1Stats={player1Stats}
+                  opponentStats={player2Stats}
+                />
+              </div>
             </div>
-            <PlayerStats
-              me={data.me}
-              player1Stats={player1Stats}
-              opponentStats={player2Stats}
-            />
           </div>
           <div className="spectator-player2">
             <div className="code-editor-wrapper">
-              <CodeEditor gameId={gameId} opponentStats={player2Stats} />
+              <CodeEditor
+                gameId={gameId}
+                opponentStats={player2Stats}
+                spectator={true}
+              />
             </div>
           </div>
         </div>
         <div className="screen-bottom">
-          <div className="challenge-question-wrapper">
+          <div className="challenge-question-wrapper-spectator">
             <ChallengeQuestion />
           </div>
-          <div className="game-chat-wrapper">
+          <div className="game-chat-wrapper-spectator">
             <Chat channelId={gameId} id={"game-chat"} me={me} />
           </div>
         </div>

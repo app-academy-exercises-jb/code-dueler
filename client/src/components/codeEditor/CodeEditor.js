@@ -7,11 +7,11 @@ import {
   UPDATE_GAME_LAST_SUBMITTED,
 } from "../../graphql/mutations";
 
-const CodeEditor = ({ gameId, me }) => {
+const CodeEditor = ({ gameId, me, spectator }) => {
   const editorRef = useRef(null);
   const [code, setCode] = useState(`var fizzBuzz = (n) => {
-
-};`);
+    
+  };`);
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
 
@@ -22,29 +22,20 @@ const CodeEditor = ({ gameId, me }) => {
     setCharCount(code.length);
     setLineCount(code.split(/\r*\n/).length);
     setCode(code);
-    const variables = { charCount, lineCount, currentCode: code, gameId, player: me._id };
+    const variables = {
+      charCount,
+      lineCount,
+      currentCode: code,
+      gameId,
+      player: me._id,
+    };
     updateUserCode({ variables });
   };
 
-  return (
-    <>
-      <div className="editor">
-        <Editor
-          autoFocus
-          ref={editorRef}
-          value={code}
-          onValueChange={(code) => {
-            handleValueChange(code);
-          }}
-          highlight={(code) => Prism.highlight(code, Prism.languages.js)}
-          padding={10}
-          preClassName="editorPre"
-          style={{
-            fontFamily: '"Fira code", "Fira Mono", monospace',
-            fontSize: 12,
-          }}
-        />
-      </div>
+  const disabled = spectator ? true : false;
+  let button = null;
+  if (!disabled) {
+    button = (
       <button
         className="code-submit"
         onClick={(e) => {
@@ -77,6 +68,30 @@ const CodeEditor = ({ gameId, me }) => {
       >
         <h1>Submit your code</h1>
       </button>
+    );
+  }
+
+  return (
+    <>
+      <div className="editor">
+        <Editor
+          disabled={disabled}
+          autoFocus
+          ref={editorRef}
+          value={code}
+          onValueChange={(code) => {
+            handleValueChange(code);
+          }}
+          highlight={(code) => Prism.highlight(code, Prism.languages.js)}
+          padding={10}
+          preClassName="editorPre"
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+          }}
+        />
+      </div>
+      {button}
     </>
   );
 };

@@ -99,11 +99,15 @@ export default ({ onlineUsers, me }) => {
           <div className="code-editor-wrapper">
             <CodeEditor gameId={gameId} me={data.me} />
           </div>
-          <PlayerStats
-            me={data.me}
-            ownStats={ownStats}
-            opponentStats={opponentStats}
-          />
+          <div className="player-stats-game-wrapper">
+            <div className="player-stats-game">
+              <PlayerStats
+                me={data.me}
+                ownStats={ownStats}
+                opponentStats={opponentStats}
+              />
+            </div>
+          </div>
         </div>
         <div className="game-right">
           <div className="challenge-question-wrapper">
