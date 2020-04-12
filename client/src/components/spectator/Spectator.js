@@ -73,29 +73,27 @@ export default ({ me }) => {
   // console.log(player1Stats);
 
   return (
-    <div className="main">
+    <div className="main-spectator">
       <div className="spectator-wrapper">
         <div className="screen-top">
           <div className="spectator-player1">
-            <div className="player-components">
-              <div className="code-editor-wrapper-spectator">
-                <CodeEditor
-                  gameId={gameId}
-                  data={player1Stats && player1Stats.currentCode}
-                  spectator={true}
-                />
-              </div>
-              <div className="player-stats">
-                <PlayerStats
-                  ownStats={player1Stats}
-                  opponentStats={player2Stats}
-                  spectator={true}
-                />
-              </div>
+            <div className="code-editor-wrapper-spectator">
+              <CodeEditor
+                gameId={gameId}
+                data={player1Stats && player1Stats.currentCode}
+                spectator={true}
+              />
+            </div>
+            <div className="player-stats">
+              <PlayerStats
+                ownStats={player1Stats}
+                opponentStats={player2Stats}
+                spectator={true}
+              />
             </div>
           </div>
           <div className="spectator-player2">
-            <div className="code-editor-wrapper">
+            <div className="code-editor-wrapper-spectator">
               <CodeEditor
                 gameId={gameId}
                 data={player2Stats && player2Stats.currentCode}

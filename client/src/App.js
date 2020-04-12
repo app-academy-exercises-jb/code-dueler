@@ -7,6 +7,7 @@ import GameFilter from "./components/game/GameFilter";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import AuthRoute from "./components/util/AuthRoute";
+import Spectator from "./pages/Spectator";
 import "./stylesheets/application.scss";
 
 export default () => {
