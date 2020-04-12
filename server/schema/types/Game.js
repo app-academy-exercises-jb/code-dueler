@@ -70,8 +70,10 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
 
 const resolvers = {
   Mutation: {
-    spectateGame: (_, {player: _id }, { user, pubsub, ws }) => {
-      if (!pubsub.subscribers[_id]) return "not ok";
+    spectateGame: (_, { player: _id }, { user, pubsub, ws }) => {
+      if (_id === undefined) return "not ok";
+
+      if (pubsub.subscribers[_id] === undefined) return "not ok";
 
       const inGameWS = pubsub.subscribers[_id].findIndex(p => p.ws && p.ws.gameId);
 
@@ -80,7 +82,9 @@ const resolvers = {
       const gameId = pubsub.subscribers[_id][inGameWS].ws.gameId;
       const game = pubsub.games[gameId];
 
-      game.addSpectator({ _id });
+      ws.gameId = gameId;
+      pubsub.updateSubscribersGameId("add", [user], gameId);
+      game.addSpectator(user);
       return gameId;
     },
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
@@ -96,7 +100,7 @@ const resolvers = {
         game.users[_id] === undefined || 
         user._id !== _id) return "ok";
 
-      if (game.spectators[_id]) {
+      if (game.spectatorsKey[_id]) {
         game.removeSpectator({ _id });
       } else {
         game.endGame({_id});
@@ -153,6 +157,7 @@ const resolvers = {
         (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
           if (ws.gameId === undefined && user._id === ws.userId) {
             // reconnected to a stale game, update subscribers
+            console.log("found stale game")
             ws.gameId = gameId;
             pubsub.updateSubscribersGameId("add", [user], gameId);
           }
@@ -163,15 +168,15 @@ const resolvers = {
             game.initializeGame();
           }
 
+          console.log("subscribing to game event")
           return pubsub.asyncIterator("gameEvent");
         },
-        ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
-          console.log({game: pubsub.games[gameId]});
+        ({ p1, p2, gameId }, _, { user, pubsub, ws }) => {
           return (
             user._id === ws.userId &&
-            p1.player._id === user._id ||
+            (p1.player._id === user._id ||
             p2.player._id === user._id ||
-            spectators[user._id]
+            pubsub.games[gameId].spectatorsKey[user._id] !== undefined)
           );
         }
       ),

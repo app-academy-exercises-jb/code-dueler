@@ -10,11 +10,9 @@ import { LEAVE_GAME } from "../../graphql/mutations";
 import PlayerStats from "../game/PlayerStats";
 
 export default ({ me }) => {
-  // debugger;
   const { loading, error, data } = me;
   const { id: gameId } = useParams();
   const history = useHistory();
-  // const [gameEvent, setGameEvent] = useState(null);
   const [player1Stats, setPlayer1Stats] = useState(null);
   const [player2Stats, setPlayer2Stats] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,26 +38,19 @@ export default ({ me }) => {
     variables: {
       gameId,
     },
-    onSubscriptionData: ({ client, subscriptionData }) => {
+    onSubscriptionData: ({ subscriptionData }) => {
       const { p1, p2, status, winner } = subscriptionData.data.gameEvent;
-      console.log("inside the onSubscriptionData");
-      if (status === "initializing") {
-        console.log("initializing");
-      } else if (status === "ready") {
-        console.log("ready");
-      } else if (status === "ongoing") {
-        console.log(data);
+      if (status === "ongoing") {
         setPlayer1Stats(p1);
         setPlayer2Stats(p2);
       } else if (status === "over") {
-        // fix this return
-        // if (winner === null) {
-        //   handleGameOver("disconnect");
-        // } else if (winner === self) {
-        //   handleGameOver("victory");
-        // } else {
-        //   handleGameOver("defeat");
-        // }
+        if (winner === null) {
+          handleGameOver("disconnect");
+        } else if (winner === "p1") {
+          handleGameOver(p1.player.username);
+        } else {
+          handleGameOver(p2.player.username);
+        }
       }
     },
   });
@@ -90,15 +81,15 @@ export default ({ me }) => {
               <div className="code-editor-wrapper-spectator">
                 <CodeEditor
                   gameId={gameId}
-                  ownStats={player1Stats}
+                  data={player1Stats && player1Stats.currentCode}
                   spectator={true}
                 />
               </div>
               <div className="player-stats">
                 <PlayerStats
-                  me={data.me}
-                  player1Stats={player1Stats}
+                  ownStats={player1Stats}
                   opponentStats={player2Stats}
+                  spectator={true}
                 />
               </div>
             </div>
@@ -107,7 +98,7 @@ export default ({ me }) => {
             <div className="code-editor-wrapper">
               <CodeEditor
                 gameId={gameId}
-                opponentStats={player2Stats}
+                data={player2Stats && player2Stats.currentCode}
                 spectator={true}
               />
             </div>

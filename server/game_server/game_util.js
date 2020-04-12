@@ -14,7 +14,8 @@ const gameUtil = pubsub => {
         [p1._id]: 1,
         [p2._id]: 1,
       },
-      spectators: {},
+      spectators: [],
+      spectatorsKey: {},
       status: "initializing",
       connections: 0,
     };
