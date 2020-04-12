@@ -9,7 +9,7 @@ import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../../graphql/mutations";
 import PlayerStats from "../game/PlayerStats";
 
-export default ({ me }) => {
+export default ({ me, setSpectators }) => {
   const { loading, error, data } = me;
   const { id: gameId } = useParams();
   const history = useHistory();
@@ -40,6 +40,8 @@ export default ({ me }) => {
     },
     onSubscriptionData: ({ subscriptionData }) => {
       const { p1, p2, status, winner } = subscriptionData.data.gameEvent;
+      setSpectators(subscriptionData.data.gameEvent.connections);
+
       if (status === "ongoing") {
         setPlayer1Stats(p1);
         setPlayer2Stats(p2);

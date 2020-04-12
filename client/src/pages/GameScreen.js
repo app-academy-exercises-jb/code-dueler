@@ -92,7 +92,7 @@ export default ({ me, gameId }) => {
 
   return (
     <div className="main">
-      <NavBar noData={true} />
+      <NavBar inGame={true} data={gameEvent && gameEvent.connections - 2}/>
       <div className="game-screen">
         <div className="game-left">
           <div className="code-editor-wrapper">

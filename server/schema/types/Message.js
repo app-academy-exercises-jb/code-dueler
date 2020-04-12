@@ -41,6 +41,11 @@ const resolvers = {
   },
   Mutation: {
     addMessage(_, { author, body, channelId }, { user, pubsub }) {
+      if (body.trim() === "") return {
+        success: false,
+        message: "no empty messages",
+        messages: []
+      };
       return Message.post({ author, body, user, channelId, pubsub });
     },
   },

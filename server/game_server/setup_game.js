@@ -79,9 +79,11 @@ const setupGame = pubsub => game => {
         game.users[spectator._id] += 1
       } else {
         game.spectators.push(spectator);
+        game.connections += 1;
         game.spectatorsKey[spectator._id] = 1;
         game.users[spectator._id] = 1;
         pubsub.games.inGame[spectator._id] = true;
+        setTimeout(() => pubsub.publish("gameEvent", game), 500);
       }
     } else if (action === "remove") {
       if (findSpectator(spectator)) {
@@ -93,9 +95,11 @@ const setupGame = pubsub => game => {
         if (idx !== -1) {
           game.spectators.splice(idx, 1);
         }
+        game.connections -= 1;
         delete game.spectatorsKey[spectator._id];
         delete game.users[spectator._id];
         pubsub.games.inGame[spectator._id] = false;
+        pubsub.publish("gameEvent", game);
       }
     }
   }
