@@ -3,7 +3,7 @@ import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
 import { useMutation, useSubscription } from "@apollo/react-hooks";
 import { ON_INVITATION } from "../../graphql/subscriptions";
-import { ACCEPT_INVITE, DECLINE_INVITE, SPECTATE_GAME } from "../../graphql/mutations";
+import { ACCEPT_INVITE, DECLINE_INVITE, SPECTATE_USER } from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
 
 const SideBar = ({ data }) => {
@@ -16,7 +16,7 @@ const SideBar = ({ data }) => {
 
   const [acceptInvite] = useMutation(ACCEPT_INVITE);
   const [declineInvite] = useMutation(DECLINE_INVITE);
-  const [spectate] = useMutation(SPECTATE_GAME);
+  const [spectate] = useMutation(SPECTATE_USER);
 
   const history = useHistory();
 
@@ -60,11 +60,11 @@ const SideBar = ({ data }) => {
     setChallengeModalOpen(false);
   };
 
-  const spectateGame = async user => {
-    const { data: { spectateGame: gameId }} = await spectate({ variables: { player: user._id }});
+  const spectateUser = async user => {
+    const { data: { spectateUser: gameId }} = await spectate({ variables: { player: user._id }});
     setSpectateModalOpen(false);
     if (gameId === "not ok") return;
-    history.push(`/game/${gameId}?spectate=true`);
+    history.push(`/game/${gameId}`);
   }
 
   return (
@@ -126,7 +126,7 @@ const SideBar = ({ data }) => {
             </button>
             <button
               className="modal-accept"
-              onClick={() => spectateGame(selectedUser)}
+              onClick={() => spectateUser(selectedUser)}
             >
               Accept
             </button>

@@ -10,9 +10,8 @@ import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
 
-export default ({ onlineUsers, me }) => {
+export default ({ onlineUsers, me, gameId }) => {
   const { loading, error, data } = me;
-  const { id: gameId } = useParams();
   const history = useHistory();
   const [gameEvent, setGameEvent] = useState(null);
   const [opponentStats, setOpponentStats] = useState(null);

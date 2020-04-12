@@ -32,6 +32,7 @@ const invitationUtil = pubsub => {
       } else {
         console.log("publishing rejection...")
         console.log({inGame: pubsub.games.inGame})
+        console.log({pending: pubsub.games.pendingInvites})
         Object.assign(doc, result);
         pubsub.publish("invitationEvent", doc);
       }

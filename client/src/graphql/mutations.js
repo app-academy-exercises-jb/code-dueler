@@ -135,7 +135,13 @@ export const LEAVE_GAME = gql `
 `;
 
 export const SPECTATE_GAME = gql`
-  mutation SpectateGame($player: ID!) {
-    spectateGame(player: $player)
+  mutation SpectateGame($gameId: String!) {
+    spectateGame(gameId: $gameId)
+  }
+`;
+
+export const SPECTATE_USER = gql`
+  mutation SpectateUser($player: ID!) {
+    spectateUser(player: $player)
   }
 `;

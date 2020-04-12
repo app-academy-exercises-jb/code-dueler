@@ -15,6 +15,7 @@ const ensureUserDetail = (user) => {
 const setupGame = pubsub => game => {
   const endGame = (player) => {
     const finishGame = () => {
+      console.log("finishing game")
       game.users = {};
       pubsub.games.inGame[game.p1.player._id] = false;
       pubsub.games.inGame[game.p2.player._id] = false;
@@ -22,8 +23,6 @@ const setupGame = pubsub => game => {
         ...game,
         status: "over",
       });
-      console.log({games: pubsub.games})
-      console.log({subs: pubsub.subscribers})
     };
     // this function should only be called by one of the two players
     if (player._id !== game.p1.player._id
@@ -52,12 +51,12 @@ const setupGame = pubsub => game => {
   const initializeGame = () => {
     if (game.initialized === true) return;
     game.initialized = true;
+    pubsub.games.inGame[game.p1.player._id] = true;
+    pubsub.games.inGame[game.p2.player._id] = true;
+    pubsub.games.pendingInvites[game.p2.player._id] = false;
+    pubsub.games.pendingInvites[game.p2.player._id] = false;
     setTimeout(() => {
       pubsub.publish("gameEvent", game);
-      pubsub.games.inGame[game.p1.player._id] = true;
-      pubsub.games.inGame[game.p2.player._id] = true;
-      pubsub.games.pendingInvites[game.p2.player._id] = false;
-      pubsub.games.pendingInvites[game.p2.player._id] = false;
     }, 0);
   };
 
