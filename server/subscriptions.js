@@ -1,4 +1,4 @@
-const handleGames = require("./game_server");
+const setupGameServer = require("./game_server");
 let pubsub;
 
 if (process.env.DOCKERIZED === 'true') {
@@ -16,6 +16,6 @@ if (process.env.DOCKERIZED === 'true') {
   pubsub = new PubSub();
 }
 
-handleGames(pubsub);
+setupGameServer(pubsub);
 
 module.exports = { pubsub };

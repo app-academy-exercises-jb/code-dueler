@@ -67,19 +67,20 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
   return [gameUser, publishGameUpdate];
 }
 
-
 const resolvers = {
   Mutation: {
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
       //please leave game.
       const game = pubsub.games[gameId];
       pubsub.games.inGame[_id] = false;
+      console.log("deleting game id");
       delete ws.gameId;
 
       if (!game || 
         game.users[_id] === undefined || 
         user._id !== _id) return "ok";
 
+      game.connections -= 1;
       game.endGame({_id});
       return "ok";
     },
@@ -128,19 +129,25 @@ const resolvers = {
     gameEvent: {
       subscribe: withFilter(
         (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
-          if (ws.gameId === undefined && user._id === ws.userId) {
+          if (ws.gameId === undefined
+              && user._id === ws.userId
+              // && gameId === pubsub.subscribers
+            ) {
+            // reconnected to a stale game, update subscribers
             ws.gameId = gameId;
+            pubsub.updateSubscribersGameId("add", [user], gameId);
           }
 
           const game = pubsub.games[ws.gameId];
 
-          if (game.connections === 2) {
+          if (game.connections === 2 ) {
             game.initializeGame();
           }
 
           return pubsub.asyncIterator("gameEvent");
         },
         ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
+          console.log({game: pubsub.games[gameId]});
           return (
             user._id === ws.userId &&
             p1.player._id === user._id ||
