@@ -13,6 +13,7 @@ const NavBar = ({ data, noData }) => {
             <ProtectedComponent component={NavBarPlayerCount} data={data} />
           )}
         </div>
+        <div className="other-left">&nbsp;</div>
         <div className="logo-wrapper">
           <Link to="/" className="logo-nav">
             CodeDueler

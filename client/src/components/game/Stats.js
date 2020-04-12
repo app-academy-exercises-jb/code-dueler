@@ -16,11 +16,13 @@ export default ({
     stats = opponentStats;
     name = "opponent";
   }
-  // console.log(stats);
+  console.log(stats);
+
+  const username = stats ? stats.player.username : title;
   return (
     <>
       <div className="stats-form">
-        <h1>{}</h1>
+        <h1>{username}</h1>
         <br />
         <div className="stats">
           <h2>Character Count: {(stats && stats.charCount) || 0}</h2>

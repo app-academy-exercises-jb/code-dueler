@@ -22,7 +22,7 @@
   align-items: center;
   font-size: 48px;
   padding: 0rem 0rem;
-  margin-right: 3rem;
+  margin-right: 3.5rem;
   &:hover {
     cursor: pointer;
   }
@@ -35,6 +35,25 @@
   margin: 0 1rem;
   padding: .25rem .250rem;
   font-size: 26px;
+}
+
+.other-left {
+  display: none;
+}
+
+@media only screen and (max-width: 650px) {
+  .left-nav {
+    display: none;
+  }
+
+  .other-left {
+    display: block;
+  }
+  
+  .logo-wrapper {
+    margin-right: 0;
+    margin-left: 3.5rem;
+  }
 }
 
 .logout-nav {
