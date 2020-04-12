@@ -35,16 +35,14 @@
   width: 92%;
   height: 90%;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-wrap: wrap;
   overflow-y: scroll;
+  flex-direction: column;
 }
 
 .chat-item {
-  width: 100%;
   display: block;
   padding: 10px;
+  width: 90%;
 }
 
 .chat-message-info {
