@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import { useMutation } from "@apollo/react-hooks";
@@ -7,7 +7,7 @@ import {
   UPDATE_GAME_LAST_SUBMITTED,
 } from "../../graphql/mutations";
 
-const CodeEditor = ({ gameId, me, spectator }) => {
+const CodeEditor = ({ gameId, me, spectator, data }) => {
   const editorRef = useRef(null);
   const [code, setCode] = useState(`var fizzBuzz = (n) => {
     
@@ -17,6 +17,10 @@ const CodeEditor = ({ gameId, me, spectator }) => {
 
   const [updateUserCode] = useMutation(UPDATE_GAME_USER_CODE);
   const [updateLastSubmission] = useMutation(UPDATE_GAME_LAST_SUBMITTED);
+
+  useEffect(() => {
+    data && setCode(data);
+  }, [spectator, data]);
 
   const handleValueChange = (code) => {
     setCharCount(code.length);
@@ -33,6 +37,7 @@ const CodeEditor = ({ gameId, me, spectator }) => {
   };
 
   const disabled = spectator ? true : false;
+
   let button = null;
   if (!disabled) {
     button = (

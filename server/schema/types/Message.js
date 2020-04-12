@@ -58,7 +58,7 @@ const resolvers = {
           if (
             game &&
             game.gameId === ws.gameId &&
-            (game.users[user._id] || game.spectators[user._id])
+            (game.users[user._id] || game.spectatorsKey[user._id])
           ) {
             return true;
           }

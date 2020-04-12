@@ -2,8 +2,12 @@ const mongoose = require("mongoose");
 const { withFilter } = require("apollo-server-express");
 
 const typeDefs = `
+  extend type Query {
+    queryGameInfo(gameId: String!): GameInfoResponse!
+  }
   extend type Mutation {
-    spectateGame(player: ID!): String!
+    spectateGame(gameId: String!): String!
+    spectateUser(player: ID!): String!
     leaveGame(player: ID!, gameId: String!): String!
     updateGameUserLastSubmitted(
       player: ID!,
@@ -42,6 +46,11 @@ const typeDefs = `
     lineCount: Int
     currentCode: String
   }
+  type GameInfoResponse {
+    gameExists: Boolean!
+    isInGame: Boolean!
+    isSpectator: Boolean!
+  }
 `;
 
 const getPlayer = (game, user) => {
@@ -69,18 +78,35 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
 }
 
 const resolvers = {
+  Query: {
+    queryGameInfo: (_, { gameId }, { user, pubsub, ws }) => {
+      return {
+        gameExists: Boolean(pubsub.games[gameId]),
+        isInGame: Boolean(ws.gameId || pubsub.games.inGame[user._id]),
+        isSpectator: Boolean(pubsub.games[gameId] && pubsub.games[gameId].spectatorsKey[user._id])
+      }
+    }
+  },
   Mutation: {
-    spectateGame: (_, {player: _id }, { user, pubsub, ws }) => {
-      if (!pubsub.subscribers[_id]) return "not ok";
+    spectateGame: (_, { gameId }, { user, pubsub, ws }) => {
+      const game = pubsub.games[gameId];
+      ws.gameId = gameId;
+      game.addSpectator(user);
+      return "ok";
+    },
+    spectateUser: (_, { player: _id }, { user, pubsub, ws }) => {
+      if (_id === undefined) return "not ok";
+      if (pubsub.subscribers[_id] === undefined) return "not ok";
 
       const inGameWS = pubsub.subscribers[_id].findIndex(p => p.ws && p.ws.gameId);
-
       if (inGameWS === -1) return "not ok";
 
       const gameId = pubsub.subscribers[_id][inGameWS].ws.gameId;
       const game = pubsub.games[gameId];
+      ws.gameId = gameId;
+      // pubsub.updateSubscribersGameId("add", [user], gameId);
 
-      game.addSpectator({ _id });
+      game.addSpectator(user);
       return gameId;
     },
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
@@ -96,7 +122,7 @@ const resolvers = {
         game.users[_id] === undefined || 
         user._id !== _id) return "ok";
 
-      if (game.spectators[_id]) {
+      if (game.spectatorsKey[_id]) {
         game.removeSpectator({ _id });
       } else {
         game.endGame({_id});
@@ -153,6 +179,7 @@ const resolvers = {
         (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
           if (ws.gameId === undefined && user._id === ws.userId) {
             // reconnected to a stale game, update subscribers
+            console.log("found stale game")
             ws.gameId = gameId;
             pubsub.updateSubscribersGameId("add", [user], gameId);
           }
@@ -163,15 +190,15 @@ const resolvers = {
             game.initializeGame();
           }
 
+          console.log("subscribing to game event")
           return pubsub.asyncIterator("gameEvent");
         },
-        ({ p1, p2, spectators, status, gameId }, _, { user, pubsub, ws }) => {
-          console.log({game: pubsub.games[gameId]});
+        ({ p1, p2, gameId }, _, { user, pubsub, ws }) => {
           return (
             user._id === ws.userId &&
-            p1.player._id === user._id ||
+            (p1.player._id === user._id ||
             p2.player._id === user._id ||
-            spectators[user._id]
+            pubsub.games[gameId].spectatorsKey[user._id] !== undefined)
           );
         }
       ),

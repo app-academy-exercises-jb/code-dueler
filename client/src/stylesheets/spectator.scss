@@ -3,47 +3,14 @@
   width: 100%;
   box-sizing: border-box;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .screen-top {
   display: flex;
-  width: 100%;
   justify-content: center;
   align-items: center;
-}
-
-.spectator-player1 {
-  flex-direction: column;
-  display: flex;
-  width: 60%;
-}
-
-.spectator-player2 {
-  flex-direction: column;
-  display: flex;
-  width: 40%;
-}
-
-.player-title {
-  width: 100%;
-}
-
-.player-components {
-  display: flex;
-}
-.player-stats {
-  display: flex;
-  width: 33%;
-}
-
-.code-editor-wrapper-spectator {
-  width: 67%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  margin-top: 16px;
+  flex: 1;
+  min-height: 300px;
 }
 
 .screen-bottom {
@@ -52,12 +19,41 @@
   flex: 1;
 }
 
+.spectator-player1 {
+  display: flex;
+  height: 100%;
+    flex: 1.4;
+}
+
+.spectator-player2 {
+  display: flex;
+  height: 100%;
+  flex: 1;
+}
+
+.player-components {
+  display: flex;
+}
+
+.player-stats {
+  display: flex;
+}
+
+.code-editor-wrapper-spectator {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
 .challenge-question-wrapper-spectator {
   display: flex;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .game-chat-wrapper-spectator {
@@ -70,4 +66,5 @@
   display: flex;
   flex-wrap: wrap;
   min-height: calc(100vh - 56px);
+  min-width: fit-content;
 }

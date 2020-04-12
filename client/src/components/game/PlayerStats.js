@@ -3,7 +3,7 @@ import Stats from "./Stats";
 import ErrorModal from './ErrorModal';
 import ResultsModal from './ResultsModal';
 
-export default ({ownStats, opponentStats}) => {
+export default ({ownStats, opponentStats, spectator}) => {
   const handleModalClose = () => {
     setModalOpen(false);
   };
@@ -45,10 +45,10 @@ export default ({ownStats, opponentStats}) => {
   const [opponentParsed, setOpponentParsed] = useState(null);
 
   useEffect(() => {
-    if (ownStats && ownStats.lastSubmittedResult) {
+    if (ownStats && ownStats.lastSubmittedResult && !spectator) {
         const parsed = JSON.parse(ownStats.lastSubmittedResult);
-        
         setOwnParsed(parsed);
+        
         if (parsed.error) {
           setModalToOpen("error");
           setErrorProps(parsed);
@@ -60,6 +60,9 @@ export default ({ownStats, opponentStats}) => {
         if (modalOpen === false) {
           setModalOpen(true);
         }
+      } else if (ownStats && ownStats.lastSubmittedResult && spectator) {
+        const parsed = JSON.parse(ownStats.lastSubmittedResult);
+        setOwnParsed(parsed);
       }
     return () => setModalOpen(false);
   }, [ownStats && ownStats.lastSubmittedResult]);

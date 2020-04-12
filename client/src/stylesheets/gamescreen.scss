@@ -32,7 +32,9 @@
 }
 
 .stats-form{
+  min-width: 150px;
   width: 90%;
+  margin: 0 5px;
   background-color: #32292F;
   justify-content: center;
   align-items: center;
@@ -104,7 +106,7 @@
 .code-editor-wrapper {
   display: flex;
   align-items: center;
-  flex: 1 1;
+  flex: 1.5;
   flex-direction: column;
   width: 95%;
   max-width: 800px;
@@ -154,4 +156,5 @@
   width: 100%;
   justify-content: center;
   height: 100%;
+  flex: 1;
 }

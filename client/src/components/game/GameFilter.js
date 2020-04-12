@@ -1,16 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import GameScreen from "../../pages/GameScreen";
 import Spectator from "../../pages/Spectator";
-import { useLocation } from "react-router-dom";
-import queryString from 'query-string';
+import { useParams, Redirect } from "react-router-dom";
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import { IN_GAME_INFO } from "../../graphql/queries";
+import { SPECTATE_GAME } from "../../graphql/mutations";
 
 export default ({ ...props }) => {
-  const location = useLocation();
-  const parsed = queryString.parse(location.search);
+  const { id: gameId } = useParams();
 
-  if (parsed.spectate === "true") {
-    return <Spectator { ...props } />
+  const { data, loading, error } = useQuery(IN_GAME_INFO, {
+    variables: { gameId }
+  });
+
+  const [spectateGame] = useMutation(SPECTATE_GAME);
+
+  useEffect(() => {
+    if (data && !data.isInGame && !data.isSpectator) {
+      debugger
+      spectateGame({ variables: { gameId }});
+    }
+  }, [data && data.isSpectator, data && data.isInGame]);
+
+  if (loading || error || !data) return null;
+
+  const { queryGameInfo: { isInGame, isSpectator, gameExists }} = data;
+
+  if (!gameExists) {
+    return <Redirect to={'/'} />
   } else {
-    return <GameScreen { ...props } />
+    if (!isSpectator && isInGame){
+      return <GameScreen { ...props } gameId={gameId} />
+    } else {
+      return <Spectator { ...props } gameId={gameId} />
+    }
   }
 };
