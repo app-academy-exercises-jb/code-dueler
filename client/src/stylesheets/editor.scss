@@ -1,10 +1,11 @@
 .editor {
   background-color: #f5f2f0;
-  width: 90%;
   border-radius: 5px;
   display: flex;
-  align-items: space-around;
   flex-direction: column;
+  height: 400px;
+  width: 100%;
+  margin: 20px;
 }
 
 .editor-info {
