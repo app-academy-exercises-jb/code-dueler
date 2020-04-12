@@ -3,12 +3,11 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import GlobalLobby from "./pages/GlobalLobby";
-import GameScreen from "./pages/GameScreen";
+import GameFilter from "./components/game/GameFilter";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import AuthRoute from "./components/util/AuthRoute";
 import "./stylesheets/application.scss";
-import Spectator from "./pages/Spectator";
 
 export default () => {
   return (
@@ -17,6 +16,7 @@ export default () => {
         <ProtectedRoute exact path="/" component={GlobalLobby} />
         <ProtectedRoute path="/game/:id" component={GameScreen} />
         {/* <ProtectedRoute path="/game/:id" component={Spectator} /> */}
+        <ProtectedRoute path="/game/:id" component={GameFilter} />
         <AuthRoute path="/login" component={Login} />
         <AuthRoute path="/signup" component={SignUp} />
         <Route path="/" component={ErrorPage} />
