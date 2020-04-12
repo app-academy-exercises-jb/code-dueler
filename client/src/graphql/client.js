@@ -76,8 +76,9 @@ const createClient = async () => {
       const def = getMainDefinition(query);
       return (
         def.kind === 'OperationDefinition' && 
-          (def.operation === 'subscription' || 
-            (def.operation === 'mutation' && def.name.value !== "LogIn")
+          (def.operation === 'subscription'
+            || (def.operation === 'mutation' && def.name.value !== "LogIn")
+            || (def.operation === 'query' && def.name.value === "InGameInfo")
           )
       )
     },

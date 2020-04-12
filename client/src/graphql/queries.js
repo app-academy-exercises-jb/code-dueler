@@ -38,3 +38,13 @@ export const GET_MESSAGES = gql`
     }
   }
 `;
+
+export const IN_GAME_INFO = gql`
+  query InGameInfo($gameId: String!) {
+    queryGameInfo(gameId: $gameId) {
+      gameExists
+      isInGame
+      isSpectator
+    }
+  }
+`;

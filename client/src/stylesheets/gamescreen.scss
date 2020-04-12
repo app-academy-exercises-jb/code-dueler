@@ -17,7 +17,7 @@
 }
 
 .stats-wrapper {
-  height: 40%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,7 +33,7 @@
 }
 
 .stats-form{
-  width: 80%;
+  width: 90%;
   background-color: #32292F;
   height: 80%;
   justify-content: center;
@@ -139,4 +139,19 @@
       cursor: pointer;
     }
   }
+}
+
+.player-stats-game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+  width: 100%;
+}
+
+.player-stats-game-wrapper {
+  display: flex;
+  align-items: flex-start;
+  width: 80%;
+  height: 100%;
 }

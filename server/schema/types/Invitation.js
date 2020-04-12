@@ -100,7 +100,7 @@ const resolvers = {
             const shouldSend = (ws.inviting || (ws.invited && ws.accepting));
             if (shouldSend && (inviter._id === user._id || invitee._id === user._id)) {
               ws.gameId = gameId;
-              pubsub.updateSubscribers("add", [user], gameId);
+              pubsub.updateSubscribersGameId("add", [user], gameId);
             }
 
             delete ws.inviting;
