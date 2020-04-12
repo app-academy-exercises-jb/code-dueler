@@ -133,3 +133,9 @@ export const LEAVE_GAME = gql `
     leaveGame(player: $player, gameId: $gameId)
   }
 `;
+
+export const SPECTATE_GAME = gql`
+  mutation SpectateGame($player: ID!) {
+    spectateGame(player: $player)
+  }
+`;

@@ -78,6 +78,7 @@ const setupGame = pubsub => game => {
       } else {
         game.spectators[spectator._id] = 1;
         game.users[spectator._id] = 1;
+        pubsub.games.inGame[_id] = true;
       }
     } else if (action === "remove") {
       if (findSpectator(spectator)) {
@@ -87,6 +88,7 @@ const setupGame = pubsub => game => {
       if (game.spectators[spectator._id] === 0) {
         delete game.spectators[spectator._id];
         delete game.users[spectator._id];
+        pubsub.games.inGame[_id] = false;
       }
     }
   }

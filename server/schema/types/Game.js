@@ -3,6 +3,7 @@ const { withFilter } = require("apollo-server-express");
 
 const typeDefs = `
   extend type Mutation {
+    spectateGame(player: ID!): String!
     leaveGame(player: ID!, gameId: String!): String!
     updateGameUserLastSubmitted(
       player: ID!,
@@ -69,19 +70,40 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
 
 const resolvers = {
   Mutation: {
+    spectateGame: (_, {player: _id }, { user, pubsub, ws }) => {
+      if (!pubsub.subscribers[_id]) return "not ok";
+
+      const inGameWS = pubsub.subscribers[_id].findIndex(p => p.ws && p.ws.gameId);
+
+      if (inGameWS === -1) return "not ok";
+
+      const gameId = pubsub.subscribers[_id][inGameWS].ws.gameId;
+      const game = pubsub.games[gameId];
+
+      game.addSpectator({ _id });
+      return gameId;
+    },
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
       //please leave game.
       const game = pubsub.games[gameId];
-      pubsub.games.inGame[_id] = false;
+      
+
       console.log("deleting game id");
       delete ws.gameId;
+      pubsub.games.inGame[_id] = false;
 
       if (!game || 
         game.users[_id] === undefined || 
         user._id !== _id) return "ok";
 
+      if (game.spectators[_id]) {
+        game.removeSpectator({ _id });
+      } else {
+        game.endGame({_id});
+      }
+
       game.connections -= 1;
-      game.endGame({_id});
+
       return "ok";
     },
     updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
@@ -129,10 +151,7 @@ const resolvers = {
     gameEvent: {
       subscribe: withFilter(
         (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
-          if (ws.gameId === undefined
-              && user._id === ws.userId
-              // && gameId === pubsub.subscribers
-            ) {
+          if (ws.gameId === undefined && user._id === ws.userId) {
             // reconnected to a stale game, update subscribers
             ws.gameId = gameId;
             pubsub.updateSubscribersGameId("add", [user], gameId);
@@ -152,7 +171,7 @@ const resolvers = {
             user._id === ws.userId &&
             p1.player._id === user._id ||
             p2.player._id === user._id ||
-            spectators.some(s => s._id === user._id)
+            spectators[user._id]
           );
         }
       ),
