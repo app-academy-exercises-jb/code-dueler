@@ -110,9 +110,7 @@ const resolvers = {
       return gameId;
     },
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
-      //please leave game.
       const game = pubsub.games[gameId];
-      
 
       console.log("deleting game id");
       delete ws.gameId;

@@ -80,8 +80,9 @@ const createClient = async () => {
             || (def.operation === 'mutation' 
               && def.name.value !== 'LogIn'
               && def.name.value !== 'SignUp')
-            || (def.operation === 'query'
-              && def.name.value === "InGameInfo")
+            || (def.operation === 'query' 
+              && (def.name.value === "InGameInfo" 
+                || def.name.value === "Messages"))
           )
       )
     },
@@ -110,6 +111,10 @@ const createClient = async () => {
   }
 
   client.onResetStore(() => {
+    localStorage.clear();
+  });
+
+  client.onClearStore(() => {
     localStorage.clear();
   });
 

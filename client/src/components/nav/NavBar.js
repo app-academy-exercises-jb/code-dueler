@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 
-const NavBar = ({ data, noData, inGame }) => {
+const NavBar = ({ data, noData, inGame, refetchMe }) => {
   return (
     <>
       <div className="nav-bar-wrapper">
@@ -20,7 +20,7 @@ const NavBar = ({ data, noData, inGame }) => {
           </Link>
         </div>
         <div>
-          <ProtectedComponent component={LogOutButton} />
+          <ProtectedComponent component={LogOutButton} refetchMe={refetchMe} />
         </div>
       </div>
       <div className="spacer">&nbsp;</div>

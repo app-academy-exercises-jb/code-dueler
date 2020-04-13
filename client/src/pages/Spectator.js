@@ -7,7 +7,7 @@ export default ({ ...props }) => {
 
   return (
     <>
-      <NavBar data={spectators && spectators - 2} inGame={true} />
+      <NavBar data={spectators && spectators - 2} inGame={true} refetchMe={props.refetchMe} />
       <Spectator {...props} setSpectators={setSpectators} />
     </>
   );
