@@ -57,7 +57,6 @@ export default ({ me, gameId, refetchMe }) => {
       } else if (e.status === "ready") {
         console.log("ready");
       } else if (e.status === "ongoing") {
-        console.log(data);
         setOwnStats(e[self]);
         setOpponentStats(e[opponent]);
       } else if (e.status === "over") {

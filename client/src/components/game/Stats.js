@@ -16,7 +16,6 @@ export default ({
     stats = opponentStats;
     name = "opponent";
   }
-  console.log(stats);
 
   const username = stats ? stats.player.username : title;
   return (
