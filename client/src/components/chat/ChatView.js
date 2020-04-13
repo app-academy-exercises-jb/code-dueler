@@ -6,16 +6,19 @@ import ChatMessageItem from "./ChatMessageItem";
 
 const ChatView = ({ channelId, id }) => {
   const messagesRef = useRef(null);
-  const [offset, setOffset] = useState(10);
+  const [offset, setOffset] = useState(15);
   const [shouldFetch, setShouldFetch] = useState(true);
 
-  const { data, loading, error, subscribeToMore, fetchMore } = useQuery(GET_MESSAGES, {
-    variables: { 
-      channelId,
-      offset: 0
-    },
-    notifyOnNetworkStatusChange: true
-  });
+  const { data, loading, error, subscribeToMore, fetchMore } = useQuery(
+    GET_MESSAGES,
+    {
+      variables: {
+        channelId,
+        offset: 0,
+      },
+      notifyOnNetworkStatusChange: true,
+    }
+  );
 
   const setRef = useCallback((node) => {
     if (node !== null) {
@@ -36,9 +39,10 @@ const ChatView = ({ channelId, id }) => {
     });
   }, []);
 
-  const lastMessage = data 
-    && data.messages[data.messages.length - 1]
-    && data.messages[data.messages.length - 1]._id;
+  const lastMessage =
+    data &&
+    data.messages[data.messages.length - 1] &&
+    data.messages[data.messages.length - 1]._id;
 
   useEffect(() => {
     if (messagesRef.current) {
@@ -55,31 +59,33 @@ const ChatView = ({ channelId, id }) => {
   if (!data) return <p>Not Found</p>;
   if (!data.messages) return <p>Messages not found</p>;
 
-  const handleScroll = e => {
+  const handleScroll = (e) => {
     if (e.target.scrollTop < 25 && !loading && shouldFetch) {
       fetchMore({
         query: GET_MESSAGES,
-        variables: { 
+        variables: {
           channelId,
-          offset
+          offset,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult.messages) return prev;
-          const next = { messages: [...fetchMoreResult.messages, ...prev.messages] };
-          setOffset(offset + 10);
+          const next = {
+            messages: [...fetchMoreResult.messages, ...prev.messages],
+          };
+          setOffset(offset + 15);
           setShouldFetch(true);
           return next;
         },
       });
       setShouldFetch(false);
-      e.target.scroll({top: 25});
+      e.target.scroll({ top: 25 });
     }
-  }
+  };
 
   return (
     <div className="chatview-wrapper">
       <div className="chatview">
-        <ul 
+        <ul
           className="chatview-inner scroll-bar"
           ref={setRef}
           onScroll={handleScroll}

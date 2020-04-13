@@ -34,9 +34,9 @@ const resolvers = {
       const messages = await Message.find({
         channelId,
       })
-        .limit(10)
+        .limit(15)
         .skip(offset)
-        .sort({createdAt: -1})
+        .sort({ createdAt: -1 })
         .populate("author");
 
       return messages.reverse();
@@ -47,11 +47,12 @@ const resolvers = {
   },
   Mutation: {
     addMessage(_, { author, body, channelId }, { user, pubsub }) {
-      if (body.trim() === "") return {
-        success: false,
-        message: "no empty messages",
-        messages: []
-      };
+      if (body.trim() === "")
+        return {
+          success: false,
+          message: "no empty messages",
+          messages: [],
+        };
       return Message.post({ author, body, user, channelId, pubsub });
     },
   },
