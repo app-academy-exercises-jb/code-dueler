@@ -12,7 +12,7 @@ const typeDefs = `
     channelId: String!
   }
   extend type Query {
-    messages(channelId: String!): [Message]
+    messages(channelId: String!, offset: Int!): [Message]
     message(_id: ID!): Message
   }
   extend type Mutation {
@@ -30,10 +30,16 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    messages(_, { channelId }, context) {
-      return Message.find({
+    messages: async (_, { channelId, offset }, context) => {
+      const messages = await Message.find({
         channelId,
-      }).populate("author");
+      })
+        .limit(10)
+        .skip(offset)
+        .sort({createdAt: -1})
+        .populate("author");
+
+      return messages.reverse();
     },
     message(_, { _id }) {
       return Message.findById(_id).populate("author");
@@ -41,6 +47,11 @@ const resolvers = {
   },
   Mutation: {
     addMessage(_, { author, body, channelId }, { user, pubsub }) {
+      if (body.trim() === "") return {
+        success: false,
+        message: "no empty messages",
+        messages: []
+      };
       return Message.post({ author, body, user, channelId, pubsub });
     },
   },

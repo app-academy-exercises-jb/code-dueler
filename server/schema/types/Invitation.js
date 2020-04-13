@@ -63,14 +63,14 @@ const resolvers = {
       acceptance.gameId = inviter + user._id + Date.now().toString();
       ws.accepting = true;
 
-      const newP1 = {...acceptance.inviter, ws};
+      const newP1 = { ...acceptance.inviter, ws };
 
       pubsub.handleGame({
         gameId: acceptance.gameId,
         p1: newP1,
         p2: user,
       });
-      
+
       pubsub.handleInvite(acceptance.invitee, "accepted", acceptance);
       return acceptance;
     },
@@ -81,7 +81,6 @@ const resolvers = {
         toAwait: { key: "inviter", awaitedUser: inviter },
       });
 
-      
       pubsub.handleInvite(declination.invitee, "declined", declination);
       return declination;
     },
@@ -97,8 +96,11 @@ const resolvers = {
           } else if (status === "declined") {
             return inviter._id === user._id;
           } else if (status === "accepted") {
-            const shouldSend = (ws.inviting || (ws.invited && ws.accepting));
-            if (shouldSend && (inviter._id === user._id || invitee._id === user._id)) {
+            const shouldSend = ws.inviting || (ws.invited && ws.accepting);
+            if (
+              shouldSend &&
+              (inviter._id === user._id || invitee._id === user._id)
+            ) {
               ws.gameId = gameId;
               pubsub.updateSubscribersGameId("add", [user], gameId);
             }
@@ -106,11 +108,14 @@ const resolvers = {
             delete ws.inviting;
             delete ws.invited;
             delete ws.accepting;
-            return shouldSend && (inviter._id === user._id || invitee._id === user._id);
+            return (
+              shouldSend &&
+              (inviter._id === user._id || invitee._id === user._id)
+            );
           } else if (status === "rejected") {
             return ws.inviting && user._id === inviter._id;
           }
-        },
+        }
       ),
       resolve: (payload) => {
         return payload;
@@ -123,6 +128,5 @@ module.exports = {
   typeDefs,
   resolvers,
 };
-
 
 // handle pubsub.games

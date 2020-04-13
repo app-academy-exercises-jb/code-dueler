@@ -26,8 +26,8 @@ export const GET_ONLINE_USERS = gql`
 `;
 
 export const GET_MESSAGES = gql`
-  query Messages($channelId: String!) {
-    messages(channelId: $channelId) {
+  query Messages($channelId: String!, $offset: Int!) {
+    messages(channelId: $channelId, offset: $offset) {
       _id
       author {
         _id

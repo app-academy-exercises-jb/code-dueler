@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 
-const NavBar = ({ data, noData }) => {
+const NavBar = ({ data, noData, inGame, refetchMe }) => {
   return (
     <>
       <div className="nav-bar-wrapper">
         <div className="left-nav">
           {!noData && (
-            <ProtectedComponent component={NavBarPlayerCount} data={data} />
+            <ProtectedComponent component={NavBarPlayerCount} data={data} inGame={inGame} />
           )}
         </div>
         <div className="other-left">&nbsp;</div>
@@ -20,7 +20,7 @@ const NavBar = ({ data, noData }) => {
           </Link>
         </div>
         <div>
-          <ProtectedComponent component={LogOutButton} />
+          <ProtectedComponent component={LogOutButton} refetchMe={refetchMe} />
         </div>
       </div>
       <div className="spacer">&nbsp;</div>

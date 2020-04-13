@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import { ON_MESSAGE_ADDED } from "../../graphql/subscriptions";
 import { GET_MESSAGES } from "../../graphql/queries";
@@ -6,9 +6,15 @@ import ChatMessageItem from "./ChatMessageItem";
 
 const ChatView = ({ channelId, id }) => {
   const messagesRef = useRef(null);
+  const [offset, setOffset] = useState(10);
+  const [shouldFetch, setShouldFetch] = useState(true);
 
-  const { data, loading, error, subscribeToMore } = useQuery(GET_MESSAGES, {
-    variables: { channelId },
+  const { data, loading, error, subscribeToMore, fetchMore } = useQuery(GET_MESSAGES, {
+    variables: { 
+      channelId,
+      offset: 0
+    },
+    notifyOnNetworkStatusChange: true
   });
 
   const setRef = useCallback((node) => {
@@ -30,28 +36,57 @@ const ChatView = ({ channelId, id }) => {
     });
   }, []);
 
+  const lastMessage = data 
+    && data.messages[data.messages.length - 1]
+    && data.messages[data.messages.length - 1]._id;
+
   useEffect(() => {
-    messagesRef.current &&
+    if (messagesRef.current) {
       messagesRef.current.scroll({
         top: messagesRef.current.scrollHeight,
         behavior: "auto",
       });
-  }, [data]);
+    }
+  }, [lastMessage]);
 
-  if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;
+  if (loading && !offset) return <p>Loading...</p>;
+
   if (!data) return <p>Not Found</p>;
   if (!data.messages) return <p>Messages not found</p>;
 
-  const messages = data.messages.map((message) => {
-    return <ChatMessageItem key={message._id} message={message} />;
-  });
+  const handleScroll = e => {
+    if (e.target.scrollTop < 25 && !loading && shouldFetch) {
+      fetchMore({
+        query: GET_MESSAGES,
+        variables: { 
+          channelId,
+          offset
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult.messages) return prev;
+          const next = { messages: [...fetchMoreResult.messages, ...prev.messages] };
+          setOffset(offset + 10);
+          setShouldFetch(true);
+          return next;
+        },
+      });
+      setShouldFetch(false);
+      e.target.scroll({top: 25});
+    }
+  }
 
   return (
     <div className="chatview-wrapper">
       <div className="chatview">
-        <ul className="chatview-inner scroll-bar" ref={setRef}>
-          {messages}
+        <ul 
+          className="chatview-inner scroll-bar"
+          ref={setRef}
+          onScroll={handleScroll}
+        >
+          {data.messages.map((message) => (
+            <ChatMessageItem key={message._id} message={message} />
+          ))}
         </ul>
       </div>
     </div>

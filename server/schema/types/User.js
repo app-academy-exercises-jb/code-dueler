@@ -60,7 +60,9 @@ const resolvers = {
           || pubsub.subscribers[user._id].every(s =>
             s.ws !== ws) ) return "not ok";
 
-      pubsub.logoutUser({user, ws});
+      setTimeout(() => {
+        pubsub.logoutUser({user, ws});
+      }, 0);
       return "ok";
     }
   },

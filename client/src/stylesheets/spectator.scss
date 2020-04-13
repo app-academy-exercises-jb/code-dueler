@@ -49,7 +49,8 @@
 
 .challenge-question-wrapper-spectator {
   display: flex;
-  width: 100%;
+  // width: 100%;
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -57,7 +58,11 @@
 }
 
 .game-chat-wrapper-spectator {
-  width: 150%;
+  width: 20rem;
+  height: 28rem;
+  flex: 1;
+  display: flex;
+  margin-top: 10px;
 }
 
 .main-spectator {

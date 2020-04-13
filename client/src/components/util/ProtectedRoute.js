@@ -8,7 +8,7 @@ import {
 } from "../../graphql/queries";
 import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
 
-const subscribeToUserEvents = (subscribeToMore, { data: { me }}, client) =>
+const subscribeToUserEvents = (subscribeToMore, { data: { me }}, client, refetchMe) =>
   subscribeToMore({
     document: USER_LOGGED_EVENT,
     updateQuery: (prev, { subscriptionData }) => {
@@ -25,7 +25,10 @@ const subscribeToUserEvents = (subscribeToMore, { data: { me }}, client) =>
         if (me._id === next.users[idx]._id) {
           client.subscriptionClient.unsubscribeAll();
           client.subscriptionClient.close();
-          client.resetStore();
+          client.clearStore()
+            .then(() => {
+              refetchMe();
+            });
         }
         next.users.splice(idx, 1);
       }
@@ -36,9 +39,9 @@ const subscribeToUserEvents = (subscribeToMore, { data: { me }}, client) =>
 
 export default ({ component: Component, path, redirectTo, ...rest }) => {
   const client = useApolloClient();
-  const { data, loading, error } = useQuery(IS_LOGGED_IN);
+  const { refetch: refetchMe, data, loading, error } = useQuery(IS_LOGGED_IN);
 
-  const { refetch, ...me } = useQuery(CURRENT_USER, {
+  const { ...me } = useQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
   });
 
@@ -49,8 +52,7 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
   useEffect(() => {
     if (data && data.isLoggedIn && onlineUsers.loading === false && me.loading === false) {
       setTimeout(() => {
-        console.log("subscribing to user events")
-        subscribeToUserEvents(subscribeToMore, me, client);
+        subscribeToUserEvents(subscribeToMore, me, client, refetchMe);
       }, 10);
     }
   }, [data, onlineUsers.loading, me.loading]);
@@ -65,7 +67,7 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
         {...rest}
         render={() => {
           return (
-            <Component onlineUsers={onlineUsers} me={me} refetchMe={refetch} />
+            <Component onlineUsers={onlineUsers} me={me} refetchMe={refetchMe} />
           );
         }}
       />

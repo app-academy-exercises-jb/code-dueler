@@ -3,7 +3,7 @@ import NavBar from "../nav/NavBar";
 import GlobalMain from "./global";
 
 
-export default ({ onlineUsers: {data, loading, error}, me }) => {
+export default ({ onlineUsers: {data, loading, error}, me, refetchMe }) => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>ERROR</p>;
@@ -12,8 +12,8 @@ export default ({ onlineUsers: {data, loading, error}, me }) => {
   
   return (
     <>
-      <NavBar data={data} />
-      <GlobalMain data={data} me={me}/>
+      <NavBar data={data} refetchMe={refetchMe} />
+      <GlobalMain data={data} me={me} />
     </>
   );
 };
