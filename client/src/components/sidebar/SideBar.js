@@ -3,7 +3,11 @@ import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
 import { useMutation, useSubscription } from "@apollo/react-hooks";
 import { ON_INVITATION } from "../../graphql/subscriptions";
-import { ACCEPT_INVITE, DECLINE_INVITE, SPECTATE_USER } from "../../graphql/mutations";
+import {
+  ACCEPT_INVITE,
+  DECLINE_INVITE,
+  SPECTATE_USER,
+} from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
 
 const SideBar = ({ data }) => {
@@ -24,6 +28,7 @@ const SideBar = ({ data }) => {
     fetchPolicy: "network-only",
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.invitationEvent;
+      console.log(e);
       if (e.status === "inviting") {
         handleModalOpen(e.inviter);
       } else if (e.status === "declined") {
@@ -39,7 +44,7 @@ const SideBar = ({ data }) => {
           setSelectedUser(e.invitee);
           setSpectateModalOpen(true);
         } else {
-          alert(`Sorry! ${e.reason}`)
+          alert(`Sorry! ${e.reason}`);
         }
       }
     },
@@ -60,12 +65,14 @@ const SideBar = ({ data }) => {
     setChallengeModalOpen(false);
   };
 
-  const spectateUser = async user => {
-    const { data: { spectateUser: gameId }} = await spectate({ variables: { player: user._id }});
+  const spectateUser = async (user) => {
+    const {
+      data: { spectateUser: gameId },
+    } = await spectate({ variables: { player: user._id } });
     setSpectateModalOpen(false);
     if (gameId === "not ok") return;
     history.push(`/game/${gameId}`);
-  }
+  };
 
   return (
     <div className="sidebar-wrapper">
@@ -111,9 +118,7 @@ const SideBar = ({ data }) => {
           <div className="modal-info">
             <h1>{selectedUser && selectedUser.username}</h1>
             <div>
-              <p>
-                is already in a duel!
-              </p>
+              <p>is already in a duel!</p>
               Would you like to spectate?
             </div>
           </div>
