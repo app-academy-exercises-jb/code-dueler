@@ -34,7 +34,7 @@ const resolvers = {
       const messages = await Message.find({
         channelId,
       })
-        .limit(10)
+        .limit(15)
         .skip(offset)
         .sort({createdAt: -1})
         .populate("author");

@@ -6,7 +6,7 @@ import ChatMessageItem from "./ChatMessageItem";
 
 const ChatView = ({ channelId, id }) => {
   const messagesRef = useRef(null);
-  const [offset, setOffset] = useState(10);
+  const [offset, setOffset] = useState(15);
   const [shouldFetch, setShouldFetch] = useState(true);
 
   const { data, loading, error, subscribeToMore, fetchMore } = useQuery(GET_MESSAGES, {
@@ -49,32 +49,50 @@ const ChatView = ({ channelId, id }) => {
     }
   }, [lastMessage]);
 
+  useEffect(() => {
+    if (messagesRef.current
+        && messagesRef.current.clientHeight === messagesRef.current.scrollHeight) {
+          const timeout = setInterval(() => {
+            if (messagesRef.current.clientHeight === messagesRef.current.scrollHeight) {
+              fetchMoreMessages();
+            } else {
+              clearInterval(timeout);
+              messagesRef.current.scroll({top: messagesRef.current.scrollHeight});
+            }
+          }, 100);
+        }
+  }, [messagesRef.current]);
+
+  const fetchMoreMessages = () => {
+    fetchMore({
+      query: GET_MESSAGES,
+      variables: { 
+        channelId,
+        offset
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult.messages) return prev;
+        const next = { messages: [...fetchMoreResult.messages, ...prev.messages] };
+        setOffset(offset + 15);
+        setShouldFetch(true);
+        return next;
+      },
+    });
+  };
+
+  const handleScroll = e => {
+    if (e.target.scrollTop < 25 && !loading && shouldFetch) {
+      fetchMoreMessages();
+      setShouldFetch(false);
+      e.target.scroll({top: 25});
+    }
+  }
+
   if (error) return <p>ERROR</p>;
   if (loading && !offset) return <p>Loading...</p>;
 
   if (!data) return <p>Not Found</p>;
   if (!data.messages) return <p>Messages not found</p>;
-
-  const handleScroll = e => {
-    if (e.target.scrollTop < 25 && !loading && shouldFetch) {
-      fetchMore({
-        query: GET_MESSAGES,
-        variables: { 
-          channelId,
-          offset
-        },
-        updateQuery: (prev, { fetchMoreResult }) => {
-          if (!fetchMoreResult.messages) return prev;
-          const next = { messages: [...fetchMoreResult.messages, ...prev.messages] };
-          setOffset(offset + 10);
-          setShouldFetch(true);
-          return next;
-        },
-      });
-      setShouldFetch(false);
-      e.target.scroll({top: 25});
-    }
-  }
 
   return (
     <div className="chatview-wrapper">
