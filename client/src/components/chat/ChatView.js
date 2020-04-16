@@ -49,11 +49,16 @@ const ChatView = ({ channelId, id }) => {
     }
   }, [lastMessage]);
 
+  let oldData;
   useEffect(() => {
     if (messagesRef.current
         && messagesRef.current.clientHeight === messagesRef.current.scrollHeight) {
           const timeout = setInterval(() => {
-            if (messagesRef.current.clientHeight === messagesRef.current.scrollHeight) {
+            if (messagesRef.current.clientHeight === messagesRef.current.scrollHeight
+                && (oldData === undefined || 
+                    data.messages.some((msg, idx) => msg._id !== oldData.messages[idx]._id))) {
+              console.log({data});
+              oldData = data;
               fetchMoreMessages();
             } else {
               clearInterval(timeout);

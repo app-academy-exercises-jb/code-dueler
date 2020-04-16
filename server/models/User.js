@@ -43,7 +43,7 @@ UserSchema.statics.signup = async function (username, password) {
 
   await newUser.save();
 
-  newUser.token = "Bearer " + jwt.sign({ _id: newUser._id }, secretOrKey);
+  newUser.token = "Bearer " + jwt.sign({ _id: newUser._id, username: newUser.username }, secretOrKey);
   newUser.loggedIn = true;
 
   return newUser;
