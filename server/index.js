@@ -1,7 +1,6 @@
 const express = require("express"),
   app = express(),
   mongoose = require("mongoose"),
-  graphqlHTTP = require("express-graphql"),
   expressPlayground = require("graphql-playground-middleware-express").default,
   passport = require("passport"),
   jwt = require("jsonwebtoken"),
@@ -129,8 +128,10 @@ app.listen = function () {
         }
       },
       onDisconnect: (ws) => {
-        if (ws.userId === undefined) return;
-        // console.log("disconnecting:", pubsub.subscribers)
+        if (ws.userId === undefined) {
+          console.log('found rogue ws:', {ws});
+          return;
+        }
         console.log(`${ws.userId} disconnected from the websocket`);
         pubsub.removeWs(ws);
       },

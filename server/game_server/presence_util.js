@@ -42,7 +42,12 @@ const presenceUtils = pubsub => {
   };
 
   const removeWs = ws => {
+    if (ws.invited) {
+      pubsub.games.pendingInvites[ws.userId] = false;
+    }
+
     if (!pubsub.subscribers[ws.userId]) return;
+
     const userIdx = pubsub.subscribers[ws.userId].findIndex(
       (s) => s.ws === ws
     );
@@ -50,6 +55,7 @@ const presenceUtils = pubsub => {
 
     pubsub.subscribers[ws.userId].splice(userIdx, 1);
 
+    // user.ws === ws, as per above findIndex
     if (user.ws.gameId) {
       pubsub.updateSubscribersGameId("remove", [user], user.ws.gameId);
     }

@@ -128,5 +128,3 @@ module.exports = {
   typeDefs,
   resolvers,
 };
-
-// handle pubsub.games
