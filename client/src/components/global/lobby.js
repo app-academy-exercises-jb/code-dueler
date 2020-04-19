@@ -12,7 +12,7 @@ export default ({ onlineUsers: {data, loading, error}, me, refetchMe }) => {
   
   return (
     <>
-      <NavBar data={data} refetchMe={refetchMe} />
+      <NavBar data={data} refetchMe={refetchMe} inLobby={true} />
       <GlobalMain data={data} me={me} />
     </>
   );

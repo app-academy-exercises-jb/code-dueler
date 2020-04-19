@@ -10,7 +10,7 @@ export default ({ refetchMe }) => {
   
   return (
     <div
-      className="logout-nav"
+      className="nav-button"
       onClick={async () => {
         const { data: { logout: ok }} = await logout();
         if (ok === "ok") {
