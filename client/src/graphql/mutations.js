@@ -151,3 +151,9 @@ export const SPECTATE_USER = gql`
     spectateUser(player: $player)
   }
 `;
+
+export const HOST_GAME = gql`
+  mutation HostGame($challenge: String!) {
+    hostGame(challenge: $challenge)
+  }
+`;

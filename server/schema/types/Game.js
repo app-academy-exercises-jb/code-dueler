@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 const { withFilter } = require("apollo-server-express");
 
+const Game = mongoose.model('Game');
+
 const typeDefs = `
   extend type Query {
     queryGameInfo(gameId: String!): GameInfoResponse!
   }
   extend type Mutation {
+    hostGame(challenge: String!): ID
     spectateGame(gameId: String!): String!
     spectateUser(player: ID!): String!
     leaveGame(player: ID!, gameId: String!): String!
@@ -88,6 +91,12 @@ const resolvers = {
     }
   },
   Mutation: {
+    hostGame: (_, { challenge }, { user, pubsub, ws}) => {
+      if (ws.userId !== user._id
+          || !pubsub.subscribers[user._id]) return null;
+
+      return Game.start(challenge, user, ws, pubsub);
+    },
     spectateGame: (_, { gameId }, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
       ws.gameId = gameId;
@@ -184,7 +193,7 @@ const resolvers = {
 
           const game = pubsub.games[ws.gameId];
 
-          if (game.connections === 2 ) {
+          if (game.connections === 2) {
             game.initializeGame();
           }
 
