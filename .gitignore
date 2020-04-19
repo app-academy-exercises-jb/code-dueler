@@ -1,6 +1,5 @@
 .history
 node_modules
 .vscode
-# keys.js
 .env
 notes.md
