@@ -1,48 +1,42 @@
-const ensureUserDetail = (user) => {
-  const details = {
-    lastSubmittedResult: "",
-    charCount: 0,
-    lineCount: 0,
-    currentCode: "",
-  };
-
-  return {
-    player: { ...user },
-    ...details,
-  };
-};
-
 const setupGame = pubsub => game => {
   const endGame = (player) => {
     const finishGame = () => {
       console.log("finishing game")
       game.users = {};
+      game.status = "over";
       pubsub.games.inGame[game.p1.player._id] = false;
-      pubsub.games.inGame[game.p2.player._id] = false;
-      pubsub.publish("gameEvent", {
-        ...game,
-        status: "over",
-      });
+      game.p2 && (pubsub.games.inGame[game.p2.player._id] = false);
+      pubsub.publish("gameEvent", game);
+      game.Game.findOneAndUpdate({_id: game._id}, { $set: {status: "over"}})
+        // __TODO__ change these console logs to something useful
+        .then(res => {
+          console.log("finished game")
+        })
+        .catch(err => {
+          console.log(err);
+        });
     };
     // this function should only be called by one of the two players
     if (player._id !== game.p1.player._id
-      && player._id !== game.p2.player._id) return;
-
+      && (!game.p2 || player._id !== game.p2.player._id)) return;
+      
     setTimeout(() => {
-      const{ p1, p2, gameId } = game;
+      const{ p1, p2, _id } = game;
       // check if both p1 and p2 are still connected 2.5s after a DC
       if (
         pubsub.subscribers[p1.player._id] !== undefined ||
-        pubsub.subscribers[p2.player._id] !== undefined
+        (!p2 || pubsub.subscribers[p2.player._id] !== undefined)
         ) {
         const found = pubsub.subscribers[player._id];
         if (found === undefined) {
           finishGame();
         } else if (found.every((connection) => 
-          connection.ws.gameId !== gameId)) {
+          connection.ws.gameId !== _id)) {
             // finish game if player is connected, 
             // but not to game screen
             finishGame();
+        } else {
+          console.log("not finishing after all:", {found})
         }
       }
     }, 1500);
@@ -51,6 +45,7 @@ const setupGame = pubsub => game => {
   const initializeGame = () => {
     if (game.initialized === true) return;
     game.initialized = true;
+    game.status = "started"
     pubsub.games.inGame[game.p1.player._id] = true;
     pubsub.games.inGame[game.p2.player._id] = true;
     pubsub.games.pendingInvites[game.p2.player._id] = false;
@@ -62,13 +57,13 @@ const setupGame = pubsub => game => {
 
   const findSpectator = spectator => {
     if (game.spectatorsKey[spectator._id] !== undefined) {
-      console.log("found spectator")
+      console.log("found spectator");
       return true;
     } else if (game.spectatorsKey[spectator._id] === 0) {
-      console.log("CRITICAL ERROR")
+      console.log("CRITICAL ERROR");
       return false;
     } 
-    console.log("did not find spectator")
+    console.log("did not find spectator");
     return false;
   }
 
@@ -83,10 +78,19 @@ const setupGame = pubsub => game => {
         game.spectatorsKey[spectator._id] = 1;
         game.users[spectator._id] = 1;
         pubsub.games.inGame[spectator._id] = true;
-        setTimeout(() => pubsub.publish("gameEvent", game), 500);
+        pubsub.publish("gameEvent", game);
+        game.Game.findOneAndUpdate({_id: game._id}, { $push: { spectators: spectator._id }})
+          .then(() => {
+            console.log("added spectator")
+          })
+          .catch(err => {
+            console.log({err})
+            console.log("failed to add spectator")
+          });
       }
     } else if (action === "remove") {
       if (findSpectator(spectator)) {
+        console.log("found spectator, removing");
         game.spectatorsKey[spectator._id] -= 1;
         game.users[spectator._id] -= 1
       } 
@@ -95,17 +99,24 @@ const setupGame = pubsub => game => {
         if (idx !== -1) {
           game.spectators.splice(idx, 1);
         }
+        console.log("lowering connections in handleSpectator")
         game.connections -= 1;
         delete game.spectatorsKey[spectator._id];
         delete game.users[spectator._id];
         pubsub.games.inGame[spectator._id] = false;
         pubsub.publish("gameEvent", game);
+        game.Game.findOneAndUpdate({_id: game._id}, { $pull: { spectators: spectator._id }})
+          .then(() => {
+            console.log("added spectator")
+          })
+          .catch(err => {
+            console.log({err})
+            console.log("failed to add spectator")
+          });
       }
     }
   }
 
-  game.p1 = ensureUserDetail(game.p1);
-  game.p2 = ensureUserDetail(game.p2);
   game.endGame = endGame;
   game.initializeGame = initializeGame;
   game.addSpectator = handleSpectator("add");

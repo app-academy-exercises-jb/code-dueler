@@ -42,6 +42,7 @@ const presenceUtils = pubsub => {
   };
 
   const removeWs = ws => {
+    // __TODO__ if ws has a gameId, it needs to leaveGame
     if (ws.invited) {
       pubsub.games.pendingInvites[ws.userId] = false;
     }

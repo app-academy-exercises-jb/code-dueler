@@ -34,11 +34,11 @@ const typeDefs = `
     gameEvent(gameId: String!): GameUpdate!
   }
   type GameUpdate {
+    _id: ID!
     p1: GameUser!
-    p2: GameUser!
+    p2: GameUser
     spectators: [User]
     status: String!
-    gameId: String!
     winner: String
     connections: Int
   }
@@ -51,6 +51,7 @@ const typeDefs = `
   }
   type GameInfoResponse {
     gameExists: Boolean!
+    gameStatus: String
     isInGame: Boolean!
     isSpectator: Boolean!
   }
@@ -85,6 +86,7 @@ const resolvers = {
     queryGameInfo: (_, { gameId }, { user, pubsub, ws }) => {
       return {
         gameExists: Boolean(pubsub.games[gameId]),
+        gameStatus: pubsub.games[gameId] && pubsub.games[gameId].status,
         isInGame: Boolean(ws.gameId || pubsub.games.inGame[user._id]),
         isSpectator: Boolean(pubsub.games[gameId] && pubsub.games[gameId].spectatorsKey[user._id])
       }
@@ -100,13 +102,14 @@ const resolvers = {
     spectateGame: (_, { gameId }, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
       ws.gameId = gameId;
+      console.log("spectating game")
       game.addSpectator(user);
       return "ok";
     },
     spectateUser: (_, { player: _id }, { user, pubsub, ws }) => {
       if (_id === undefined) return "not ok";
       if (pubsub.subscribers[_id] === undefined) return "not ok";
-
+      
       const inGameWS = pubsub.subscribers[_id].findIndex(p => p.ws && p.ws.gameId);
       if (inGameWS === -1) return "not ok";
 
@@ -115,14 +118,16 @@ const resolvers = {
       ws.gameId = gameId;
       // pubsub.updateSubscribersGameId("add", [user], gameId);
 
+      console.log("spectating user")
       game.addSpectator(user);
       return gameId;
     },
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
 
-      console.log("deleting game id");
+      console.log("leaving game");
       delete ws.gameId;
+      delete ws.p1;
       pubsub.games.inGame[_id] = false;
 
       if (!game || 
@@ -132,10 +137,9 @@ const resolvers = {
       if (game.spectatorsKey[_id]) {
         game.removeSpectator({ _id });
       } else {
+        console.log("starting end game sequence")
         game.endGame({_id});
       }
-
-      game.connections -= 1;
 
       return "ok";
     },
@@ -143,7 +147,6 @@ const resolvers = {
       const { player: _id, lastSubmittedResult, gameId } = input;
 
       const game = pubsub.games[gameId];
-      game.status = "ongoing";
       
       const player = getPlayer(game, user);
 
@@ -158,6 +161,10 @@ const resolvers = {
       });
     
       publishGameUpdate(gameUser);
+      game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: gameUser } })
+        .then(res => console.log("game updated"))
+        .catch(error => console.log("unable to update game:", {error}));
+
       return gameUser;
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
@@ -167,7 +174,7 @@ const resolvers = {
 
       if (game === undefined) return false;
 
-      game.status = "ongoing";
+      game.status = "started";
 
       const player = getPlayer(game, user);
 
@@ -186,30 +193,37 @@ const resolvers = {
         (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
           if (ws.gameId === undefined && user._id === ws.userId) {
             // reconnected to a stale game, update subscribers
-            console.log("found stale game")
             ws.gameId = gameId;
             pubsub.updateSubscribersGameId("add", [user], gameId);
           }
+          
+          let game = pubsub.games[ws.gameId];
 
-          const game = pubsub.games[ws.gameId];
-
-          if (game.connections === 2) {
+          if (game.connections >= 2
+              && game.p2 !== undefined) {
             game.initializeGame();
           }
+
+          setTimeout(() => {
+            pubsub.publish('gameEvent', game);
+          }, 10);
 
           console.log("subscribing to game event")
           return pubsub.asyncIterator("gameEvent");
         },
-        ({ p1, p2, gameId }, _, { user, pubsub, ws }) => {
+        ({ p1, p2, _id }, _, { user, pubsub, ws }) => {
           return (
             user._id === ws.userId &&
             (p1.player._id === user._id ||
-            p2.player._id === user._id ||
-            pubsub.games[gameId].spectatorsKey[user._id] !== undefined)
+            (p2 && p2.player._id === user._id) ||
+            pubsub.games[_id].spectatorsKey[user._id] !== undefined)
           );
         }
       ),
-      resolve: payload => payload
+      resolve: payload => {
+        // console.log("gameEvent:", {payload});
+        return payload;
+      }
     },
   },
 };

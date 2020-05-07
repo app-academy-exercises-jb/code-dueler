@@ -42,7 +42,7 @@ const GameSchema = new Schema({
   },
   spectators: {
     type: [Schema.Types.ObjectId],
-    ref: 'Player',
+    ref: 'User',
     required: true,
   },
   status: {
@@ -73,8 +73,7 @@ GameSchema.statics.start = async (challenge, user, ws, pubsub) => {
   await p1.save();
   await game.save();
 
-  // __TODO__ mark user as inGame now
-  // mark ws with game Id
+  pubsub.initGame({ws, user, game, Game});
 
   return game._id;
 }
