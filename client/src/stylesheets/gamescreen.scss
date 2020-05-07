@@ -8,12 +8,10 @@
   justify-content: space-evenly;
   align-items: center;
   flex-direction: column;
-  flex-wrap: wrap;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
   padding: 7px;
   font-size: 18px;
-  height: 400px;
-  margin: 20px 26px 0;
+  height: 100%;
 }
 
 .stats-wrapper {
@@ -28,7 +26,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 50%;
 }
 
 .stats-form{
@@ -53,21 +50,24 @@
     color: #d4f2d2;
     
   }
+
   .stats{
-  text-align: left;
-  padding: 5px;
-  height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
+    text-align: left;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
   }
+}
+
+.stats > h2 {
+  margin: 0.3rem 0;
 }
 
 .game-screen {
   display: flex;
   width: 100%;
   box-sizing: border-box;
-  min-height: calc(100vh - 56px);
 }
 
 .game-left {
@@ -75,10 +75,8 @@
   justify-content: space-between;
   align-items: center;
   flex-direction: column;
-  // min-width: 500px;
   flex: 1;
   box-sizing: border-box;
-  // min-height: 600px;
 }
 
 .game-right {
@@ -107,7 +105,7 @@
 .code-editor-wrapper {
   display: flex;
   align-items: center;
-  flex: 1.5;
+  flex: 1;
   flex-direction: column;
   width: 95%;
   max-width: 800px;
@@ -125,11 +123,9 @@
   display: flex;
   justify-content: center;
   margin-top: 10px;
-  flex-wrap: wrap;
   h2 {
     width: 60%;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     align-self: center;
     font-size: 16px;
@@ -137,7 +133,8 @@
     color: #0E1428;
     border-radius: 4px;
     padding: 3px 0;
-    margin-bottom: 8px;;
+    margin: 0 1rem 8px;
+    margin-bottom: 8px;
     &:hover {
       cursor: pointer;
     }
@@ -148,6 +145,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  align-self: flex-end;
+  margin-bottom: 2rem;
   width: 80%;
 }
 
