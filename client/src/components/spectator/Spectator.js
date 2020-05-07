@@ -87,11 +87,13 @@ export default ({ me, setSpectators }) => {
           </div>
         </div>
         <div className="player-stats">
-          <PlayerStats
-            ownStats={player1Stats}
-            opponentStats={player2Stats}
-            spectator={true}
-          />
+          <div className="stats-wrapper-spectator">
+            <PlayerStats
+              ownStats={player1Stats}
+              opponentStats={player2Stats}
+              spectator={true}
+            />
+          </div>
         </div>
         <div className="spectator-player2">
           <div className="code-editor-wrapper-spectator">

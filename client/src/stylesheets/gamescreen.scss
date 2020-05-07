@@ -12,14 +12,16 @@
   padding: 7px;
   font-size: 18px;
   height: 100%;
-}
+  padding: 1rem;
+  
+  h1 {
+    font-weight: 600;
+    border-bottom: 1px solid;
+  }
 
-.stats-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  flex: 1;
+  * {
+    margin: 0.35rem 0;
+  }
 }
 
 .stats-players {
@@ -52,6 +54,7 @@
   }
 
   .stats{
+    margin: 1rem 0;
     text-align: left;
     padding: 5px;
     display: flex;
@@ -76,6 +79,7 @@
   align-items: center;
   flex-direction: column;
   flex: 1;
+  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -87,7 +91,7 @@
   min-width: 500px;
   box-sizing: border-box;
   flex: 1;
-  // min-height: 600px;
+  padding: 20px;
   background-color: #63768D;
 }
 
@@ -121,7 +125,8 @@
 
 .stats-results {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
   margin-top: 10px;
   h2 {
     width: 60%;
@@ -132,8 +137,8 @@
     background-color: #D4F2D2;
     color: #0E1428;
     border-radius: 4px;
-    padding: 3px 0;
-    margin: 0 1rem 8px;
+    padding: 3px 6px;
+    // margin: 0 1rem 8px;
     margin-bottom: 8px;
     &:hover {
       cursor: pointer;
@@ -150,12 +155,16 @@
   width: 80%;
 }
 
-.player-stats-game-wrapper {
+.stats-wrapper {
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: center;
+  justify-content: space-around;
   height: 100%;
+  flex: 1;
+}
+
+.stats-wrapper > div {
   flex: 1;
 }
 

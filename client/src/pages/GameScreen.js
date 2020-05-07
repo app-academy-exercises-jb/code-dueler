@@ -103,14 +103,12 @@ export default ({ me, gameId, refetchMe }) => {
             <div className="code-editor-wrapper">
               <CodeEditor gameId={gameId} me={data.me} />
             </div>
-            <div className="player-stats-game-wrapper">
-              <div className="player-stats-game">
-                <PlayerStats
-                  me={data.me}
-                  ownStats={ownStats}
-                  opponentStats={opponentStats}
-                  />
-              </div>
+            <div className="stats-wrapper">
+              <PlayerStats
+                me={data.me}
+                ownStats={ownStats}
+                opponentStats={opponentStats}
+              />
             </div>
           </div>
           <div className="game-right">
