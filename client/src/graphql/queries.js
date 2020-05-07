@@ -25,6 +25,15 @@ export const GET_ONLINE_USERS = gql`
   }
 `;
 
+export const GET_USERS_IN_GAME = gql`
+  query GameUsers($gameId: ID!) {
+    gameUsers(gameId: $gameId) {
+      _id
+      username
+    }
+  }
+`;
+
 export const GET_MESSAGES = gql`
   query Messages($channelId: String!, $offset: Int!) {
     messages(channelId: $channelId, offset: $offset) {
@@ -43,6 +52,7 @@ export const IN_GAME_INFO = gql`
   query InGameInfo($gameId: String!) {
     queryGameInfo(gameId: $gameId) {
       gameExists
+      gameStatus
       isInGame
       isSpectator
     }

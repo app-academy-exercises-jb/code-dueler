@@ -42,7 +42,7 @@ export default ({ me, setSpectators }) => {
       const { p1, p2, status, winner } = subscriptionData.data.gameEvent;
       setSpectators(subscriptionData.data.gameEvent.connections);
 
-      if (status === "ongoing") {
+      if (status === "started") {
         setPlayer1Stats(p1);
         setPlayer2Stats(p2);
       } else if (status === "over") {

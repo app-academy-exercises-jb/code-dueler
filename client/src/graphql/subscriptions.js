@@ -48,6 +48,7 @@ export const ON_INVITATION = gql`
 export const ON_GAME = gql`
   subscription onGame($gameId: String!) {
     gameEvent(gameId: $gameId) {
+      _id
       p1 {
         ...GameUserDetails
       }
@@ -59,7 +60,6 @@ export const ON_GAME = gql`
         username
       }
       status
-      gameId
       connections
       winner
     }

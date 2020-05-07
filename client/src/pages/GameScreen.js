@@ -10,10 +10,10 @@ import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
 
-export default ({ me, gameId, refetchMe }) => {
+export default ({ me, gameId, refetchMe, gameEvent }) => {
   const { loading, error, data } = me;
+
   const history = useHistory();
-  const [gameEvent, setGameEvent] = useState(null);
   const [opponentStats, setOpponentStats] = useState(null);
   const [ownStats, setOwnStats] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,42 +34,32 @@ export default ({ me, gameId, refetchMe }) => {
     []
   );
 
-  useSubscription(ON_GAME, {
-    fetchPolicy: "network-only",
-    variables: {
-      gameId,
-    },
-    onSubscriptionData: ({ client, subscriptionData }) => {
-      const e = subscriptionData.data.gameEvent;
-      setGameEvent(e);
+  useEffect(() => {
+    let self, opponent;
+    if (gameEvent.p1.player._id === data.me._id) {
+      self = "p1";
+      opponent = "p2";
+    } else {
+      opponent = "p1";
+      self = "p2";
+    }
 
-      let self, opponent;
-      if (e.p1.player._id === data.me._id) {
-        self = "p1";
-        opponent = "p2";
+    if (gameEvent.status === "initializing") {
+      console.log("initializing");
+    } else if (gameEvent.status === "started") {
+      setOwnStats(gameEvent[self]);
+      setOpponentStats(gameEvent[opponent]);
+    } else if (gameEvent.status === "over") {
+      if (gameEvent.winner === null) {
+        handleGameOver("disconnect");
+      } else if (gameEvent.winner === self) {
+        handleGameOver("victory");
       } else {
-        opponent = "p1";
-        self = "p2";
+        handleGameOver("defeat");
       }
-
-      if (e.status === "initializing") {
-        console.log("initializing");
-      } else if (e.status === "ready") {
-        console.log("ready");
-      } else if (e.status === "ongoing") {
-        setOwnStats(e[self]);
-        setOpponentStats(e[opponent]);
-      } else if (e.status === "over") {
-        if (e.winner === null) {
-          handleGameOver("disconnect");
-        } else if (e.winner === self) {
-          handleGameOver("victory");
-        } else {
-          handleGameOver("defeat");
-        }
-      }
-    },
-  });
+    }
+  
+  }, [gameEvent]);
 
   if (loading || error || !data) return null;
 
