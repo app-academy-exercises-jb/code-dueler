@@ -2,10 +2,10 @@ html, body, #root {
     height:100%;
 }
 
-// html, body, #root
-// {
-//     height: 100vh;
-// }
+#root {
+  height: fit-content;
+  min-height: 100vh;
+}
 
 .scroll-bar {
   --scrollbarBG: #0E1428;
@@ -31,11 +31,12 @@ html, body, #root {
   background-color: #63768D;
   font-family: 'Roboto', sans-serif;
   display: flex;
-  height: inherit;
+  flex: 1;
 }
 
 .global {
   display: flex;
   flex-direction: column;
   height: inherit;
+  min-height: 100vh;
 }
