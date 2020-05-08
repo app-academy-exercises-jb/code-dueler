@@ -77,8 +77,8 @@ export default ({ownStats, opponentStats, spectator}) => {
 
   useEffect(() => setModalOpen(false), []);
 
-  return (<>
-    <div className="stats-wrapper">
+  return (
+    <>
       <div className="stats-players">
         <Stats 
           ownStats={ownStats} 
@@ -93,12 +93,12 @@ export default ({ownStats, opponentStats, spectator}) => {
           {...statsProps}
         />
       </div>
-    </div>
-    {modalOpen && 
-      ((modalToOpen === "results" &&  
-        <ResultsModal test={"test"} {...props} />) ||
-      (modalToOpen === "error" &&  
-        <ErrorModal {...props} />))
-    }
-  </>)
+      {modalOpen && 
+        ((modalToOpen === "results" &&  
+          <ResultsModal test={"test"} {...props} />) ||
+        (modalToOpen === "error" &&  
+          <ErrorModal {...props} />))
+      }
+    </>
+  )
 };

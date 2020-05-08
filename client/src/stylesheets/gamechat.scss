@@ -24,7 +24,6 @@
 .playerview {
   width: 27%;
   background-color: #32292F;
-  height: 415px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -43,7 +42,6 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  flex-wrap: wrap;
   overflow-y: scroll;
   margin-bottom: 50px;
 }

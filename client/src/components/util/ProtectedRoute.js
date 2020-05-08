@@ -61,6 +61,8 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
   if (loading || error || !data || !me.data || me.loading) {
     return null;
   } else if (data.isLoggedIn) {
+    if (!onlineUsers.data || onlineUsers.error) return null;
+    
     return (
       <Route
         path={path}

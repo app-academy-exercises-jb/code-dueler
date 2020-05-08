@@ -1,12 +1,17 @@
 import React from "react";
-import Lobby from "../components/global/lobby";
+import NavBar from "../components/nav/NavBar";
+import SideBar from "../components/sidebar/SideBar";
+import Chat from "../components/chat/Chat";
 
-export default (props) => {
+export default ({onlineUsers: {data}, me, refetchMe}) => {
   return (
-    <div className="main">
-      <div className="main-sub">
-        <Lobby {...props} />
+    <div className="global">
+      <NavBar data={data} refetchMe={refetchMe} />
+      <div className="main">
+        <SideBar data={data} />
+        <Chat me={me} />
       </div>
+      <footer></footer>
     </div>
   );
 };

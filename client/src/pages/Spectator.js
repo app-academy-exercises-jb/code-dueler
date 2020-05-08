@@ -6,9 +6,12 @@ export default ({ ...props }) => {
   const [spectators, setSpectators] = useState(null);
 
   return (
-    <>
+    <div className="global">
       <NavBar data={spectators && spectators - 2} inGame={true} refetchMe={props.refetchMe} />
-      <Spectator {...props} setSpectators={setSpectators} />
-    </>
+      <div className="main">
+        <Spectator {...props} setSpectators={setSpectators} />
+      </div>
+      <footer></footer>
+    </div>
   );
 };

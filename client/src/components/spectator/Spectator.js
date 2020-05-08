@@ -75,42 +75,42 @@ export default ({ me, setSpectators }) => {
   // console.log(player1Stats);
 
   return (
-    <div className="main-spectator">
-      <div className="spectator-wrapper">
-        <div className="screen-top">
-          <div className="spectator-player1">
-            <div className="code-editor-wrapper-spectator">
-              <CodeEditor
-                gameId={gameId}
-                data={player1Stats && player1Stats.currentCode}
-                spectator={true}
-              />
-            </div>
-            <div className="player-stats">
-              <PlayerStats
-                ownStats={player1Stats}
-                opponentStats={player2Stats}
-                spectator={true}
-              />
-            </div>
-          </div>
-          <div className="spectator-player2">
-            <div className="code-editor-wrapper-spectator">
-              <CodeEditor
-                gameId={gameId}
-                data={player2Stats && player2Stats.currentCode}
-                spectator={true}
-              />
-            </div>
+    <div className="spectator-wrapper">
+      <div className="screen-top">
+        <div className="spectator-player1">
+          <div className="code-editor-wrapper-spectator">
+            <CodeEditor
+              gameId={gameId}
+              data={player1Stats && player1Stats.currentCode}
+              spectator={true}
+            />
           </div>
         </div>
-        <div className="screen-bottom">
-          <div className="challenge-question-wrapper-spectator">
-            <ChallengeQuestion />
+        <div className="player-stats">
+          <div className="stats-wrapper-spectator">
+            <PlayerStats
+              ownStats={player1Stats}
+              opponentStats={player2Stats}
+              spectator={true}
+            />
           </div>
-          <div className="game-chat-wrapper-spectator">
-            <Chat channelId={gameId} id={"game-chat"} me={me} />
+        </div>
+        <div className="spectator-player2">
+          <div className="code-editor-wrapper-spectator">
+            <CodeEditor
+              gameId={gameId}
+              data={player2Stats && player2Stats.currentCode}
+              spectator={true}
+            />
           </div>
+        </div>
+      </div>
+      <div className="screen-bottom">
+        <div className="challenge-question-wrapper-spectator">
+          <ChallengeQuestion />
+        </div>
+        <div className="game-chat-wrapper-spectator">
+          <Chat channelId={gameId} id={"game-chat"} me={me} />
         </div>
       </div>
       <ReactModal
