@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 import HostGameButton from "./HostGameButton";
+import JoinGameButton from "./JoinGameButton";
 
 const NavBar = ({ data, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
   return (
@@ -26,9 +27,14 @@ const NavBar = ({ data, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
           </Link>
         </div>
         <div className="nav-buttons">
-          {inLobby && <div>
+          {inLobby && <>
+          <div>
             <ProtectedComponent component={HostGameButton} />
-          </div>}
+          </div>
+          <div>
+            <ProtectedComponent component={JoinGameButton} />
+          </div>
+          </>}
           <div>
             <ProtectedComponent component={LogOutButton} refetchMe={refetchMe} />
           </div>
