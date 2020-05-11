@@ -1,10 +1,12 @@
-html, body, #root {
-    height:100%;
+html,body {
+  height: 100%;
 }
 
 #root {
-  height: fit-content;
-  min-height: 100vh;
+  height: 100%;
+  width: 100%;
+  min-height: fit-content;
+  min-width: fit-content;
 }
 
 .scroll-bar {
@@ -38,5 +40,5 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   height: inherit;
-  min-height: 100vh;
+  width: inherit;
 }
