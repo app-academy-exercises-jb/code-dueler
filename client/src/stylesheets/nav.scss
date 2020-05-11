@@ -9,6 +9,12 @@
   font-size: 36px;
   box-sizing: border-box;
   z-index: 3;
+  position: fixed;
+  width: 100vw;
+}
+
+.nav-bar-spacer {
+  min-height: 56px;
 }
 
 .logo-wrapper {
