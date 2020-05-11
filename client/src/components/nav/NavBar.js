@@ -34,7 +34,7 @@ const NavBar = ({ data, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
           </div>
         </div>
       </div>
-      <div className="spacer">&nbsp;</div>
+      <div className="nav-bar-spacer"></div>
     </>
   );
 };

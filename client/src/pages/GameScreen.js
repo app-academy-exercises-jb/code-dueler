@@ -80,19 +80,20 @@ export default ({ me, gameId, refetchMe, gameEvent }) => {
   };
 
   return (
-    <div className="main">
+    <div className="global">
       <NavBar
         inGame={true}
         data={gameEvent && gameEvent.connections - 2}
         refetchMe={refetchMe}
       />
-      <div className="game-screen">
-        <div className="game-left">
-          <div className="code-editor-wrapper">
-            <CodeEditor gameId={gameId} me={data.me} />
-          </div>
-          <div className="player-stats-game-wrapper">
-            <div className="player-stats-game">
+
+      <div className="main">
+        <div className="game-screen">
+          <div className="game-left">
+            <div className="code-editor-wrapper">
+              <CodeEditor gameId={gameId} me={data.me} />
+            </div>
+            <div className="stats-wrapper">
               <PlayerStats
                 me={data.me}
                 ownStats={ownStats}
@@ -100,42 +101,44 @@ export default ({ me, gameId, refetchMe, gameEvent }) => {
               />
             </div>
           </div>
-        </div>
-        <div className="game-right">
-          <div className="challenge-question-wrapper">
-            <ChallengeQuestion />
+          <div className="game-right">
+            <div className="challenge-question-wrapper">
+              <ChallengeQuestion />
+            </div>
+            <div className="game-chat-wrapper">
+              <Chat channelId={gameId} id={"game-chat"} me={me} />
+            </div>
           </div>
-          <div className="game-chat-wrapper">
-            <Chat channelId={gameId} id={"game-chat"} me={me} />
-          </div>
         </div>
+        <ReactModal
+          isOpen={modalOpen}
+          className={`modal-overlay`}
+          shouldCloseOnEsc={true}
+          onRequestClose={() => setModalOpen(false)}
+          >
+          <div className={`modal`}>
+            <div className={`modal-info center`}>
+              <h1>{gameOverMessage}</h1>
+            </div>
+            <div className="modal-buttons">
+              <button
+                className="modal-decline decline-hover"
+                onClick={handleModalClose}
+                >
+                Go back to the lobby
+              </button>
+              {/* <button className="game-over-stay">
+              Hang out here
+              </button>
+              <button className="game-over-challenge">
+              Rematch!
+            </button> */}
+            </div>
+          </div>
+        </ReactModal>
       </div>
-      <ReactModal
-        isOpen={modalOpen}
-        className={`modal-overlay`}
-        shouldCloseOnEsc={true}
-        onRequestClose={() => setModalOpen(false)}
-      >
-        <div className={`modal`}>
-          <div className={`modal-info center`}>
-            <h1>{gameOverMessage}</h1>
-          </div>
-          <div className="modal-buttons">
-            <button
-              className="modal-decline decline-hover"
-              onClick={handleModalClose}
-            >
-              Go back to the lobby
-            </button>
-            {/* <button className="game-over-stay">
-            Hang out here
-          </button>
-          <button className="game-over-challenge">
-            Rematch!
-          </button> */}
-          </div>
-        </div>
-      </ReactModal>
+
+      <footer></footer>
     </div>
   );
 };

@@ -1,10 +1,5 @@
 .nav-bar-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
   min-height: 56px;
-  height: 6vh;
   background-color: #0E1428;
   color: #D4F2D2;
   display: flex;
@@ -14,6 +9,12 @@
   font-size: 36px;
   box-sizing: border-box;
   z-index: 3;
+  position: fixed;
+  width: 100vw;
+}
+
+.nav-bar-spacer {
+  min-height: 56px;
 }
 
 .logo-wrapper {
@@ -70,9 +71,4 @@
   &:hover {
     background-color: #575366;
   }
-}
-
-.spacer {
-  height: 56px;
-  width: 100%;
 }

@@ -22,7 +22,6 @@ export default ({
     <>
       <div className="stats-form">
         <h1 className="stats-title">{username}</h1>
-        <br />
         <div className="stats">
           <h2>Character Count: {(stats && stats.charCount) || 0}</h2>
           <h2>Lines of Code: {(stats && stats.lineCount) || 0}</h2>
