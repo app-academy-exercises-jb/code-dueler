@@ -7,6 +7,7 @@ import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import AuthRoute from "./components/util/AuthRoute";
 import "./stylesheets/application.scss";
+import Splash from "./pages/Splash";
 
 export default () => {
   return (
@@ -14,6 +15,7 @@ export default () => {
       <Switch>
         <ProtectedRoute exact path="/" component={GlobalLobby} />
         <ProtectedRoute path="/game/:id" component={GameFilter} />
+        <AuthRoute path="/welcome" component={Splash} />
         <AuthRoute path="/login" render={() => <Auth action="login" />} />
         <AuthRoute path="/signup" render={() => <Auth action="signup" />} />
         <Route path="/" component={ErrorPage} />
