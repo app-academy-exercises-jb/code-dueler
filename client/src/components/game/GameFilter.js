@@ -44,10 +44,10 @@ export default ({ me, ...props }) => {
   // function returned from useEffect will run on component unmount
   useEffect(
     () => () => {
-      if (!data) return;
+      if (!me) return;
       leaveGame({
         variables: {
-          player: data.me._id,
+          player: me._id,
           gameId,
         },
       });
@@ -55,8 +55,7 @@ export default ({ me, ...props }) => {
     []
   );
 
-  if (gameLoading || gameError || !gameData
-      || loading || error || !data) return null;
+  if (gameLoading || gameError || !gameData) return null;
 
   const { queryGameInfo } = gameData,
   { isInGame, gameStatus, isSpectator, gameExists } = queryGameInfo;
@@ -72,7 +71,7 @@ export default ({ me, ...props }) => {
             queryGameInfo={queryGameInfo}
             gameEvent={gameEvent}
             gameId={gameId}
-            me={data.me}
+            me={me}
           />}
         </GameData>
       );
@@ -84,7 +83,7 @@ export default ({ me, ...props }) => {
               { ...props }
               gameEvent={gameEvent}
               gameId={gameId}
-              me={data.me}
+              me={me}
             />}
           </GameData>
         );
@@ -95,7 +94,7 @@ export default ({ me, ...props }) => {
               { ...props }
               gameEvent={gameEvent}
               gameId={gameId}
-              me={data.me}
+              me={me}
             />}
           </GameData>
         );

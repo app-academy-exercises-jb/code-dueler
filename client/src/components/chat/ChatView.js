@@ -57,7 +57,6 @@ const ChatView = ({ channelId, id }) => {
             if (messagesRef.current.clientHeight === messagesRef.current.scrollHeight
                 && (oldData === undefined || 
                     data.messages.some((msg, idx) => msg._id !== oldData.messages[idx]._id))) {
-              console.log({data});
               oldData = data;
               fetchMoreMessages();
             } else {
@@ -76,7 +75,10 @@ const ChatView = ({ channelId, id }) => {
         offset
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult.messages) return prev;
+        if (fetchMoreResult.messages.length === 0) {
+          setShouldFetch(false);
+          return prev;
+        }
         const next = { messages: [...fetchMoreResult.messages, ...prev.messages] };
         setOffset(offset + 15);
         setShouldFetch(true);

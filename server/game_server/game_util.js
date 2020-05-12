@@ -47,7 +47,7 @@ const gameUtil = pubsub => {
     pubsub.games.inGame[user._id] = true;
 
     // remember that this ws client object is inGame
-    ws.gameId = inMemGame._id;
+    ws.gameId = inMemGame._id.toString();
   }
 
   pubsub.initGame = initGame;

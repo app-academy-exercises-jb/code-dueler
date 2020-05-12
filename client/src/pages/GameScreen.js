@@ -45,7 +45,7 @@ export default ({ me, gameId, refetchMe, gameEvent }) => {
     }
 
     if (gameEvent.status === "initializing") {
-      console.log("initializing");
+      
     } else if (gameEvent.status === "started") {
       setOwnStats(gameEvent[self]);
       setOpponentStats(gameEvent[opponent]);

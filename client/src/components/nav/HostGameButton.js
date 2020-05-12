@@ -8,6 +8,7 @@ const HostGameButton = props => {
   const history = useHistory();
 
   const handleClick = async e => {
+    //show modal with host game options, such as: choose your challenge
     const { data: { hostGame: gameId } } = await hostGame({variables: {challenge: "fizz-buzz"}});
     if (gameId !== null) {
       history.push(`/game/${gameId}`);

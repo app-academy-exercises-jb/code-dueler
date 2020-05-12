@@ -69,7 +69,7 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
         {...rest}
         render={() => {
           return (
-            <Component onlineUsers={onlineUsers} me={me} refetchMe={refetchMe} />
+            <Component onlineUsers={onlineUsers} me={me.data.me} refetchMe={refetchMe} />
           );
         }}
       />
