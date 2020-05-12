@@ -1,5 +1,5 @@
 import React from "react";
-import SplashPage from "../components/splash/Splash";
+import SplashComponent from "../components/splash/Splash";
 import NavBar from "../components/nav/NavBar";
 
 export default (props) => {
@@ -7,7 +7,7 @@ export default (props) => {
     <div className="global">
       <NavBar />
       <div className="main">
-        <SplashPage />
+        <SplashComponent />
       </div>
       <footer></footer>
     </div>
