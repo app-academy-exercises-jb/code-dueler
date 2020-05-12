@@ -18,7 +18,6 @@ class SplashComponent extends React.Component {
   }
 
   moveRight() {
-    console.log(this.state.idx);
     if (this.state.idx < 8) {
       this[`photo${this.state.idx + 1}`].current.classList.add("card-in");
       this[`photo${this.state.idx}`].current.classList.remove("card-in");
@@ -30,7 +29,6 @@ class SplashComponent extends React.Component {
   }
 
   moveLeft() {
-    console.log(this.state.idx);
     if (this.state.idx > 1) {
       this[`photo${this.state.idx}`].current.classList.remove("card-in");
       this[`photo${this.state.idx - 1}`].current.classList.add("card-in");
@@ -65,7 +63,7 @@ class SplashComponent extends React.Component {
 
             <div ref={this.photo2} className="card_part card_part-2">
               <p className="slide-text flex-start">
-                Hello and wecome to CodeDueler!
+                Hello and welcome to CodeDueler!
               </p>
               <p className="slide-text flex-start">
                 Code Dueler is a competitive problem solving game where two
