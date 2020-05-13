@@ -1,70 +1,20 @@
 import React, { useState } from "react";
 import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
-import { useMutation, useSubscription } from "@apollo/react-hooks";
-import { ON_INVITATION } from "../../graphql/subscriptions";
-import {
-  ACCEPT_INVITE,
-  DECLINE_INVITE,
-  SPECTATE_USER,
-} from "../../graphql/mutations";
+import { useMutation } from "@apollo/react-hooks";
+import { SPECTATE_USER } from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
 
-const SideBar = ({ data, inGame }) => {
-  if (inGame === true) {
-    // ReactModal.setAppElement("#game-lobby");
-  } else {
-    ReactModal.setAppElement("#root");
-  }
+const SideBar = ({ users, inGame }) => {
+  ReactModal.setAppElement("#root");
 
-  const [challengeModalOpen, setChallengeModalOpen] = useState(false);
   const [spectateModalOpen, setSpectateModalOpen] = useState(false);
-
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [acceptInvite] = useMutation(ACCEPT_INVITE);
-  const [declineInvite] = useMutation(DECLINE_INVITE);
+
   const [spectate] = useMutation(SPECTATE_USER);
 
   const history = useHistory();
-
-  // useSubscription(ON_INVITATION, {
-  //   fetchPolicy: "network-only",
-  //   onSubscriptionData: ({ client, subscriptionData }) => {
-  //     const e = subscriptionData.data.invitationEvent;
-  //     console.log(e);
-  //     if (e.status === "inviting") {
-  //       handleModalOpen(e.inviter);
-  //     } else if (e.status === "declined") {
-  //       // setSelectedUser(e.invitee)
-  //       // setDeclineModalOpen(true)
-  //       // // => "invitee declined your invite"
-  //       alert(`${e.invitee.username} declined`);
-  //     } else if (e.status === "accepted") {
-  //       // Go to the game screen
-  //       history.push(`/game/${e.gameId}`);
-  //     } else if (e.status === "rejected") {
-  //       if (e.reason === "That player's already in another game!") {
-  //         setSelectedUser(e.invitee);
-  //         setSpectateModalOpen(true);
-  //       } else {
-  //         alert(`Sorry! ${e.reason}`);
-  //       }
-  //     }
-  //   },
-  // });
-
-  const handleModalOpen = (user) => {
-    // setSelectedUser(user);
-    setChallengeModalOpen(true);
-  };
-
-  const handleAccept = (user) => {
-    acceptInvite({ variables: { inviter: user._id } });
-    setChallengeModalOpen(false);
-  };
-
-  
 
   const spectateUser = async (user) => {
     const {
@@ -78,7 +28,18 @@ const SideBar = ({ data, inGame }) => {
   return (
     <div className="sidebar-wrapper">
       <div className="user-list-wrapper">
-        <SideBarUsers data={data} handleModalOpen={handleModalOpen} />
+        {inGame && "Players"}
+        <SideBarUsers 
+          users={users}
+          inGame={inGame}
+          action={(user) => {
+            if (!(user.inGame || user.inLobby)) return;
+            setSelectedUser(user);
+            setSpectateModalOpen(true);
+          }}
+          />
+        <br />
+        {inGame && "Spectators"}
       </div>
       <ReactModal
         isOpen={spectateModalOpen}

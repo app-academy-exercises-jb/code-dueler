@@ -60,3 +60,34 @@
   background-color: #D4F2D2;
 }
 
+.tooltip-container {
+  width: max-content;
+  position: absolute;
+  top: 1px;
+  left: 1.5rem;
+  padding: 1px;
+  border: 1px solid #6E7DAB;
+  border-radius: 4px;
+  background-color: #6E7DAB;
+  color: white;
+  font-weight: 600;
+  font-size: 0.925rem;
+  max-width: 125px;
+
+}
+
+.tooltipped-icon {
+  position: relative;
+}
+
+.tooltip {
+  font-size: 1.25rem;
+}
+
+.tooltip-tail {
+  position: absolute;
+  top: 3px;
+  left: -.65rem;
+  border: 5px solid;
+  border-color: transparent #6E7DAB transparent transparent;
+}
