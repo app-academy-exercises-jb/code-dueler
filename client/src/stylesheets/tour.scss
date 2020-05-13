@@ -37,6 +37,62 @@
   color: #D4F2D2;
 }
 
+.game-challenge {
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 18rem;
+  height: 10rem;
+  right: 58rem;
+  top: 7rem;
+  font-family: 'Roboto', sans-serif;
+  color: #D4F2D2;
+}
+
+.game-editor {
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  width: 18rem;
+  height: 10rem;
+  left: 20rem;
+  top: 7rem;
+  font-family: 'Roboto', sans-serif;
+  color: #D4F2D2;
+}
+
+.game-submit {
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 18rem;
+  height: 10rem;
+  left: 41rem;
+  top: 23.5rem;
+  font-family: 'Roboto', sans-serif;
+  color: #D4F2D2;
+}
+
+.game-stats {
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  position: fixed;
+  width: 18rem;
+  height: 12rem;
+  left: 20.25rem;
+  bottom: 9.8rem;
+  font-family: 'Roboto', sans-serif;
+  color: #D4F2D2;
+}
+
 .tour-text-wrapper {
   display: flex;
   justify-content: center;
@@ -48,7 +104,6 @@
   text-align: center;
   border:  2px solid #D4F2D2;
   border-radius: 4px;
-  
 }
 
 .tour-text {
@@ -61,6 +116,20 @@
   color: #0E1428;
   animation: left-right 1s ease-in-out infinite;
   margin-right: 9px;
+}
+
+.tour-arrow-right {
+  font-size: 2rem;
+  color: #0E1428;
+  animation: left-right 1s ease-in-out infinite;
+  margin-left: 18px;
+}
+
+.tour-arrow-left-right {
+  font-size: 3rem;
+  color: #D4F2D2;
+  animation: left-right 1s ease-in-out infinite;
+  margin-left: 18px;
 }
 
 .tour-arrow-up {

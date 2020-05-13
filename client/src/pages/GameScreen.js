@@ -9,6 +9,7 @@ import { ON_GAME } from "../graphql/subscriptions";
 import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
+import GameTour from "../components/tour/GameTour";
 
 export default ({ me, gameId, refetchMe }) => {
   const { loading, error, data } = me;
@@ -97,6 +98,8 @@ export default ({ me, gameId, refetchMe }) => {
         refetchMe={refetchMe}
       />
 
+      <GameTour />
+
       <div className="main">
         <div className="game-screen">
           <div className="game-left">
@@ -125,7 +128,7 @@ export default ({ me, gameId, refetchMe }) => {
           className={`modal-overlay`}
           shouldCloseOnEsc={true}
           onRequestClose={() => setModalOpen(false)}
-          >
+        >
           <div className={`modal`}>
             <div className={`modal-info center`}>
               <h1>{gameOverMessage}</h1>
@@ -134,7 +137,7 @@ export default ({ me, gameId, refetchMe }) => {
               <button
                 className="modal-decline decline-hover"
                 onClick={handleModalClose}
-                >
+              >
                 Go back to the lobby
               </button>
               {/* <button className="game-over-stay">

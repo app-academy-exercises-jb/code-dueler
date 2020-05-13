@@ -11,11 +11,6 @@ class LobbyTour extends React.Component {
     this.lobby1 = React.createRef();
     this.lobby2 = React.createRef();
     this.lobby3 = React.createRef();
-    // this.lobby4 = React.createRef();
-    // this.lobby5 = React.createRef();
-    // this.lobby6 = React.createRef();
-    // this.lobby7 = React.createRef();
-    // this.lobby8 = React.createRef();
   }
 
   componentDidMount() {
