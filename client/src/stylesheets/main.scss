@@ -43,3 +43,9 @@ html,body {
   height: inherit;
   width: inherit;
 }
+
+.vertical-half {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

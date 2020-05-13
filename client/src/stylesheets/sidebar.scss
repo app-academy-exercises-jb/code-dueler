@@ -27,6 +27,18 @@
   margin-bottom: 0.25rem;
   padding-left: 2rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.user-list-item>div {
+  margin-right: 0.75rem;
+  margin-left: -0.75rem;
+}
+
+.status-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .sidebar-wrapper::-webkit-scrollbar-track {
