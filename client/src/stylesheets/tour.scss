@@ -1,5 +1,4 @@
 .lobby-sidebar {
-  z-index: 100;
   display: flex;
   justify-content: space-between;
   position: fixed;
@@ -38,7 +37,6 @@
 }
 
 .game-challenge {
-  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,7 +50,6 @@
 }
 
 .game-editor {
-  z-index: 100;
   display: flex;
   justify-content: space-between;
   position: fixed;
@@ -65,7 +62,6 @@
 }
 
 .game-submit {
-  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,7 +75,6 @@
 }
 
 .game-stats {
-  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
