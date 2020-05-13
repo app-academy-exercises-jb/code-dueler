@@ -22,8 +22,6 @@ class SplashComponent extends React.Component {
       this[`photo${this.state.idx + 1}`].current.classList.add("card-in");
       this[`photo${this.state.idx}`].current.classList.remove("card-in");
       this[`photo${this.state.idx}`].current.classList.add("card-out");
-    }
-    if (this.state.idx < 8) {
       this.setState({ idx: this.state.idx + 1 });
     }
   }
@@ -33,8 +31,6 @@ class SplashComponent extends React.Component {
       this[`photo${this.state.idx}`].current.classList.remove("card-in");
       this[`photo${this.state.idx - 1}`].current.classList.add("card-in");
       this[`photo${this.state.idx - 1}`].current.classList.remove("card-out");
-    }
-    if (this.state.idx > 1) {
       this.setState({ idx: this.state.idx - 1 });
     }
   }
