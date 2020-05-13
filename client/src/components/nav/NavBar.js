@@ -3,6 +3,7 @@ import LogOutButton from "../users/LogOutButton";
 import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
+import Credits from "../credits/Credits";
 
 const NavBar = ({ data, noData, inGame, refetchMe }) => {
   return (
@@ -10,7 +11,11 @@ const NavBar = ({ data, noData, inGame, refetchMe }) => {
       <div className="nav-bar-wrapper">
         <div className="left-nav">
           {!noData && (
-            <ProtectedComponent component={NavBarPlayerCount} data={data} inGame={inGame} />
+            <ProtectedComponent
+              component={NavBarPlayerCount}
+              data={data}
+              inGame={inGame}
+            />
           )}
         </div>
         <div className="other-left">&nbsp;</div>
@@ -19,7 +24,10 @@ const NavBar = ({ data, noData, inGame, refetchMe }) => {
             CodeDueler
           </Link>
         </div>
-        <div>
+        <div className="nav-right">
+          <Link className="button-nav" to="/credits">
+            Credits
+          </Link>
           <ProtectedComponent component={LogOutButton} refetchMe={refetchMe} />
         </div>
       </div>

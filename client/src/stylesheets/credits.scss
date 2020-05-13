@@ -1,0 +1,22 @@
+.credits {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  font-family: 'Roboto', sans-serif;
+  color: #D4F2D2;
+}
+
+.credits-inner {
+  
+}
+
+.credit-header {
+  font-size: 4rem;
+}
+
+@media only screen and (max-width: 600px) {
+  .credits {
+    flex-direction: column;
+  }
+}
