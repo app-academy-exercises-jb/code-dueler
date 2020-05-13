@@ -8,6 +8,8 @@ const typeDefs = `
     _id: ID!
     username: String!
     loggedIn: Boolean
+    inGame: Boolean
+    inLobby: Boolean
   }
   extend type Query {
     me: User
@@ -32,18 +34,33 @@ const typeDefs = `
   }
 `;
 
+const gameLobbyResolver = (pubsub, user) => {
+  let game = pubsub.games.inGame[user._id],
+    inGame = Boolean(pubsub.games.inGame[user._id]);
+
+  inGame
+    ? (pubsub.games[game].status === "initializing"
+      ? user.inLobby = inGame
+      : user.inGame = inGame)
+    : (user.inGame = inGame);
+}
+
 const resolvers = {
   Query: {
     me(_, __, context) {
       // user provided by passport
-      // console.log("querying for current user");
       return context.user;
     },
-    users: (_, __, { pubsub }) => {
-      // console.log("resolving users:", { subscribers: pubsub.subscribers });
+    users: async (_, __, { pubsub }) => {
       if (!pubsub.subscribers) return [];
-      return User.find({
+      return (await User.find({
         _id: { $in: Object.keys(pubsub.subscribers) },
+      })).map(user => {
+        console.log({games: pubsub.games})
+        user.loggedIn = true;
+
+        gameLobbyResolver(pubsub, user);
+        return user;
       });
     },
   },
@@ -71,16 +88,17 @@ const resolvers = {
       subscribe: (_, __, { pubsub, ws }) => {
         return pubsub.asyncIterator("userLoggedEvent");
       },
-      resolve: async (payload) => {
-        const user = await User.findById(payload);
-        // payload.userLoggedEvent.user = payload.user;
-        delete payload._id;
+      resolve: async (payload, _, { pubsub }) => {
+        const user = await User.findById(payload._id);
+
         payload.user = {
-          _id: user._id,
+          _id: payload._id,
           username: user.username,
           loggedIn: payload.loggedIn,
         };
-        payload.id = user._id;
+
+        gameLobbyResolver(pubsub, payload.user);
+
         return payload;
       },
     },

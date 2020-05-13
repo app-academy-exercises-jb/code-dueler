@@ -22,6 +22,8 @@ export const USER_LOGGED_EVENT = gql`
         _id
         username
         loggedIn
+        inGame
+        inLobby
       }
     }
   }

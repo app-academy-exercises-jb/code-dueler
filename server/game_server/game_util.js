@@ -43,8 +43,8 @@ const gameUtil = pubsub => {
     // save a local copy of the game object
     pubsub.games[game._id] = inMemGame;
 
-    // persist local list of inGame players
-    pubsub.games.inGame[user._id] = true;
+    // persist local list of inGame players, and their relevant games
+    pubsub.games.inGame[user._id] = inMemGame._id.toString();
 
     // remember that this ws client object is inGame
     ws.gameId = inMemGame._id.toString();

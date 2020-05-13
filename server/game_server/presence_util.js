@@ -32,6 +32,7 @@ const presenceUtils = pubsub => {
     user.ws = ws;
     // mark the socket object with the appropriate ID so we can remove it on DC
     ws.userId = user._id;
+    ws.username = user.username;
 
     if (pubsub.subscribers[user._id] === undefined) {
       pubsub.subscribers[user._id] = [user];
@@ -62,8 +63,9 @@ const presenceUtils = pubsub => {
     }
 
     if (pubsub.subscribers[ws.userId].length === 0) {
-      delete pubsub.subscribers[ws.userId];
+      pubsub.subscribers[ws.userId].push({username: ws.username})
       pubsub.publishUserLoggedEvent(user, false);
+      delete pubsub.subscribers[ws.userId];
     }
   }
 

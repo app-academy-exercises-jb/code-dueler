@@ -21,6 +21,8 @@ export const GET_ONLINE_USERS = gql`
       _id
       username
       loggedIn
+      inGame
+      inLobby
     }
   }
 `;
