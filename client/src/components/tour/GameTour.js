@@ -41,7 +41,7 @@ class GameTour extends React.Component {
 
   render() {
     return (
-      <>
+      <div className="tour-wrapper">
         <div ref={this.game1} className="game-challenge">
           <div className="tour-text-wrapper">
             <div className="tour-text">
@@ -110,7 +110,7 @@ class GameTour extends React.Component {
           </div>
           <i className="fas fa-arrows-alt-h tour-arrow-left-right"></i>
         </div>
-      </>
+      </div>
     );
   }
 }

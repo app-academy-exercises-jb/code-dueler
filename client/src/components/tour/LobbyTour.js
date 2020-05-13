@@ -40,7 +40,7 @@ class LobbyTour extends React.Component {
 
   render() {
     return (
-      <>
+      <div className="tour-wrapper">
         <div ref={this.lobby1} className="lobby-sidebar">
           <i className="fas fa-arrow-left tour-arrow-left"></i>
           <div className="tour-text-wrapper">
@@ -88,7 +88,7 @@ class LobbyTour extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 }

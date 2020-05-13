@@ -58,7 +58,7 @@
   }
 }
 
-.logout-nav {
+.button-nav {
   display: flex;
   justify-self: center;
   align-items: center;
@@ -74,4 +74,10 @@
     background-color: #575366;
     cursor: pointer;
   }
+}
+
+.nav-right {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

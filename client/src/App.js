@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/util/ProtectedRoute";
 import AuthRoute from "./components/util/AuthRoute";
 import "./stylesheets/application.scss";
 import Splash from "./pages/Splash";
+import Credits from "./pages/Credits";
 
 export default () => {
   return (
@@ -18,6 +19,7 @@ export default () => {
         <AuthRoute path="/welcome" component={Splash} />
         <AuthRoute path="/login" render={() => <Auth action="login" />} />
         <AuthRoute path="/signup" render={() => <Auth action="signup" />} />
+        <Route path="/credits" component={Credits} />
         <Route path="/" component={ErrorPage} />
       </Switch>
     </BrowserRouter>
