@@ -5,8 +5,9 @@ import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 import HostGameButton from "./HostGameButton";
 import JoinGameButton from "./JoinGameButton";
+import StartGameButton from "./StartGameButton";
 
-const NavBar = ({ data, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
+const NavBar = ({ userCount, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
   return (
     <>
       <div className="nav-bar-wrapper">
@@ -14,7 +15,7 @@ const NavBar = ({ data, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
           {!noData && (
             <ProtectedComponent
               component={NavBarPlayerCount}
-              data={data}
+              userCount={userCount}
               inGame={inGame}
               inGameLobby={inGameLobby}
             />
@@ -33,6 +34,11 @@ const NavBar = ({ data, noData, inGame, inLobby, inGameLobby, refetchMe }) => {
           </div>
           <div>
             <ProtectedComponent component={JoinGameButton} />
+          </div>
+          </>}
+          {inGameLobby && <>
+          <div>
+            <ProtectedComponent component={StartGameButton} />
           </div>
           </>}
           <div>

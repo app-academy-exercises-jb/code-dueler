@@ -3,12 +3,15 @@ import NavBar from "../components/nav/NavBar";
 import SideBar from "../components/sidebar/SideBar";
 import Chat from "../components/chat/Chat";
 
-export default ({onlineUsers: {data}, me, refetchMe}) => {
+export default ({users, me, refetchMe}) => {
   return (
     <div className="global">
-      <NavBar data={data} refetchMe={refetchMe} inLobby={true} />
+      <NavBar userCount={users.length} refetchMe={refetchMe} inLobby={true} />
       <div className="main">
-        <SideBar data={data} />
+        <SideBar
+          users={users}
+          inGame={false}
+        />
         <Chat me={me} />
       </div>
       <footer></footer>

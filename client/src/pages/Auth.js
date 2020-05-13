@@ -22,6 +22,7 @@ export default ({action}) => {
           <Form />
         </div>
       </div>
+      <footer></footer>
     </div>
   );
 };

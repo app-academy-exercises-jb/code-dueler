@@ -33,21 +33,25 @@ export default ({ gameId, gameEvent, refetchMe, me}) => {
 
   
   return (
-    <div className="main" id="game-lobby">
+    <div className="global">
       <NavBar
         inGameLobby={true}
-        data={gameEvent && gameEvent.connections}
+        userCount={gameEvent && gameEvent.connections}
         refetchMe={refetchMe}
       />
-      <SideBar 
-        data={{users: playersInGame}}
-        inGame={true}
-      />
-      <div className="challenge-question-wrapper">
-        <ChallengeQuestion />
-      </div>
-      <div className="game-chat-wrapper">
-        <Chat channelId={gameId} id={"game-chat"} me={me} />
+      <div className="main" id="game-lobby">
+        <SideBar
+          users={playersInGame}
+          inGame={true}
+        />
+        <div className="vertical-half">
+          <div className="challenge-question-wrapper">
+            <ChallengeQuestion />
+          </div>
+          <div className="game-chat-wrapper">
+            <Chat channelId={gameId} id={"game-chat"} me={me} />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -20,7 +20,6 @@ const subscribeToUserEvents = (subscribeToMore, { data: { me }}, client, refetch
         // if we have a brand new user, splice them in
         next.users.splice(0, 0, user);
       } else if (user.loggedIn === false) {
-        
         if (idx === -1) return next;
         if (me._id === next.users[idx]._id) {
           client.subscriptionClient.unsubscribeAll();
@@ -69,12 +68,13 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
         {...rest}
         render={() => {
           return (
-            <Component onlineUsers={onlineUsers} me={me.data.me} refetchMe={refetchMe} />
+            <Component users={onlineUsers.data.users} me={me.data.me} refetchMe={refetchMe} />
           );
         }}
       />
     );
   } else {
+
     return (
       <Route
         path={path}
