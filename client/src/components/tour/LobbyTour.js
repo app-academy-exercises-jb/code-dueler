@@ -13,10 +13,6 @@ class LobbyTour extends React.Component {
     this.lobby3 = React.createRef();
   }
 
-  componentDidMount() {
-    console.log(this.state.idx);
-  }
-
   tourNext() {
     console.log("inside the thing");
     if (this.state.idx < 3) {
