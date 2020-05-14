@@ -20,13 +20,17 @@
   color: #e4e6c3;
 }
 
+.user-list-wrapper > div {
+  margin-left: 0.75rem;
+}
+
 .user-list-item {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
   padding-left: 2rem;
-  cursor: pointer;
+  cursor: default;
   display: flex;
   align-items: center;
 }
@@ -34,6 +38,24 @@
 .user-list-item>div {
   margin-right: 0.75rem;
   margin-left: -0.75rem;
+}
+
+.sidebar-section {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 1rem;
+  cursor: pointer;
+}
+
+.sidebar-section > *:last-of-type {
+  border: 1px solid black;
+  border-radius: 32px;
+  line-height: 8px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  margin: 4px 0;
+  padding: 0px 1px;
 }
 
 .status-icon {

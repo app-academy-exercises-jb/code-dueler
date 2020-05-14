@@ -146,9 +146,9 @@ export const SPECTATE_GAME = gql`
   }
 `;
 
-export const SPECTATE_USER = gql`
-  mutation SpectateUser($player: ID!) {
-    spectateUser(player: $player)
+export const JOIN_GAME = gql`
+  mutation JoinGame($player: ID!) {
+    joinGame(player: $player)
   }
 `;
 

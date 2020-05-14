@@ -4,19 +4,31 @@ import SideBar from "../components/sidebar/SideBar";
 import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import { useHistory } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_USERS_IN_GAME } from "../graphql/queries";
+import ReactModal from "react-modal";
 
 export default ({ gameId, gameEvent, refetchMe, me}) => {
   const history = useHistory();
-  const [playersInGame, setPlayersInGame] = useState([me]);
+  const [playersInGame, setPlayersInGame] = useState([]),
+    [spectatorsInGame, setSpectatorsInGame] = useState([]),
+    [modalOpen, setModalOpen] = useState(false),
+    [gameSelfStatus, setGameSelfStatus] = useState("player");
+
   
   useEffect(() => {
     if (gameEvent === null) return;
-    setPlayersInGame(gameEvent.spectators.concat(
-      [gameEvent.p1.player],
+    setPlayersInGame([].concat(
+      gameEvent.p1 && [gameEvent.p1.player] || [],
       gameEvent.p2 && [gameEvent.p2.player] || []
     ));
+    setSpectatorsInGame(gameEvent.spectators);
+
+    if (gameEvent.p1 && me._id === gameEvent.p1.player._id) {
+      setGameSelfStatus("host");
+    } else if (gameEvent.p2 && me._id === gameEvent.p2.player._id) {
+      setGameSelfStatus("player");
+    } else {
+      setGameSelfStatus("spectator");
+    }
 
     if (gameEvent.status === "initializing") {
       
@@ -24,10 +36,15 @@ export default ({ gameId, gameEvent, refetchMe, me}) => {
       
     } else if (gameEvent.status === "over") {
       // __TODO__ inform user game has ended early (modal preferred)
-      history.push('/');
+      setModalOpen(true);
     }
   
   }, [gameEvent]);
+
+  const handleClose = () => {
+    setModalOpen(false);
+    history.push('/');
+  }
 
   if (gameEvent === null) return null;
 
@@ -41,8 +58,11 @@ export default ({ gameId, gameEvent, refetchMe, me}) => {
       />
       <div className="main" id="game-lobby">
         <SideBar
-          users={playersInGame}
+          players={playersInGame}
+          spectators={spectatorsInGame}
           inGame={true}
+          gameSelfStatus={gameSelfStatus}
+          me={me}
         />
         <div className="vertical-half">
           <div className="challenge-question-wrapper">
@@ -52,6 +72,32 @@ export default ({ gameId, gameEvent, refetchMe, me}) => {
             <Chat channelId={gameId} id={"game-chat"} me={me} />
           </div>
         </div>
+        <ReactModal
+          isOpen={modalOpen}
+          className={`modal-overlay`}
+          shouldCloseOnEsc={true}
+          onRequestClose={() => handleClose()}
+          >
+          <div className={`modal`}>
+            <div className={`modal-info center`}>
+              <h1>Looks like the game is over early</h1>
+            </div>
+            <div className="modal-buttons">
+              <button
+                className="modal-decline decline-hover"
+                onClick={handleClose}
+                >
+                Go back to the lobby
+              </button>
+              {/* <button className="game-over-stay">
+              Hang out here
+              </button>
+              <button className="game-over-challenge">
+              Rematch!
+            </button> */}
+            </div>
+          </div>
+        </ReactModal>
       </div>
     </div>
   );

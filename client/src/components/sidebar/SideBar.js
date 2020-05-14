@@ -2,24 +2,24 @@ import React, { useState } from "react";
 import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
 import { useMutation } from "@apollo/react-hooks";
-import { SPECTATE_USER } from "../../graphql/mutations";
+import { JOIN_GAME } from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
 
-const SideBar = ({ users, inGame }) => {
+const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me }) => {
   ReactModal.setAppElement("#root");
 
   const [spectateModalOpen, setSpectateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
 
-  const [spectate] = useMutation(SPECTATE_USER);
+  const [join] = useMutation(JOIN_GAME);
 
   const history = useHistory();
 
-  const spectateUser = async (user) => {
+  const joinGame = async (user) => {
     const {
-      data: { spectateUser: gameId },
-    } = await spectate({ variables: { player: user._id } });
+      data: { joinGame: gameId },
+    } = await join({ variables: { player: user._id } });
     setSpectateModalOpen(false);
     if (gameId === "not ok") return;
     history.push(`/game/${gameId}`);
@@ -28,18 +28,36 @@ const SideBar = ({ users, inGame }) => {
   return (
     <div className="sidebar-wrapper">
       <div className="user-list-wrapper">
-        {inGame && "Players"}
-        <SideBarUsers 
-          users={users}
-          inGame={inGame}
-          action={(user) => {
-            if (!(user.inGame || user.inLobby)) return;
-            setSelectedUser(user);
-            setSpectateModalOpen(true);
-          }}
+        {!inGame && 
+          <SideBarUsers 
+            users={users}
+            inGame={inGame}
+            action={(user) => {
+              if (!(user.inGame || user.inLobby)) return;
+              setSelectedUser(user);
+              setSpectateModalOpen(true);
+            }}
           />
-        <br />
-        {inGame && "Spectators"}
+        }
+        {inGame && [
+          ['Players', players],
+          ['Spectators', spectators],
+        ].map(([section, users]) => (
+        <div key={section}>
+          <div className={`sidebar-section`}>
+            <p>{section}</p>
+            <p>+</p>
+          </div>
+          <SideBarUsers 
+            users={users}
+            playersSection={section==='Players'}
+            inGame={inGame}
+            action={() => {}}
+            gameSelfStatus={gameSelfStatus}
+            me={me}
+          />
+          <br />
+        </div>))}
       </div>
       <ReactModal
         isOpen={spectateModalOpen}
@@ -49,11 +67,15 @@ const SideBar = ({ users, inGame }) => {
       >
         <div className="modal">
           <div className="modal-info">
-            <h1>{selectedUser && selectedUser.username}</h1>
+            {selectedUser && <>
+            <h1>{selectedUser.username}</h1>
             <div>
-              <p>is already in a duel!</p>
-              Would you like to spectate?
+              {selectedUser.inGame && <><p>is already in a duel!</p>
+              Would you like to spectate?</>}
+              {selectedUser.inLobby && <><p>is preparing for a duel!</p>
+              Would you like to join?</>}
             </div>
+            </>}
           </div>
           <div className="modal-buttons">
             <button
@@ -64,7 +86,7 @@ const SideBar = ({ users, inGame }) => {
             </button>
             <button
               className="modal-accept"
-              onClick={() => spectateUser(selectedUser)}
+              onClick={() => joinGame(selectedUser)}
             >
               Accept
             </button>

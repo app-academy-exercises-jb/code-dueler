@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 
 const ToolTip = ({content, children}) => {
-  let timer = null,
+  let [timer, setTimer] = useState(null),
     [displayClass, setDisplayClass] = useState('hidden');
 
   const mouseOverHandler = e => {
-    timer = setTimeout(() => {
-      setDisplayClass('visible');
-      timer = null;
-    }, 500);
+    if (timer === null) {
+      setTimer(setTimeout(() => {
+        setDisplayClass('visible');
+        timer = null;
+      }, 500));
+    }
   }
 
   const mouseOutHandler = e => {
     if (timer !== null) {
-      clearTimeout(timer);
-    } else {
       setDisplayClass('hidden');
+      clearTimeout(timer);
+      setTimer(null);
     }
   }
 

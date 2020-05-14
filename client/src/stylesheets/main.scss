@@ -57,3 +57,11 @@ html,body {
 .visible {
   display: block;
 }
+
+.pointer {
+  cursor: pointer !important;
+}
+
+.cursor-default {
+  cursor: default;
+}

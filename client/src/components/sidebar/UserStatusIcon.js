@@ -4,12 +4,15 @@ import RedCo from "../../images/red-co.png";
 import YellowCo from "../../images/yellow-co.png";
 import PinkCo from "../../images/pink-co.png";
 import ToolTip from "../util/ToolTip";
+import P1 from "../../images/p1.png";
+import P2 from "../../images/p2.png";
 
-const UserStatusIcon = ({user, inGame}) => {
+const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
   if (inGame) {
+    let players = [P1, P2];
     return (
       <div>
-        <img className="status-icon" src={PinkCo} />
+        <img className="status-icon" src={playersSection ? players[idx] : PinkCo} />
       </div>
     );
   } else {
