@@ -1,29 +1,14 @@
 const presenceUtils = pubsub => {
   const publishUserLoggedEvent = (user, loggedIn) => {
+    console.log(`logging ${user.username || user._id} \
+      ${loggedIn === true ? 'in' : loggedIn === false ? 'out' : 'ERROR'} \
+    `);
     setTimeout(() => {
       pubsub.publish("userLoggedEvent", {
         _id: user._id,
         loggedIn,
       });
     }, 100);
-  };
-
-  const updateSubscribersGameId = (action, players, gameId) => {
-    const game = pubsub.games[gameId];
-    if (game === undefined || game.p1 === undefined || game.p2 === undefined) return;
-    players.forEach((p) => {
-      if (action === "add") {
-        game.connections += 1;
-        pubsub.subscribers[p._id].forEach((c) => (c.gameId = gameId));
-      } else if (action === "remove") {
-        game.connections -= 1;
-        if (p._id === game.p1.player._id || p._id === game.p2.player._id) {
-          console.log("ending game from subs")
-          game.endGame(p);
-        }
-        delete pubsub.subscribers[p._id].gameId;
-      }
-    });
   };
 
   const addWs = ({ws, user}) => {
@@ -55,12 +40,9 @@ const presenceUtils = pubsub => {
     );
     const user = pubsub.subscribers[ws.userId][userIdx];
 
-    pubsub.subscribers[ws.userId].splice(userIdx, 1);
+    //__TODO__ should throw errors against userIdx being -1
 
-    // user.ws === ws, as per above findIndex
-    if (user.ws.gameId) {
-      pubsub.updateSubscribersGameId("remove", [user], user.ws.gameId);
-    }
+    pubsub.subscribers[ws.userId].splice(userIdx, 1);
 
     if (pubsub.subscribers[ws.userId].length === 0) {
       pubsub.subscribers[ws.userId].push({username: ws.username})
@@ -70,13 +52,6 @@ const presenceUtils = pubsub => {
   }
 
   const logoutUser = ({user}) => {
-    // if (!pubsub.subscribers[user._id]) return;
-    pubsub.subscribers[user._id].forEach(sub => {
-      if (sub.ws.gameId) {
-        pubsub.updateSubscribersGameId("remove", [sub], sub.ws.gameId);
-      }
-    });
-
     pubsub.publishUserLoggedEvent(user, false);
     delete pubsub.subscribers[user._id];
   }
@@ -86,7 +61,6 @@ const presenceUtils = pubsub => {
   }
 
   pubsub.publishUserLoggedEvent = publishUserLoggedEvent;
-  pubsub.updateSubscribersGameId = updateSubscribersGameId;
   pubsub.addWs = addWs;
   pubsub.removeWs = removeWs;
   pubsub.loginUser = loginUser;

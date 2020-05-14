@@ -10,7 +10,7 @@ const gameUtil = pubsub => {
     pubsub.games[gameId] = game;
   };
 
-  const initGame = ({Game, game, user, ws}) => {
+  const initGame = ({Game, game, user, ws, p1}) => {
     // setup useful in-memory variables to make find operations O(1)
     const details = {
       spectatorsKey: {},
@@ -48,6 +48,9 @@ const gameUtil = pubsub => {
 
     // remember that this ws client object is inGame
     ws.gameId = inMemGame._id.toString();
+
+    // tell everyone the user entered the lobby
+    pubsub.publishUserLoggedEvent(user, true);
   }
 
   pubsub.initGame = initGame;
