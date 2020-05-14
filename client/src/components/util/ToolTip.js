@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 
-const ToolTip = ({content, children}) => {
+const ToolTip = ({content, children, time, positionClass}) => {
   let [timer, setTimer] = useState(null),
     [displayClass, setDisplayClass] = useState('hidden');
 
+  if (time === undefined) time = 500;
+
   const mouseOverHandler = e => {
-    if (timer === null) {
+    if (displayClass === 'hidden' && timer == null) {
       setTimer(setTimeout(() => {
         setDisplayClass('visible');
         timer = null;
-      }, 500));
+      }, time));
     }
   }
 
@@ -25,13 +27,16 @@ const ToolTip = ({content, children}) => {
   return (
     <div
       className="tooltipped-icon"
-      onMouseOut={mouseOutHandler}
-      onMouseOver={mouseOverHandler}
     >
-      {children}
-      <div className={`${displayClass} tooltip-container`}>
+      <div
+        onMouseOut={mouseOutHandler}
+        onMouseOver={mouseOverHandler}
+      >
+        {children}
+      </div>
+      <div className={`${displayClass} ${positionClass || 'tooltip-container'}`}>
         <div className="tooltip">{content}</div>
-        <div className="tooltip-tail"></div>
+        <div className={`${positionClass && positionClass + '-tail' || 'tooltip-tail'}`}></div>
       </div>
     </div>
   );

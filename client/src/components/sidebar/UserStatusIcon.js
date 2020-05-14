@@ -27,7 +27,7 @@ const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
     } else if (user.inLobby === true) {
       return (
         <div>
-          <ToolTip content={`${user.username} is preparing for a duel!`}>
+          <ToolTip content={`${user.username} is in a duel lobby!`}>
             <img className="status-icon" src={YellowCo} />
           </ToolTip>
         </div>

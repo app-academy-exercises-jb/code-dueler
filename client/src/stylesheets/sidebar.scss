@@ -5,9 +5,10 @@
   flex: 1;
   max-width: 300px;
   min-width: 200px;
-  overflow-y: scroll;
   font-family: 'VT323', monospace;
   font-size: 22px;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .user-list-wrapper {
@@ -25,37 +26,53 @@
 }
 
 .user-list-item {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  padding: 0.25rem 1rem 0.25rem 0;
+  margin: 0.25rem 0;
   padding-left: 2rem;
   cursor: default;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+
+  div {
+    display: flex;
+  }
+  p {
+    margin-left: 1rem;
+  }
 }
 
-.user-list-item>div {
+.user-list-item>div:first-of-type {
   margin-right: 0.75rem;
   margin-left: -0.75rem;
 }
 
 .sidebar-section {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   padding-right: 1rem;
+  padding: 0.25rem 1rem 0.25rem 0;
+}
+
+.sidebar-section > * {
   cursor: pointer;
 }
 
-.sidebar-section > *:last-of-type {
-  border: 1px solid black;
-  border-radius: 32px;
-  line-height: 8px;
+.sidebar-section:hover > div:first-of-type > div:first-of-type {
+  text-decoration: underline;
+}
+
+.sidebar-section:hover > *:last-of-type {
   display: flex;
+}
+
+.sidebar-section > *:last-of-type {
+  width: 18px;
+  height: 18px;
+  display: none;
   align-items: center;
   justify-items: center;
-  margin: 4px 0;
-  padding: 0px 1px;
 }
 
 .status-icon {
@@ -63,19 +80,23 @@
   height: 20px;
 }
 
-.sidebar-wrapper::-webkit-scrollbar-track {
+.scroll {
+  scrollbar-color: #D4F2D2 #0E1428;
+}
+
+.scroll::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   border-radius: 10px;
   background-color: #0E1428;
 }
 
-.sidebar-wrapper::-webkit-scrollbar {
+.scroll::-webkit-scrollbar {
   width: 12px;
   background-color: #0E1428;
 }
 
-.sidebar-wrapper::-webkit-scrollbar-thumb {
+.scroll::-webkit-scrollbar-thumb {
   border-radius: 10px;
   box-shadow: inset 0 0 6px rgba(0,0,0,.3);
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
@@ -83,19 +104,10 @@
 }
 
 .tooltip-container {
-  width: max-content;
   position: absolute;
-  top: 1px;
+  top: 0rem;
+  width: 125px;
   left: 1.5rem;
-  padding: 1px;
-  border: 1px solid #6E7DAB;
-  border-radius: 4px;
-  background-color: #6E7DAB;
-  color: white;
-  font-weight: 600;
-  font-size: 0.925rem;
-  max-width: 125px;
-
 }
 
 .tooltipped-icon {
@@ -103,13 +115,71 @@
 }
 
 .tooltip {
-  font-size: 1.25rem;
+  text-decoration: none;
+  width: 100%;
+  height: fit-content;
+  line-height: 1em;
+  font-size: 1em;
+  background-color: #6E7DAB;
+  border: 1px solid #6E7DAB;
+  border-radius: 4px;
+  padding: 1px;
+  color: white;
 }
 
 .tooltip-tail {
   position: absolute;
   top: 3px;
-  left: -.65rem;
+  left: -10px;
   border: 5px solid;
   border-color: transparent #6E7DAB transparent transparent;
+}
+
+.section-tooltip {
+  position: absolute;
+  top: 26px;
+  left: 0.5rem;
+  width: 150px;
+}
+
+.section-tooltip-tail {
+  position: absolute;
+  top: -10px;
+  left: 9px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
+.section-button-tooltip {
+  position: absolute;
+  top: 22px;
+  right: 1px;
+  width: 150px;
+}
+
+.section-button-tooltip-tail {
+  position: absolute;
+  top: -10px;
+  right: 3px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
+.checkbox-tooltip {
+  position: absolute;
+  top: 18px;
+  right: 0px;
+  width: 150px;
+}
+
+.checkbox-tooltip-tail {
+  position: absolute;
+  top: -9px;
+  right: 3px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
+.user-ready-checkmark {
+  justify-self: flex-end;
 }
