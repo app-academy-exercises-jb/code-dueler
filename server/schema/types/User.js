@@ -40,6 +40,7 @@ const gameLobbyResolver = (pubsub, user) => {
 
   inGame
     ? (pubsub.games[game].status === "initializing"
+        || pubsub.games[game].status === "over"
       ? user.inLobby = inGame
       : user.inGame = inGame)
     : (user.inGame = inGame);
@@ -56,9 +57,7 @@ const resolvers = {
       return (await User.find({
         _id: { $in: Object.keys(pubsub.subscribers) },
       })).map(user => {
-        console.log({games: pubsub.games})
         user.loggedIn = true;
-
         gameLobbyResolver(pubsub, user);
         return user;
       });
@@ -89,14 +88,14 @@ const resolvers = {
         return pubsub.asyncIterator("userLoggedEvent");
       },
       resolve: async (payload, _, { pubsub }) => {
-        const user = await User.findById(payload._id);
+        const user = await User.findById(payload);
 
         payload.user = {
           _id: payload._id,
           username: user.username,
           loggedIn: payload.loggedIn,
         };
-
+        
         gameLobbyResolver(pubsub, payload.user);
 
         return payload;

@@ -34,7 +34,7 @@ const PlayerSchema = new Schema({
 const GameSchema = new Schema({
   p1: {
     type: PlayerSchema,
-    required: true,
+    required: false,
   },
   p2: {
     type: PlayerSchema,
@@ -56,7 +56,7 @@ const GameSchema = new Schema({
   }
 });
 
-mongoose.Schema.Types.String.checkRequired(v => v != null);
+mongoose.Schema.Types.String.checkRequired(v => v !== null);
 
 GameSchema.statics.start = async (challenge, user, ws, pubsub) => {
   if (CHALLENGES.every(c => c !== challenge)) return null;
@@ -73,6 +73,7 @@ GameSchema.statics.start = async (challenge, user, ws, pubsub) => {
   await p1.save();
   await game.save();
 
+  user.pId = p1._id;
   pubsub.initGame({ws, user, game, Game});
 
   return game._id;
