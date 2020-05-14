@@ -9,8 +9,8 @@ const typeDefs = `
   }
   extend type Mutation {
     hostGame(challenge: String!): ID
-    spectateGame(gameId: String!): String!
-    joinGame(player: ID, game: ID): String!
+    handleGame(gameId: String!, action: String!): String!
+    joinGame(player: ID, gameId: ID): String!
     leaveGame(player: ID!, gameId: String!): String!
     updateGameUserLastSubmitted(
       player: ID!,
@@ -99,21 +99,37 @@ const resolvers = {
 
       return Game.start(challenge, user, ws, pubsub);
     },
-    spectateGame: (_, { gameId }, { user, pubsub, ws }) => {
+    handleGame: (_, { gameId, action }, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
       ws.gameId = gameId;
-      console.log("spectating game")
-      game.addSpectator(user);
+
+      let inPlayers = !Boolean(game.spectatorsKey[user._id])
+        && Boolean(game.users[user._id]),
+        inSpectators = Boolean(game.spectatorsKey[user._id]);
+
+      if (action === "spectate") {
+        console.log("spectating game")
+        if (!inSpectators) game.addSpectator(user);
+        if (inPlayers) game.removePlayer(user); 
+      } else if (action === "play") {
+        console.log("playing game")
+        if (!inPlayers) game.addPlayer(user);
+        if (inSpectators) game.removeSpectator(user);
+
+      } else {
+        throw 'unknown action in handleGame'
+      }
+
       return "ok";
     },
-    joinGame: (_, { player: playerId, game: gameId }, { user, pubsub, ws }) => {
-      if (playerId === undefined
-        || pubsub.subscribers[playerId] === undefined) return "not ok";
+    joinGame: (_, { player: playerId, gameId }, { user, pubsub, ws }) => {
+      if ((playerId === undefined && gameId === undefined)
+        || pubsub.subscribers[user._id] === undefined) return "not ok";
       
-      const inGameWS = pubsub.subscribers[playerId].findIndex(p => p.ws && p.ws.gameId);
-      if (inGameWS === -1) return "not ok";
-
       if (gameId === undefined) {
+        const inGameWS = pubsub.subscribers[playerId].findIndex(p => p.ws && p.ws.gameId);
+        if (inGameWS === -1) return "not ok";
+
         gameId = pubsub.subscribers[playerId][inGameWS].ws.gameId;
       }
 

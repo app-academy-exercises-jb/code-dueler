@@ -140,15 +140,15 @@ export const LEAVE_GAME = gql `
   }
 `;
 
-export const SPECTATE_GAME = gql`
-  mutation SpectateGame($gameId: String!) {
-    spectateGame(gameId: $gameId)
+export const HANDLE_GAME = gql`
+  mutation HandleGame($gameId: String!, $action: String!) {
+    handleGame(gameId: $gameId, action: $action)
   }
 `;
 
 export const JOIN_GAME = gql`
-  mutation JoinGame($player: ID!) {
-    joinGame(player: $player)
+  mutation JoinGame($player: ID, $gameId: ID) {
+    joinGame(player: $player, gameId: $gameId)
   }
 `;
 

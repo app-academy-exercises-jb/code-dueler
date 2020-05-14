@@ -5,7 +5,7 @@ import Spectator from "../../pages/Spectator";
 import { useParams, Redirect } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { IN_GAME_INFO } from "../../graphql/queries";
-import { SPECTATE_GAME, LEAVE_GAME } from "../../graphql/mutations";
+import { JOIN_GAME, LEAVE_GAME } from "../../graphql/mutations";
 import GameData from "./GameData";
 
 export default ({ me, ...props }) => {
@@ -24,7 +24,7 @@ export default ({ me, ...props }) => {
     }
   );
 
-  const [spectateGame] = useMutation(SPECTATE_GAME);
+  const [joinGame] = useMutation(JOIN_GAME);
   const [leaveGame] = useMutation(LEAVE_GAME);
 
   const shouldUpdateExists = gameData && gameData.queryGameInfo.gameExists;
@@ -36,7 +36,7 @@ export default ({ me, ...props }) => {
       if (shouldUpdateExists === true
         && shouldUpdateInGame === false
         && shouldUpdateSpectator === false) {
-        spectateGame({ variables: { gameId }});
+        joinGame({ variables: { gameId }});
       }
     }, 10);
   }, [shouldUpdateSpectator, shouldUpdateInGame]);
