@@ -63,6 +63,7 @@ export default ({ gameId, gameEvent, refetchMe, me}) => {
           inGame={true}
           gameSelfStatus={gameSelfStatus}
           me={me}
+          gameId={gameId}
         />
         <div className="vertical-half">
           <div className="challenge-question-wrapper">

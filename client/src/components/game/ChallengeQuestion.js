@@ -2,7 +2,7 @@ import React from "react";
 
 const ChallengeQuestion = (props) => {
   return (
-    <div className="question-text-box">
+    <div className="question-text-box scroll">
       <h1>Challenge Question</h1>
 
       <p>

@@ -45,13 +45,28 @@ html,body {
 }
 
 .vertical-half {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  font-size: 16px;
+}
+
+.vertical-half > div {
+  height: 50%;
+}
+
+.vertical-half > div:first-of-type {
+  flex: 1;
+  max-height: fit-content;
+}
+
+.vertical-half > div:last-of-type {
+  flex: 2;
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .visible {
