@@ -51,9 +51,10 @@ const ChatView = ({ channelId, id }) => {
 
   let oldData;
   useEffect(() => {
+    let timeout;
     if (messagesRef.current
         && messagesRef.current.clientHeight === messagesRef.current.scrollHeight) {
-          const timeout = setInterval(() => {
+          timeout = setInterval(() => {
             if (messagesRef.current.clientHeight === messagesRef.current.scrollHeight
                 && (oldData === undefined || 
                     data.messages.some((msg, idx) => msg._id !== oldData.messages[idx]._id))) {
@@ -65,6 +66,7 @@ const ChatView = ({ channelId, id }) => {
             }
           }, 100);
         }
+    return () => {clearInterval(timeout)};
   }, [messagesRef.current]);
 
   const fetchMoreMessages = () => {

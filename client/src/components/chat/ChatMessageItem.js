@@ -1,7 +1,7 @@
 import React from "react";
 
 const ChatMessageItem = ({ message }) => {
-  const date = new Date(message.createdAt).toLocaleTimeString();
+  const date = new Date(message.createdAt).toLocaleString();
   return (
     <li key={message._id} className="chat-item">
       <div className="chat-message-info">
