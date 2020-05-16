@@ -1,26 +1,53 @@
 import React from "react";
 import UserStatusIcon from "./UserStatusIcon";
 import ToolTip from "../util/ToolTip";
+import { 
+  UPDATE_GAME_USER_STATUS,
+  KICK_PLAYER,
+} from "../../graphql/mutations";
+import { useMutation } from "@apollo/react-hooks";
+import KickPlayer from "../../images/cancel.png"
 
+const SideBarUsers = ({
+  users,
+  inGame,
+  action,
+  playersSection,
+  me,
+  gameSelfStatus,
+  gameId
+ }) => {
+  const [updateUserStatus] = useMutation(UPDATE_GAME_USER_STATUS);
+  const [kickPlayer] = useMutation(KICK_PLAYER);
 
-const SideBarUsers = ({ users, inGame, action, playersSection, me, gameSelfStatus }) => {
-  const handleReady = (e, user) => {
+  const handleReady = (e, user, ready) => {
     if (user._id !== me._id
       || gameSelfStatus === 'host') return e.preventDefault();
-    debugger
 
+    updateUserStatus({ variables: {
+      player: user._id,
+      ready,
+      gameId,
+    }});
   };
 
-  const CheckBox = ({idx, user}) => {
-    let checked = false;
-    if (idx === 0) checked = true;
+  const handleKickPlayer = player => {
+    kickPlayer({variables: {
+      player,
+      action: 'boot'
+    }});
+  };
+
+  const CheckBox = ({user}) => {
+    let checked = user.ready;
 
     return (
       <input 
         type='checkbox'
         className='user-ready-checkmark'
         checked={checked}
-        onChange={e => handleReady(e, user)}
+        readOnly={true}
+        onClick={e => handleReady(e, user, !checked)}
       >
       </input>
     )};
@@ -35,9 +62,19 @@ const SideBarUsers = ({ users, inGame, action, playersSection, me, gameSelfStatu
         {!inGame &&
           <UserStatusIcon user={user} />
         }
-        {inGame && 
-          <UserStatusIcon playersSection={playersSection} idx={idx} inGame={true} user={user} />
-        }
+        {inGame && (gameSelfStatus === 'host' && user._id !== me._id
+          ? <div className='cancellable' onClick={() => handleKickPlayer(user._id)}>
+              <ToolTip content="Kick player" positionClass='kick-tooltip'>
+                <UserStatusIcon
+                  playersSection={playersSection}
+                  idx={idx}
+                  inGame={true}
+                  user={user} />
+                <img src={KickPlayer} />
+              </ToolTip>
+            </div>
+          : <UserStatusIcon playersSection={playersSection} idx={idx} inGame={true} user={user} />
+        )}
         <p>{user.username}</p>
       </div>
       {playersSection &&

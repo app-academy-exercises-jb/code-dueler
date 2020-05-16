@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom";
 import ToolTip from "../util/ToolTip";
 import Cross from "../../images/cross.png"
 
-const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, gameId }) => {
+const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refetchMe, gameId }) => {
   ReactModal.setAppElement("#root");
 
   const [spectateModalOpen, setSpectateModalOpen] = useState(false);
@@ -24,7 +24,10 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, gameI
     } = await join({ variables: { player: user._id } });
     setSpectateModalOpen(false);
     if (gameId === "not ok") return;
-    history.push(`/game/${gameId}`);
+    await refetchMe();
+    setTimeout(() => {
+      history.push(`/game/${gameId}`);
+    }, 10);
   };
 
   const sectionHandler = section => {
@@ -110,6 +113,7 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, gameI
             action={() => {}}
             gameSelfStatus={gameSelfStatus}
             me={me}
+            gameId={gameId}
           />
           <br />
         </div>))}
@@ -125,10 +129,18 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, gameI
             {selectedUser && <>
             <h1>{selectedUser.username}</h1>
             <div>
-              {selectedUser.inGame && <><p>is already in a duel!</p>
-              Would you like to spectate?</>}
-              {selectedUser.inLobby && <><p>is preparing for a duel!</p>
-              Would you like to join?</>}
+              {selectedUser.inGame
+                ? <>
+                  <p>is already in a duel!</p>
+                  Would you like to spectate?
+                  </>
+                : selectedUser.inLobby
+                  ? <>
+                    <p>is in a duel lobby!</p>
+                    Would you like to join?
+                    </>
+                  : ''
+              }
             </div>
             </>}
           </div>
