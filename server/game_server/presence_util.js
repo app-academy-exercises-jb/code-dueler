@@ -33,16 +33,22 @@ const presenceUtils = pubsub => {
     if (Boolean(gameId) && game
         && Boolean(oldWs)
         && !pubsub.subscribers[user._id].includes(oldWs)) {
-      console.log("switching ws")
+      console.log("switching ws");
       game.users[user._id] = ws;
+      ws.gameId = game._id;
+      game.connections++;
     }
   };
 
   const removeWs = ws => {
-    // __TODO__ if ws has a gameId, it needs to leaveGame
-    // if (ws.invited) {
-    //   pubsub.games.pendingInvites[ws.userId] = false;
-    // }
+    if (ws.gameId) {
+      let game = pubsub.games[ws.gameId];
+      if (game.spectatorsKey[ws.userId]) {
+        game.removeSpectator({_id: ws.userId, username: ws.username});
+      } else {
+        game.removePlayer({_id: ws.userId, username: ws.username});
+      }
+    }
 
     if (!pubsub.subscribers[ws.userId]) return;
 
@@ -51,7 +57,6 @@ const presenceUtils = pubsub => {
     );
 
     if (userIdx === -1) throw "tried to remove nonexistent WS"
-    //__TODO__ should throw errors against userIdx being -1
     
     const oldWs = pubsub.subscribers[ws.userId][userIdx],
       user = {

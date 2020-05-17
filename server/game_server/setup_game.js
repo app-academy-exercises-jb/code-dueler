@@ -59,7 +59,7 @@ const setupGame = pubsub => game => {
             // but not to game screen
             finishGame();
         } else {
-          console.log("not finishing after all:", {found})
+          console.log("not finishing after all:")
         }
       }
     }, 200);
@@ -221,7 +221,7 @@ const setupGame = pubsub => game => {
               }}).catch(err => console.log(err));
 
               game.p1 = game.p2;
-              game.p1.ready = true;
+              game.p1 && (game.p1.ready = true);
               game.p2 = null;
             } else {
               game.Game.findOneAndUpdate({_id: game._id}, { $set: { [playerKey]: null } })

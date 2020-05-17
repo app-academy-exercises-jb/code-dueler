@@ -90,8 +90,6 @@ const resolvers = {
 
 
       let userInGame = Boolean(game && game.users[user._id]);
-      // console.log({userInGame: game && game.users[user._id]})
-      console.log({isOk: game && game.users[user._id] === ws })
 
       return {
         gameExists: Boolean(game),
@@ -108,7 +106,8 @@ const resolvers = {
   Mutation: {
     hostGame: (_, { challenge }, { user, pubsub, ws}) => {
       if (ws.userId !== user._id
-          || !pubsub.subscribers[user._id]) return null;
+          || !pubsub.subscribers[user._id]
+          || Boolean(pubsub.games.inGame[user._id])) return null;
 
       return Game.start(challenge, user, ws, pubsub);
     },
@@ -158,13 +157,14 @@ const resolvers = {
       
       if (game === undefined) return "not ok: game not found";
       if (Boolean(game.users[user._id])) return "not ok: duplicate user";
+      if (Boolean(pubsub.games.inGame[user._id])) return `not ok: user already in game`;
       
       
       ws.gameId = gameId;
 
       console.log("joining game")
       if (!(Boolean(game.p1) && Boolean(game.p2))
-        && !Boolean(game.spectatorsKey[user._id])) {
+        && !Boolean(game.users[user._id])) {
         await game.addPlayer(user);
       } else if (game.p1.player._id !== user._id
           && game.p2 && game.p2.player._id !== user._id) {
