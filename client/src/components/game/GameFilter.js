@@ -74,7 +74,6 @@ export default ({ me, ...props }) => {
     if (joinedGame === false
         && shouldUpdateSpectator === false
         && shouldUpdateInGame === false) {
-      debugger
       joinGame();
     } else if ((gameStatus === "not ok"
       || shouldUpdateInGame === false)

@@ -82,7 +82,15 @@ const SideBarUsers = ({
           ? <ToolTip content="The host is always ready..." positionClass='checkbox-tooltip'>
               <CheckBox idx={idx} user={user}/>
             </ToolTip>
-          : <CheckBox idx={idx} user={user}/>)
+          : user._id === me._id
+            ? <ToolTip
+            content={`Declare self ${user.ready ? 'not ready' : 'ready'}`}
+            positionClass='checkbox-tooltip'
+            >
+              <CheckBox idx={idx} user={user}/>
+            </ToolTip>
+            : <CheckBox idx={idx} user={user}/>
+        )
       }
     </li>
   ));

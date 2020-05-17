@@ -203,17 +203,17 @@
 
 .checkbox-tooltip {
   position: absolute;
-  top: 18px;
-  right: 0px;
-  width: 150px;
+  top: -2px;
+  left: calc(-100% - 110px);
+  width: 110px;
 }
 
 .checkbox-tooltip-tail {
   position: absolute;
-  top: -9px;
-  right: 3px;
+  top: 7.5px;
+  right: -14px;
   border: 5px solid;
-  border-color: transparent transparent #6E7DAB transparent;
+  border-color: transparent transparent transparent #6E7DAB;
 }
 
 .kick-tooltip {
