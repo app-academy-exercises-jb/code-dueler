@@ -6,19 +6,18 @@ import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import { useHistory } from "react-router-dom";
 import ReactModal from "react-modal";
 
-export default ({ gameId, gameEvent, refetchMe, me}) => {
+export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
   const history = useHistory();
   const [playersInGame, setPlayersInGame] = useState([]),
     [spectatorsInGame, setSpectatorsInGame] = useState([]),
     [modalOpen, setModalOpen] = useState(false),
     [gameSelfStatus, setGameSelfStatus] = useState("player");
-
   
   useEffect(() => {
     if (gameEvent === null) return;
     setPlayersInGame([].concat(
-      gameEvent.p1 && [gameEvent.p1.player] || [],
-      gameEvent.p2 && [gameEvent.p2.player] || []
+      gameEvent.p1 && [{ ready: gameEvent.p1.ready, ...gameEvent.p1.player}] || [],
+      gameEvent.p2 && [{ ready: gameEvent.p2.ready, ...gameEvent.p2.player}] || []
     ));
     setSpectatorsInGame(gameEvent.spectators);
 

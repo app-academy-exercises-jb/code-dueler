@@ -10,7 +10,7 @@ import ReactModal from "react-modal";
 import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
 
-export default ({ me, gameId, refetchMe, gameEvent }) => {
+export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
   const { loading, error, data } = me;
 
   const history = useHistory();
@@ -84,7 +84,7 @@ export default ({ me, gameId, refetchMe, gameEvent }) => {
       <NavBar
         inGame={true}
         data={gameEvent && gameEvent.connections - 2}
-        refetchMe={refetchMe}
+        refetchMeLogged={refetchMeLogged}
       />
 
       <div className="main">

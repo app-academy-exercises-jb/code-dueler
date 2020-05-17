@@ -7,7 +7,7 @@ export default ({ ...props }) => {
 
   return (
     <div className="global">
-      <NavBar data={spectators && spectators - 2} inGame={true} refetchMe={props.refetchMe} />
+      <NavBar data={spectators && spectators - 2} inGame={true} refetchMeLogged={props.refetchMeLogged} />
       <div className="main">
         <Spectator {...props} setSpectators={setSpectators} />
       </div>

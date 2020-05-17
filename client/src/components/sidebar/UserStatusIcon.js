@@ -16,19 +16,19 @@ const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
       </div>
     );
   } else {
-    if (user.inGame === false) {
-      return (
-        <div>
-          <ToolTip content={`${user.username} is ready for a duel!`}>
-            <img className="status-icon" src={GreenCo} />
-          </ToolTip>
-        </div>
-      );
-    } else if (user.inLobby === true) {
+    if (user.inLobby === true) {
       return (
         <div>
           <ToolTip content={`${user.username} is in a duel lobby!`}>
             <img className="status-icon" src={YellowCo} />
+          </ToolTip>
+        </div>
+      );
+    } else if (user.inGame === false) {
+      return (
+        <div>
+          <ToolTip content={`${user.username} is ready for a duel!`}>
+            <img className="status-icon" src={GreenCo} />
           </ToolTip>
         </div>
       );

@@ -9,10 +9,16 @@ const HostGameButton = props => {
 
   const handleClick = async e => {
     //show modal with host game options, such as: choose your challenge
-    const { data: { hostGame: gameId } } = await hostGame({variables: {challenge: "fizz-buzz"}});
-    if (gameId !== null) {
-      history.push(`/game/${gameId}`);
-    };
+    await hostGame({variables: {challenge: "fizz-buzz"}})
+      .then(async ({data: { hostGame: gameId }}) => {
+        await props.refetchMe();
+        return gameId;
+      })
+      .then(gameId => {
+        if (gameId !== null) {
+          history.push(`/game/${gameId}`);
+        };
+      });
   };
 
   return (
