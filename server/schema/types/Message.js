@@ -68,9 +68,9 @@ const resolvers = {
           const game = pubsub.games[payload.channelId];
 
           if (
-            game &&
-            game._id.toString() === ws.gameId &&
-            (game.users[user._id] || game.spectatorsKey[user._id])
+            game 
+            && game._id.toString() === ws.gameId 
+            && Boolean(game.users[user._id])
           ) {
             return true;
           }

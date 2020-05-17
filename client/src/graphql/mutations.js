@@ -42,6 +42,12 @@ export const ADD_MESSAGE = gql`
   }
 `;
 
+export const KICK_PLAYER = gql`
+  mutation KickPlayer($player: ID!, $action: String!) {
+    kickPlayer(player: $player, action: $action)
+  }
+`;
+
 export const INVITE_PLAYER = gql`
   mutation InvitePlayer($invitee: ID!) {
     invitePlayer(invitee: $invitee) {
@@ -124,10 +130,10 @@ export const UPDATE_GAME_USER_CODE = gql`
 export const UPDATE_GAME_USER_STATUS = gql`
   mutation UpdateGameUserStatus(
     $player: ID!
-    $status: String!
-    $gameId: String!
+    $ready: Boolean!
+    $gameId: ID!
   ) {
-    updateGameUserStatus(player: $player, status: $status, gameId: $gameId) {
+    updateGameUserStatus(player: $player, ready: $ready, gameId: $gameId) {
       ...GameUserDetails
     }
   }

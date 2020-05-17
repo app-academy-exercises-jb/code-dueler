@@ -82,7 +82,8 @@ const createClient = async () => {
               && def.name.value !== 'SignUp')
             || (def.operation === 'query' 
               && (def.name.value === "InGameInfo" 
-                || def.name.value === "Messages"))
+                || def.name.value === "Messages"
+                || def.name.value === "CurrentUser"))
           )
       )
     },

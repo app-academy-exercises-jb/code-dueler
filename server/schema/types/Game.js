@@ -12,6 +12,7 @@ const typeDefs = `
     handleGame(gameId: String!, action: String!): String!
     joinGame(player: ID, gameId: ID): String!
     leaveGame(player: ID!, gameId: String!): String!
+    kickPlayer(player: ID!, action: String!): String!
     updateGameUserLastSubmitted(
       player: ID!,
       lastSubmittedResult: String!,
@@ -26,8 +27,8 @@ const typeDefs = `
     ): GameUser!
     updateGameUserStatus(
       player: ID!,
-      status: String!,
-      gameId: String!
+      ready: Boolean!,
+      gameId: ID!
     ): GameUser!
   }
   extend type Subscription {
@@ -48,6 +49,7 @@ const typeDefs = `
     charCount: Int
     lineCount: Int
     currentCode: String
+    ready: Boolean
   }
   type GameInfoResponse {
     gameExists: Boolean!
@@ -84,11 +86,22 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
 const resolvers = {
   Query: {
     queryGameInfo: (_, { gameId }, { user, pubsub, ws }) => {
+      let game = pubsub.games[gameId];
+
+
+      let userInGame = Boolean(game && game.users[user._id]);
+      // console.log({userInGame: game && game.users[user._id]})
+      console.log({isOk: game && game.users[user._id] === ws })
+
       return {
-        gameExists: Boolean(pubsub.games[gameId]),
-        gameStatus: pubsub.games[gameId] && pubsub.games[gameId].status,
+        gameExists: Boolean(game),
+        gameStatus: (userInGame
+          ? (game.users[user._id] === ws
+            ? game.status
+            : "wrong ws")
+          : "not ok"),
         isInGame: Boolean(ws.gameId || pubsub.games.inGame[user._id]),
-        isSpectator: Boolean(pubsub.games[gameId] && pubsub.games[gameId].spectatorsKey[user._id])
+        isSpectator: Boolean(game && game.spectatorsKey[user._id])
       }
     }
   },
@@ -101,12 +114,16 @@ const resolvers = {
     },
     handleGame: (_, { gameId, action }, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
-      ws.gameId = gameId;
+      if (user.ws !== ws) {
+        console.log('mismatched ws, exiting');
+        return "not ok";
+      }
 
       let inPlayers = !Boolean(game.spectatorsKey[user._id])
         && Boolean(game.users[user._id]),
         inSpectators = Boolean(game.spectatorsKey[user._id]);
 
+      
       if (action === "spectate") {
         console.log("spectating game")
         if (!inSpectators) game.addSpectator(user);
@@ -115,59 +132,93 @@ const resolvers = {
         console.log("playing game")
         if (!inPlayers) game.addPlayer(user);
         if (inSpectators) game.removeSpectator(user);
-
       } else {
         throw 'unknown action in handleGame'
       }
 
+      ws.gameId = gameId;
+      pubsub.games.inGame[user._id] = gameId;
+      game.users[user._id] = ws;
+      console.log({gameState: game, inGame: pubsub.games.inGame})
       return "ok";
     },
-    joinGame: (_, { player: playerId, gameId }, { user, pubsub, ws }) => {
+    joinGame: async (_, { player: playerId, gameId }, { user, pubsub, ws }) => {
       if ((playerId === undefined && gameId === undefined)
-        || pubsub.subscribers[user._id] === undefined) return "not ok";
-      
+        || pubsub.subscribers[user._id] === undefined) return "not ok: ";
+
       if (gameId === undefined) {
-        const inGameWS = pubsub.subscribers[playerId].findIndex(p => p.ws && p.ws.gameId);
-        if (inGameWS === -1) return "not ok";
-
-        gameId = pubsub.subscribers[playerId][inGameWS].ws.gameId;
+        // we're joining a game via reference to a player
+        const inGameWS = pubsub.subscribers[playerId].findIndex(subWs => subWs.gameId);
+        if (inGameWS === -1) return "not ok: referenced player not found in game";
+        
+        gameId = pubsub.subscribers[playerId][inGameWS].gameId;
       }
-
+      
       const game = pubsub.games[gameId];
+      
+      if (game === undefined) return "not ok: game not found";
+      if (Boolean(game.users[user._id])) return "not ok: duplicate user";
+      
+      
       ws.gameId = gameId;
 
       console.log("joining game")
-      if (!(Boolean(game.p1) && Boolean(game.p2))) {
-        game.addPlayer(user);
+      if (!(Boolean(game.p1) && Boolean(game.p2))
+        && !Boolean(game.spectatorsKey[user._id])) {
+        await game.addPlayer(user);
+      } else if (game.p1.player._id !== user._id
+          && game.p2 && game.p2.player._id !== user._id) {
+        await game.addSpectator(user);
       } else {
-        game.addSpectator(user);
+        console.log("didn't join, was already in game")
       }
       return gameId;
     },
     leaveGame: (_, {player: _id, gameId}, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
 
+      if (!game) return "not ok";
+
       console.log("leaving game");
       delete ws.gameId;
       delete ws.p1;
-      pubsub.games.inGame[_id] = false;
 
-      if (!game || 
-        game.users[_id] === undefined || 
-        user._id !== _id) {
-          // console.log({game})
-          // pubsub.publishUserLoggedEvent(spectator, Boolean(pubsub.subscribers[spectator._id]));
-          console.log('not ok')
-          return "not ok";
-        }
+      if (game.users[_id] === undefined || 
+          user._id !== _id) {
+        console.log('not ok:', {game})
+        return "not ok";
+      }
 
       if (game.spectatorsKey[_id]) {
+        console.log('removing self from spectators')
         game.removeSpectator({ _id });
       } else if ((game.p1 && game.p1.player._id === _id)
           || (game.p2 && game.p2.player._id === _id)) {
+        console.log('removing self from players')
         game.removePlayer({ _id })
       }
 
+      return "ok";
+    },
+    kickPlayer: (_, {player: _id, action}, {pubsub, ws, user}) => {
+      const game = pubsub.games[ws.gameId];
+      if (game === undefined
+        || game.p1 && game.p1.player._id !== user._id
+        || ws.userId !== user._id
+        || _id === user._id
+        || !Boolean(game.users[_id])) return "not ok";
+
+      if (action === "boot") {
+        Boolean(game.spectatorsKey[_id])
+          ? game.removeSpectator({_id})
+          : game.removePlayer({_id});
+        
+      } else if (action === "spectate") {
+        if (game.p2 && game.p2.player._id !== _id) return "not ok";
+        game.addSpectator({_id});
+        game.removePlayer({_id});
+      }
+      
       return "ok";
     },
     updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
@@ -209,6 +260,19 @@ const resolvers = {
         pubsub, ws, gameId, player, _id, game, input, user
       });
 
+      publishGameUpdate(gameUser);
+      return gameUser;
+    },
+    updateGameUserStatus: (_, { player: _id, ready, gameId }, {user, pubsub, ws}) => {
+      const game = pubsub.games[gameId];
+
+      if (game === undefined) return false;
+
+      const player = getPlayer(game, user);
+
+      const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
+        pubsub, ws, gameId, player, _id, game, input: { ready }, user
+      });
 
       publishGameUpdate(gameUser);
       return gameUser;

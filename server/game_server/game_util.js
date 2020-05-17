@@ -16,7 +16,7 @@ const gameUtil = pubsub => {
       spectatorsKey: {},
       connections: 1,
       users: {
-        [user._id]: 1,
+        [user._id]: ws,
       }
     };
 
@@ -32,6 +32,7 @@ const gameUtil = pubsub => {
         lineCount: 0,
         currentCode: '',
         player: user,
+        ready: true,
       },
       Game,
     };

@@ -35,22 +35,27 @@ const typeDefs = `
 `;
 
 const gameLobbyResolver = (pubsub, user) => {
-  let game = pubsub.games.inGame[user._id],
+  let game = pubsub.games[pubsub.games.inGame[user._id]],
     inGame = Boolean(pubsub.games.inGame[user._id]);
 
-  inGame
-    ? (pubsub.games[game].status === "initializing"
-        || pubsub.games[game].status === "over"
-      ? user.inLobby = inGame
-      : user.inGame = inGame)
-    : (user.inGame = inGame);
+  user.inGame = inGame;
+  user.inLobby = inGame && game && game.status === "initializing";
 }
 
 const resolvers = {
   Query: {
-    me(_, __, context) {
+    me(_, __, { user: doc, pubsub,}) {
       // user provided by passport
-      return context.user;
+      if (doc === undefined) return;
+
+      let user = { 
+        _id: doc._id.toString(),
+        username: doc.username
+      };
+      
+      gameLobbyResolver(pubsub, user);
+      // console.log('fetching me:', {user});
+      return user;
     },
     users: async (_, __, { pubsub }) => {
       if (!pubsub.subscribers) return [];
@@ -84,7 +89,7 @@ const resolvers = {
   },
   Subscription: {
     userLoggedEvent: {
-      subscribe: (_, __, { pubsub, ws }) => {
+      subscribe: (_, __, { pubsub }) => {
         return pubsub.asyncIterator("userLoggedEvent");
       },
       resolve: async (payload, _, { pubsub }) => {

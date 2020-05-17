@@ -7,8 +7,9 @@ const setupPlayer = (user, player) => {
     lineCount: 0,
     currentCode: '',
     player: user,
+    // ready: true,
   };
-  newPlayer.player.pId = player._id;
+  newPlayer.player.pId = player._id.toString();
   return newPlayer;
 };
 
@@ -21,9 +22,14 @@ const setupGame = pubsub => game => {
       // });
       game.users = {};
       game.status = "over";
-      // pubsub.games.inGame[game.p1.player._id] = false;
-      // game.p2 && (pubsub.games.inGame[game.p2.player._id] = false);
+      
+      //__TODO__ sometimes we'll have to delete as follows, but not always
+      // delete game.users[user._id];
+      pubsub.games.inGame[player._id] = false;
+      
       pubsub.publish("gameEvent", game);
+      pubsub.publishUserLoggedEvent(player, Boolean(pubsub.subscribers[player._id]));
+
       await game.Game.findOneAndUpdate({_id: game._id}, { $set: {status: "over"}})
         // __TODO__ change these console logs to something useful
         .then(res => {
@@ -47,8 +53,8 @@ const setupGame = pubsub => game => {
         const found = pubsub.subscribers[player._id];
         if (found === undefined) {
           finishGame();
-        } else if (found.every((connection) => 
-          connection.ws.gameId !== _id)) {
+        } else if (found.every(ws => 
+          ws.gameId !== _id)) {
             // finish game if player is connected, 
             // but not to game screen
             finishGame();
@@ -102,50 +108,54 @@ const setupGame = pubsub => game => {
   }
 
   const handleAction = async (userClass, action, user) => {
+    console.log(`${action}ing ${userClass}: ${user.username}`);
+
     let find = findUser(userClass),
-      spec = userClass === "spectator",
-      Player;
+      isSpectator = userClass === "spectator",
+      Player = mongoose.model('Player');;
 
     if (action === "add") {
       if (find(user)) {
         console.log(`found ${userClass}, adding`);
-        if (spec) {
+        if (isSpectator) {
           game.spectatorsKey[user._id] += 1;
         } else {
           throw 'players should not be added when they are already players';
         }
-        game.users[user._id] += 1
+        game.users[user._id] = user.ws;
       } else {
-        if (spec) {
+        if (isSpectator) {
           game.spectators.push(user);
           game.spectatorsKey[user._id] = 1;
         } else {
           // if no p1, add it. else if no p2, add it. else, throw error
-          Player = mongoose.model('Player');
           let player = new Player({
             user: user._id
           });
           if (!Boolean(game.p1)) {
+            console.log("adding p1")
             game.p1 = setupPlayer(user, player);
             await player.save();
             await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p1: player }});
           } else if (!Boolean(game.p2)) {
+            console.log("adding p2")
             game.p2 = setupPlayer(user, player);
             await player.save();
             await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p2: player }});
           } else {
+            console.log('can\'t add player when already full')
             throw "can't add player when already full"
           }
         }
 
         game.connections += 1;
-        game.users[user._id] = 1;
+        game.users[user._id] = user.ws;
         pubsub.games.inGame[user._id] = game._id;
 
         pubsub.publish("gameEvent", game);
         pubsub.publishUserLoggedEvent(user, Boolean(pubsub.subscribers[user._id]));
 
-        spec && await game.Game.findOneAndUpdate({_id: game._id}, { $push: { spectators: user._id }})
+        isSpectator && await game.Game.findOneAndUpdate({_id: game._id}, { $push: { spectators: user._id }})
           .then(() => {
             console.log("added spectator")
           })
@@ -157,9 +167,9 @@ const setupGame = pubsub => game => {
     } else if (action === "remove") {
       if (find(user)) {
         console.log(`found ${userClass}, removing`);
-        if (spec) {
+        if (isSpectator) {
           game.spectatorsKey[user._id] -= 1;
-          game.users[user._id] -= 1;
+          // game.users[user._id] -= 1;
 
           if (game.spectatorsKey[user._id] === 0) {
             const idx = game.spectators.findIndex(s => s._id === user._id);
@@ -182,29 +192,40 @@ const setupGame = pubsub => game => {
           }
         } else {
           if (game.status === "ongoing"
-              || game.status === "initializing"
-              && game.connections < 2) {
+              || (game.status === "initializing"
+              && game.connections < 2)) {
             game.endGame(user);
           } else if (game.status === "initializing") {
             let playerKey = user._id === (game.p1 && game.p1.player._id)
               ? 'p1' : 'p2';
             
             delete game[playerKey];
+            delete game.users[user._id];
+            pubsub.games.inGame[user._id] = false;
+
+            console.log({inGame: pubsub.games.inGame})
 
             if (playerKey === 'p1' && Boolean(game.p2)) {
               // if we're removing p1 but have a p2, switch em so we always have a p1
-              let p2 = await mongoose.model('Player').find({ _id: game.p2.player.pId })
+              // and make sure p1 is always ready
+              let p2 = await Player
+                .findOneAndUpdate(
+                  { _id: game.p2.player.pId },
+                  { $set: { ready: true }},
+                  { new: true })
                 .catch(err => console.log(err));
 
               await game.Game.findOneAndUpdate({_id: game._id}, { $set: { 
-                [playerKey]: p2[0],
+                [playerKey]: p2,
                 p2: null
               }}).catch(err => console.log(err));
 
               game.p1 = game.p2;
+              game.p1.ready = true;
               game.p2 = null;
             } else {
-              await game.Game.findOneAndUpdate({_id: game._id}, { $set: { [playerKey]: null } });
+              game.Game.findOneAndUpdate({_id: game._id}, { $set: { [playerKey]: null } })
+                .catch(err => console.log(err));
             }
           } else {
             throw `can't remove user from game with status: ${game.status}`;

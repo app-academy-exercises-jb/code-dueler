@@ -27,6 +27,11 @@ const PlayerSchema = new Schema({
     default: '',
     required: true,
   },
+  ready: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model('Player', PlayerSchema);

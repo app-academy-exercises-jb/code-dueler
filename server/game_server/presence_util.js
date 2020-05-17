@@ -10,7 +10,6 @@ const presenceUtils = pubsub => {
       });
     }, 100);
   };
-
   const addWs = ({ws, user}) => {
     console.log(`${user._id} connected to the websocket`);
 
@@ -20,27 +19,46 @@ const presenceUtils = pubsub => {
     ws.username = user.username;
 
     if (pubsub.subscribers[user._id] === undefined) {
-      pubsub.subscribers[user._id] = [user];
+      pubsub.subscribers[user._id] = [ws];
       pubsub.publishUserLoggedEvent(user, true);
     } else {
-      pubsub.subscribers[user._id].push(user);
+      pubsub.subscribers[user._id].push(ws);
+    }
+
+    let gameId = pubsub.games.inGame[user._id],
+        game = pubsub.games[gameId],
+        oldWs = game && game.users[user._id];
+
+    // user is in game, rescue ws
+    if (Boolean(gameId) && game
+        && Boolean(oldWs)
+        && !pubsub.subscribers[user._id].includes(oldWs)) {
+      console.log("switching ws")
+      game.users[user._id] = ws;
     }
   };
 
   const removeWs = ws => {
     // __TODO__ if ws has a gameId, it needs to leaveGame
-    if (ws.invited) {
-      pubsub.games.pendingInvites[ws.userId] = false;
-    }
+    // if (ws.invited) {
+    //   pubsub.games.pendingInvites[ws.userId] = false;
+    // }
 
     if (!pubsub.subscribers[ws.userId]) return;
 
     const userIdx = pubsub.subscribers[ws.userId].findIndex(
-      (s) => s.ws === ws
+      subWs => subWs === ws
     );
-    const user = pubsub.subscribers[ws.userId][userIdx];
 
+    if (userIdx === -1) throw "tried to remove nonexistent WS"
     //__TODO__ should throw errors against userIdx being -1
+    
+    const oldWs = pubsub.subscribers[ws.userId][userIdx],
+      user = {
+        username: oldWs.username,
+        _id: oldWs.userId,
+      };
+
 
     pubsub.subscribers[ws.userId].splice(userIdx, 1);
 

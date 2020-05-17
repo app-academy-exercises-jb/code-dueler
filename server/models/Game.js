@@ -64,7 +64,8 @@ GameSchema.statics.start = async (challenge, user, ws, pubsub) => {
   const Game = mongoose.model('Game'),
     Player = mongoose.model('Player'),
     p1 = new Player({
-      user: user._id
+      user: user._id,
+      ready: true,
     }),
     game = new Game({
       p1
