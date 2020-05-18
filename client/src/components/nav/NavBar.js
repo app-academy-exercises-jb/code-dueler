@@ -6,6 +6,9 @@ import NavBarPlayerCount from "./NavBarPlayerCount";
 import HostGameButton from "./HostGameButton";
 import JoinGameButton from "./JoinGameButton";
 import StartGameButton from "./StartGameButton";
+import ReadyGameButton from "./ReadyGameButton";
+import SpectatorButton from "./SpectatorButton";
+import ToolTip from "../util/ToolTip";
 
 const NavBar = ({
   userCount,
@@ -14,8 +17,47 @@ const NavBar = ({
   inLobby,
   inGameLobby,
   refetchMe,
-  refetchMeLogged
+  refetchMeLogged,
+  gameSelfStatus,
+  players,
+  playersReady,
+  me,
+  gameId
 }) => {
+  const getUserButtons = () => {
+    if (gameSelfStatus === "host") {
+      if (playersReady) {
+        return <StartGameButton gameId={gameId} />
+      } else {
+        return (
+          <ToolTip 
+            content={"Two players must first be ready"} 
+            positionClass="nav-tooltip"
+          >
+            <StartGameButton 
+              displayClass='inactive'
+            />
+          </ToolTip>
+        )
+      }
+    } else if (gameSelfStatus === "player") {
+      return (
+        <ReadyGameButton
+          ready={playersReady}
+          userId={me._id}
+          gameId={gameId}
+        />
+      );
+    } else if (gameSelfStatus === "spectator") {
+      return (
+        <SpectatorButton 
+          players={players} 
+          gameId={gameId}
+        />
+      );
+    } 
+  }
+
   return (
     <>
       <div className="nav-bar-wrapper">
@@ -44,11 +86,10 @@ const NavBar = ({
             <ProtectedComponent component={JoinGameButton} />
           </div>
           </>}
-          {inGameLobby && <>
-          <div>
-            <ProtectedComponent component={StartGameButton} />
-          </div>
-          </>}
+          {inGameLobby && 
+          <ProtectedComponent>
+            {getUserButtons()}
+          </ProtectedComponent>}
           <div>
             <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />
           </div>

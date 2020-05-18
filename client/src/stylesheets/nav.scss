@@ -72,3 +72,11 @@
     background-color: #575366;
   }
 }
+
+.inactive {
+  cursor: default;
+  background-color: #63656a;
+  &:hover {
+    background-color: #63656a;
+  }
+}

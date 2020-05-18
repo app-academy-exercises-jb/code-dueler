@@ -1,17 +1,21 @@
 import React from 'react';
+import { useMutation } from '@apollo/react-hooks';
+import { HANDLE_GAME } from '../../graphql/mutations';
 
-const StartGameButton = props => {
-
+const StartGameButton = ({ gameId, displayClass }) => {
+  const [handleGame] = useMutation(HANDLE_GAME);
+  
   const handleClick = e => {
-    // mutation to start game
+    if (displayClass === "inactive") return;
+    handleGame({variables: { gameId, action: "start" }});
   };
 
   return (
     <div 
-      className="nav-button"
+      className={`nav-button ${displayClass}`}
       onClick={handleClick}
     >
-      <button>Start Game</button>
+      <button className={displayClass || ''}>Start Game</button>
     </div>
   );
 };

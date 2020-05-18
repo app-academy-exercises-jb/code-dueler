@@ -18,7 +18,7 @@ export default ({ component: Component, ...rest }) => {
   if (loading || error || !data) {
     return null;
   } else if (data.isLoggedIn) {
-    return <Component {...rest} />;
+    return Component ? <Component {...rest} /> : rest.children;
   } else {
     return null;
   }

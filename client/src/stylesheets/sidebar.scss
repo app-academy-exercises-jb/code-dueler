@@ -231,6 +231,22 @@
   border-color: transparent #6E7DAB transparent transparent;
 }
 
+.nav-tooltip {
+  font-size: 0.7em;
+  position: absolute;
+  top: 34px;
+  right: 9px;
+  width: 180px;
+}
+
+.nav-tooltip-tail {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
 .user-ready-checkmark {
   justify-self: flex-end;
 }

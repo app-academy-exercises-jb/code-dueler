@@ -11,7 +11,8 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
   const [playersInGame, setPlayersInGame] = useState([]),
     [spectatorsInGame, setSpectatorsInGame] = useState([]),
     [modalOpen, setModalOpen] = useState(false),
-    [gameSelfStatus, setGameSelfStatus] = useState("player");
+    [gameSelfStatus, setGameSelfStatus] = useState("player"),
+    [playersReady, setPlayersReady] = useState(false);
   
   useEffect(() => {
     if (gameEvent === null) return;
@@ -20,6 +21,8 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
       (gameEvent.p2 && [{ ready: gameEvent.p2.ready, ...gameEvent.p2.player}]) || []
     ));
     setSpectatorsInGame(gameEvent.spectators);
+    setPlayersReady(gameEvent.p1 && gameEvent.p1.ready
+      && gameEvent.p2 && gameEvent.p2.ready);
 
     if (gameEvent.p1 && me._id === gameEvent.p1.player._id) {
       setGameSelfStatus("host");
@@ -58,6 +61,8 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
         gameSelfStatus={gameSelfStatus}
         me={me}
         gameId={gameId}
+        playersReady={playersReady}
+        players={playersInGame}
       />
       <div className="main" id="game-lobby">
         <SideBar
