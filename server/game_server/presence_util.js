@@ -41,14 +41,15 @@ const presenceUtils = pubsub => {
   };
 
   const removeWs = ws => {
-    if (ws.gameId) {
+    if (ws.gameId) () => {
       let game = pubsub.games[ws.gameId];
+      if (game === undefined) return;
       if (game.spectatorsKey[ws.userId]) {
         game.removeSpectator({_id: ws.userId, username: ws.username});
       } else {
         game.removePlayer({_id: ws.userId, username: ws.username});
       }
-    }
+    };
 
     if (!pubsub.subscribers[ws.userId]) return;
 

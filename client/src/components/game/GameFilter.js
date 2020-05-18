@@ -18,7 +18,6 @@ export default ({ me, ...props }) => {
     loading: gameLoading,
     error: gameError,
     refetch: refetchGame,
-    networkStatus,
   } = useQuery(
     IN_GAME_INFO, {
     variables: { gameId },

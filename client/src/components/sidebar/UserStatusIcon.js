@@ -12,7 +12,10 @@ const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
     let players = [P1, P2];
     return (
       <div>
-        <img className="status-icon" src={playersSection ? players[idx] : PinkCo} />
+        <img
+          className="status-icon"
+          src={playersSection ? players[idx] : PinkCo}
+          alt={playersSection ? players[idx].toString() : "S"} />
       </div>
     );
   } else {
@@ -20,7 +23,7 @@ const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
       return (
         <div>
           <ToolTip content={`${user.username} is in a duel lobby!`}>
-            <img className="status-icon" src={YellowCo} />
+            <img className="status-icon" src={YellowCo} alt="Y" />
           </ToolTip>
         </div>
       );
@@ -28,7 +31,7 @@ const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
       return (
         <div>
           <ToolTip content={`${user.username} is ready for a duel!`}>
-            <img className="status-icon" src={GreenCo} />
+            <img className="status-icon" src={GreenCo} alt="G" />
           </ToolTip>
         </div>
       );
@@ -36,7 +39,7 @@ const UserStatusIcon = ({user, inGame, playersSection, idx}) => {
       return (
         <div>
           <ToolTip content={`${user.username} is in a duel!`}>
-            <img className="status-icon" src={RedCo} />
+            <img className="status-icon" src={RedCo} alt="R" />
           </ToolTip>
         </div>
       );

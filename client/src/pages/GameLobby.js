@@ -16,8 +16,8 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
   useEffect(() => {
     if (gameEvent === null) return;
     setPlayersInGame([].concat(
-      gameEvent.p1 && [{ ready: gameEvent.p1.ready, ...gameEvent.p1.player}] || [],
-      gameEvent.p2 && [{ ready: gameEvent.p2.ready, ...gameEvent.p2.player}] || []
+      (gameEvent.p1 && [{ ready: gameEvent.p1.ready, ...gameEvent.p1.player}]) || [],
+      (gameEvent.p2 && [{ ready: gameEvent.p2.ready, ...gameEvent.p2.player}]) || []
     ));
     setSpectatorsInGame(gameEvent.spectators);
 
@@ -48,12 +48,16 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
   if (gameEvent === null) return null;
 
   
+  
   return (
     <div className="global">
       <NavBar
         inGameLobby={true}
         userCount={gameEvent && gameEvent.connections}
         refetchMe={refetchMe}
+        gameSelfStatus={gameSelfStatus}
+        me={me}
+        gameId={gameId}
       />
       <div className="main" id="game-lobby">
         <SideBar

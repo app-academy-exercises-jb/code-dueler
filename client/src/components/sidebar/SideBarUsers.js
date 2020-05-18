@@ -70,7 +70,7 @@ const SideBarUsers = ({
                   idx={idx}
                   inGame={true}
                   user={user} />
-                <img src={KickPlayer} />
+                <img src={KickPlayer} alt=""/>
               </ToolTip>
             </div>
           : <UserStatusIcon playersSection={playersSection} idx={idx} inGame={true} user={user} />

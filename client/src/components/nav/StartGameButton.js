@@ -1,8 +1,6 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 
 const StartGameButton = props => {
-  const history = useHistory();
 
   const handleClick = e => {
     // mutation to start game

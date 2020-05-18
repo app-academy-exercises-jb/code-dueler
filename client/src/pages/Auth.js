@@ -10,8 +10,6 @@ export default ({action}) => {
     Form = LogInForm;
   } else if (action === "signup") {
     Form = SignUpForm;
-  } else {
-    throw "unrecognized action";
   }
 
   return (

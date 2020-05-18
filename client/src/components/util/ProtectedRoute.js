@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
 import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import {

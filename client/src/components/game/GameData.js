@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useSubscription, useMutation } from "@apollo/react-hooks";
+import React, { useState } from 'react';
+import { useSubscription } from "@apollo/react-hooks";
 import { ON_GAME } from '../../graphql/subscriptions';
 
 const GameData = ({ gameId, spectator, ...props}) => {

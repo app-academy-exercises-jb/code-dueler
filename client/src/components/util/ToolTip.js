@@ -36,7 +36,7 @@ const ToolTip = ({content, children, time, positionClass}) => {
       </div>
       <div className={`${displayClass} ${positionClass || 'tooltip-container'}`}>
         <div className="tooltip">{content}</div>
-        <div className={`${positionClass && positionClass + '-tail' || 'tooltip-tail'}`}></div>
+        <div className={`${(positionClass && positionClass + '-tail') || 'tooltip-tail'}`}></div>
       </div>
     </div>
   );
