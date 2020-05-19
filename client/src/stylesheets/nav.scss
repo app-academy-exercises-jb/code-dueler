@@ -54,6 +54,12 @@
 
 .nav-buttons {
   display: flex;
+
+  >div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .nav-button {

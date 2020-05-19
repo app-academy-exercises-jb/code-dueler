@@ -35,6 +35,7 @@ html,body {
   display: flex;
   flex: 1;
   max-height: calc(100vh - 56px);
+  min-height: fit-content;
 }
 
 .global {

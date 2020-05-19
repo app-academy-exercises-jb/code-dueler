@@ -7,6 +7,7 @@
 .chat-main {
   width: 100%;
   color: #D4F2D2;
+  max-height: inherit;
 }
 
 .chatview-wrapper {
@@ -48,7 +49,6 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-end;
-  width: 50%;
   padding-bottom: 4px;
 }
 
