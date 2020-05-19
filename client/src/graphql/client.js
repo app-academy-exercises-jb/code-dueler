@@ -77,13 +77,10 @@ const createClient = async () => {
       return (
         def.kind === 'OperationDefinition' && 
           (def.operation === 'subscription'
-            || (def.operation === 'mutation' 
+            || (def.operation === 'query' )
+            || (def.operation === 'mutation'
               && def.name.value !== 'LogIn'
               && def.name.value !== 'SignUp')
-            || (def.operation === 'query' 
-              && (def.name.value === "InGameInfo" 
-                || def.name.value === "Messages"
-                || def.name.value === "CurrentUser"))
           )
       )
     },

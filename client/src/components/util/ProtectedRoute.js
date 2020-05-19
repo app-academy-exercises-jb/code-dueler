@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
-import { useQuery, useApolloClient } from "@apollo/react-hooks";
+import { useQuery, useApolloClient, useLazyQuery } from "@apollo/react-hooks";
 import {
   CURRENT_USER,
   IS_LOGGED_IN,
@@ -56,25 +56,36 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
   const client = useApolloClient();
   const { refetch: refetchMeLogged, data, loading, error } = useQuery(IS_LOGGED_IN);
 
-  const { refetch: refetchMe, ...me } = useQuery(CURRENT_USER, {
+  const [loadMe, { refetch: refetchMe, ...me }] = useLazyQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
-  const { subscribeToMore, ...onlineUsers } = useQuery(GET_ONLINE_USERS, {
+  const [loadUsers, { subscribeToMore, ...onlineUsers }] = useLazyQuery(GET_ONLINE_USERS, {
     fetchPolicy: "network-only",
   });
 
   useEffect(() => {
-    if (data && data.isLoggedIn && onlineUsers.loading === false && me.loading === false) {
+    if (!data || !data.isLoggedIn) return;
+
+    if (me.called === false) {
+      loadMe();
+      loadUsers();
+    } 
+    
+    if (me.loading === false
+        && me.called === true
+        && onlineUsers.loading === false) {
       setTimeout(() => {
         subscribeToUserEvents(subscribeToMore, me, client, refetchMe, refetchMeLogged);
       }, 10);
     }
-  }, [data, onlineUsers.loading, me.loading]);
+  }, [data, onlineUsers.loading, me.loading, me.called]);
 
   if (!redirectTo) redirectTo = "/login";
-  if (loading || error || !data || !me.data) {
+  if (loading || error || !data || 
+      (data.isLoggedIn && 
+        (!me.called || (me.called && me.loading)))) {
     return null;
   } else if (data.isLoggedIn) {
     if (!onlineUsers.data || onlineUsers.error) return null;
@@ -96,7 +107,6 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
       />
     );
   } else {
-
     return (
       <Route
         path={path}

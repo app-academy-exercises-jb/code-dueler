@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Redirect } from "react-router-dom";
 import Auth from "./pages/Auth";
 import GlobalLobby from "./pages/GlobalLobby";
 import GameFilter from "./components/game/GameFilter";
@@ -16,7 +16,7 @@ export default () => {
         <ProtectedRoute path="/game/:id" component={GameFilter} />
         <AuthRoute path="/login" render={() => <Auth action="login" />} />
         <AuthRoute path="/signup" render={() => <Auth action="signup" />} />
-        <Route path="/" component={ErrorPage} />
+        <Redirect to="/" />
       </Switch>
     </BrowserRouter>
   );
