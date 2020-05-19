@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { useSubscription } from "@apollo/react-hooks";
 import { ON_GAME } from '../../graphql/subscriptions';
 
-const GameData = ({ gameId, spectator, ...props}) => {
+const GameData = ({ 
+  gameId,
+  spectator,
+  gameStarted,
+  setGameStarted,
+  refetchGame,
+  ...props
+}) => {
   const [gameEvent, setGameEvent] = useState(null);
 
   useSubscription(ON_GAME, {
@@ -12,7 +19,20 @@ const GameData = ({ gameId, spectator, ...props}) => {
     },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const e = subscriptionData.data.gameEvent;
-      setGameEvent(e);      
+      if (e.status !== gameStarted) {
+        if (e.status === "over") {
+          setGameStarted("over"); 
+          setGameEvent(e);   
+        } else {
+          refetchGame()
+            .then(res => {
+              setGameStarted(res.data.queryGameInfo.gameStatus);
+              setGameEvent(e);      
+            });
+        }
+      } else {
+        setGameEvent(e);
+      }
     },
   });
 

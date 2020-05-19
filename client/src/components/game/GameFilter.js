@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import GameLobby from "../../pages/GameLobby";
 import GameScreen from "../../pages/GameScreen";
-import Spectator from "../../pages/Spectator";
+import Spectator from "../spectator/Spectator";
 import { useParams, Redirect, useHistory } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { IN_GAME_INFO } from "../../graphql/queries";
@@ -12,12 +12,14 @@ export default ({ me, ...props }) => {
   const { id: gameId } = useParams();
   let history = useHistory();
   let [joinedGame, setJoinedGame] = useState(me.inGame);
+  let [gameStarted, setGameStarted] = useState("initializing");
 
   const { 
     data: gameData,
     loading: gameLoading,
     error: gameError,
     refetch: refetchGame,
+    networkStatus
   } = useQuery(
     IN_GAME_INFO, {
     variables: { gameId },
@@ -39,7 +41,7 @@ export default ({ me, ...props }) => {
   const shouldUpdateExists = gameData && gameData.queryGameInfo.gameExists;
   const shouldUpdateSpectator = gameData && gameData.queryGameInfo.isSpectator;
   const shouldUpdateInGame = gameData && gameData.queryGameInfo.isInGame;
-  let gameStatus = gameData && gameData.queryGameInfo.gameStatus;
+  const gameStatus = gameData && gameData.queryGameInfo.gameStatus;
   
   useEffect(() => {
     async function joinGame() {
@@ -79,25 +81,18 @@ export default ({ me, ...props }) => {
       && joinedGame === false) {
         history.push('/');
     }
-  }, [me.inGame, shouldUpdateInGame, shouldUpdateSpectator, gameStatus]);
+  }, [me.inGame, shouldUpdateInGame, shouldUpdateSpectator, gameStatus, gameData, gameLoading]);
 
   // function returned from useEffect will run on component unmount
   useEffect(
     () => () => {
-      if (!gameData) return;
-
-      let { queryGameInfo: { gameStatus }} = gameData;
-
-      if (!(gameStatus === "not ok"
-          || gameStatus === "wrong ws")) {
-        leaveGame();
-      }
+      leaveGame();
+      history.push('/');
     },
-    [gameData]
+    []
   );
 
-  if (gameLoading 
-    || gameError
+  if (gameError
     || !gameData
     || gameStatus === "not ok") return null;
 
@@ -115,7 +110,12 @@ export default ({ me, ...props }) => {
     }
     if (gameStatus === 'initializing') {
       return (
-        <GameData gameId={gameId}>
+        <GameData 
+          gameId={gameId}
+          refetchGame={refetchGame}
+          gameStarted={gameStarted}
+          setGameStarted={setGameStarted}
+        >
           {gameEvent => <GameLobby 
             {...props}
             queryGameInfo={queryGameInfo}
@@ -128,7 +128,12 @@ export default ({ me, ...props }) => {
     } else if (gameStatus === 'started') {
       if (!isSpectator && isInGame){
         return (
-          <GameData gameId={gameId}>
+          <GameData 
+            gameId={gameId}
+            refetchGame={refetchGame}
+            gameStarted={gameStarted}
+            setGameStarted={setGameStarted}
+          >
             {gameEvent => <GameScreen
               { ...props }
               gameEvent={gameEvent}
@@ -139,7 +144,13 @@ export default ({ me, ...props }) => {
         );
       } else {
         return (
-          <GameData gameId={gameId} spectator={true}>
+          <GameData 
+            gameId={gameId}
+            refetchGame={refetchGame}
+            gameStarted={gameStarted}
+            setGameStarted={setGameStarted}
+            spectator={true}
+          >
             {gameEvent => <Spectator
               { ...props }
               gameEvent={gameEvent}
