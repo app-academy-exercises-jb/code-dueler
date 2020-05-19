@@ -14,13 +14,22 @@ const setupPlayer = (user, player) => {
 };
 
 const setupGame = pubsub => game => {
+  const startGame = async () => {
+    game.status = "started";
+    await game.Game.findOneAndUpdate(
+      {_id: game._id},
+      { $set: { status: "started" }}
+    );
+    pubsub.publish("gameEvent", game);
+  };
+
   const endGame = (player) => {
     const finishGame = async () => {
       console.log("finishing game")
       // Object.keys(game.users).forEach(user => {
       //   pubsub.publishUserLoggedEvent({_id: user}, Boolean(pubsub.subscribers[user]));
       // });
-      game.users = {};
+      // game.users = {};
       game.status = "over";
       
       //__TODO__ sometimes we'll have to delete as follows, but not always
@@ -30,10 +39,14 @@ const setupGame = pubsub => game => {
       pubsub.publish("gameEvent", game);
       pubsub.publishUserLoggedEvent(player, Boolean(pubsub.subscribers[player._id]));
 
-      await game.Game.findOneAndUpdate({_id: game._id}, { $set: {status: "over"}})
+      await game.Game.findOneAndUpdate({_id: game._id}, { $set: {status: "over"}}, { new: true })
         // __TODO__ change these console logs to something useful
         .then(res => {
-          console.log("finished game")
+          if (res.status.over) {
+            // __TODO__ delete as follows when we see game connections at 0
+            // delete pubsub.games[game._id]
+            console.log("finished game")
+          }
         })
         .catch(err => {
           console.log(err);
@@ -135,6 +148,7 @@ const setupGame = pubsub => game => {
           if (!Boolean(game.p1)) {
             console.log("adding p1")
             game.p1 = setupPlayer(user, player);
+            game.p1.ready = true;
             await player.save();
             await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p1: player }});
           } else if (!Boolean(game.p2)) {
@@ -191,7 +205,7 @@ const setupGame = pubsub => game => {
               });
           }
         } else {
-          if (game.status === "ongoing"
+          if (game.status === "started"
               || (game.status === "initializing"
               && game.connections < 2)) {
             game.endGame(user);
@@ -227,6 +241,8 @@ const setupGame = pubsub => game => {
               game.Game.findOneAndUpdate({_id: game._id}, { $set: { [playerKey]: null } })
                 .catch(err => console.log(err));
             }
+          } else if (game.status === "over") {
+            pubsub.games.inGame[user._id] = false;
           } else {
             throw `can't remove user from game with status: ${game.status}`;
           }
@@ -244,6 +260,7 @@ const setupGame = pubsub => game => {
     }
   }
 
+  game.startGame = startGame;
   game.endGame = endGame;
   game.initializeGame = initializeGame;
   game.addSpectator = user => handleAction("spectator", "add", user);

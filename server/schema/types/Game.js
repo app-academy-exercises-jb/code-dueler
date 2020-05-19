@@ -122,23 +122,31 @@ const resolvers = {
         && Boolean(game.users[user._id]),
         inSpectators = Boolean(game.spectatorsKey[user._id]);
 
-      
-      if (action === "spectate") {
-        console.log("spectating game")
-        if (!inSpectators) game.addSpectator(user);
-        if (inPlayers) game.removePlayer(user); 
-      } else if (action === "play") {
-        console.log("playing game")
-        if (!inPlayers) game.addPlayer(user);
-        if (inSpectators) game.removeSpectator(user);
-      } else {
-        throw 'unknown action in handleGame'
+      switch (action) {
+        case "spectate":
+          console.log("spectating game;")
+          if (!inSpectators) game.addSpectator(user);
+          if (inPlayers) game.removePlayer(user); 
+          break;
+        case "play":
+          console.log("playing game");
+          if (!inPlayers) game.addPlayer(user);
+          if (inSpectators) game.removeSpectator(user);
+          break;
+        case "start":
+          if (user._id !== (game.p1 && game.p1.player._id)
+            || !Boolean(game.p2 && game.p2.ready) ) return "not ok";
+          console.log("starting game");
+          game.startGame();
+          console.log({game})
+          break;
+        default:
+          throw 'unknown action in handleGame';
       }
 
       ws.gameId = gameId;
       pubsub.games.inGame[user._id] = gameId;
       game.users[user._id] = ws;
-      console.log({gameState: game, inGame: pubsub.games.inGame})
       return "ok";
     },
     joinGame: async (_, { player: playerId, gameId }, { user, pubsub, ws }) => {
@@ -179,12 +187,13 @@ const resolvers = {
 
       if (!game) return "not ok";
 
-      console.log("leaving game");
+      console.log(`${user.username} leaving game`);
       delete ws.gameId;
       delete ws.p1;
 
       if (game.users[_id] === undefined || 
           user._id !== _id) {
+        console.log({inGame: pubsub.games.inGame})
         console.log('not ok:', {game})
         return "not ok";
       }
