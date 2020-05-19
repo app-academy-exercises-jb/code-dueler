@@ -6,7 +6,7 @@ const NavBarPlayerCount = ({ userCount, inGame, inGameLobby }) => {
   } else if (inGameLobby) {
     return <>{userCount || 0} {userCount === 1 ? 'player' : 'players'} in lobby</>;
   } else {
-    return <>{userCount} {userCount === 1 ? 'user' : 'users'} ready to duel</>;
+    return <>{userCount} {userCount === 1 ? 'user' : 'users'} online</>;
   }
 };
 

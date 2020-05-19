@@ -24,7 +24,7 @@ const NavBar = ({
   me,
   gameId
 }) => {
-  const getUserButtons = () => {
+  const getUserButton = () => {
     if (gameSelfStatus === "host") {
       if (playersReady) {
         return <StartGameButton gameId={gameId} />
@@ -50,7 +50,7 @@ const NavBar = ({
       );
     } else if (gameSelfStatus === "spectator") {
       return (
-        <SpectatorButton 
+        <SpectatorButton
           players={players} 
           gameId={gameId}
         />
@@ -88,7 +88,9 @@ const NavBar = ({
           </>}
           {inGameLobby && 
           <ProtectedComponent>
-            {getUserButtons()}
+            <div>
+              {getUserButton()}
+            </div>
           </ProtectedComponent>}
           <div>
             <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />

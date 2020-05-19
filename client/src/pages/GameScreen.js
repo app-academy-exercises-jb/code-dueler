@@ -10,57 +10,45 @@ import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
 
 export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
-  const { loading, error, data } = me;
-
   const history = useHistory();
   const [opponentStats, setOpponentStats] = useState(null);
   const [ownStats, setOwnStats] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState("");
-  const [leaveGame] = useMutation(LEAVE_GAME);
-
-  // function returned from useEffect will run on component unmount
-  useEffect(
-    () => () => {
-      if (!data) return;
-      leaveGame({
-        variables: {
-          player: data.me._id,
-          gameId,
-        },
-      });
-    },
-    []
-  );
+  const [spectators, setSpectators] = useState([]);
 
   useEffect(() => {
-    let self, opponent;
-    if (gameEvent.p1.player._id === data.me._id) {
-      self = "p1";
-      opponent = "p2";
-    } else {
-      opponent = "p1";
-      self = "p2";
-    }
-
-    if (gameEvent.status === "initializing") {
-      
-    } else if (gameEvent.status === "started") {
-      setOwnStats(gameEvent[self]);
-      setOpponentStats(gameEvent[opponent]);
-    } else if (gameEvent.status === "over") {
-      if (gameEvent.winner === null) {
-        handleGameOver("disconnect");
-      } else if (gameEvent.winner === self) {
-        handleGameOver("victory");
+    if (gameEvent) {
+      let self, opponent;
+      if (gameEvent.p1.player._id === me._id) {
+        self = "p1";
+        opponent = "p2";
       } else {
-        handleGameOver("defeat");
+        opponent = "p1";
+        self = "p2";
       }
+
+      if (gameEvent.status === "initializing") {
+        
+      } else if (gameEvent.status === "started") {
+        setOwnStats(gameEvent[self]);
+        setOpponentStats(gameEvent[opponent]);
+      } else if (gameEvent.status === "over") {
+        if (gameEvent.winner === null) {
+          handleGameOver("disconnect");
+        } else if (gameEvent.winner === self) {
+          handleGameOver("victory");
+        } else {
+          handleGameOver("defeat");
+        }
+      }
+
+      setSpectators(gameEvent.spectators);
     }
   
   }, [gameEvent]);
 
-  if (loading || error || !data) return null;
+  if (gameEvent === null) return null;
 
   const handleGameOver = (wincon) => {
     if (wincon === "defeat") {
@@ -82,7 +70,7 @@ export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
     <div className="global">
       <NavBar
         inGame={true}
-        data={gameEvent && gameEvent.connections - 2}
+        userCount={spectators.length}
         refetchMeLogged={refetchMeLogged}
       />
 
@@ -90,11 +78,11 @@ export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
         <div className="game-screen">
           <div className="game-left">
             <div className="code-editor-wrapper">
-              <CodeEditor gameId={gameId} me={data.me} />
+              <CodeEditor gameId={gameId} me={me} />
             </div>
             <div className="stats-wrapper">
               <PlayerStats
-                me={data.me}
+                me={me}
                 ownStats={ownStats}
                 opponentStats={opponentStats}
               />

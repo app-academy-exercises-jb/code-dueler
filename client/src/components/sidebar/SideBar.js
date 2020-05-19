@@ -10,6 +10,7 @@ import Cross from "../../images/cross.png"
 const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refetchMe, gameId }) => {
   ReactModal.setAppElement("#root");
 
+  const [errorModelOpen, setErrorModalOpen] = useState(false);
   const [spectateModalOpen, setSpectateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -23,7 +24,11 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
       data: { joinGame: gameId },
     } = await join({ variables: { player: user._id } });
     setSpectateModalOpen(false);
-    if (gameId === "not ok") return;
+    if (gameId.split("not ok:").length !== 1) {
+      let reason = gameId.split("not ok: ")[1];
+      setErrorModalOpen(true);
+      throw 'implement me';
+    }
     await refetchMe();
     setTimeout(() => {
       history.push(`/game/${gameId}`);
@@ -102,6 +107,7 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
               <img
                 src={Cross}
                 onClick={() => sectionHandler(section)}
+                alt={`Join ${section}`}
               />
             </ToolTip>
             
@@ -130,16 +136,16 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
             <h1>{selectedUser.username}</h1>
             <div>
               {selectedUser.inGame
-                ? <>
-                  <p>is already in a duel!</p>
-                  Would you like to spectate?
-                  </>
-                : selectedUser.inLobby
+                ? selectedUser.inLobby
                   ? <>
-                    <p>is in a duel lobby!</p>
+                    <p>is currently in a duel lobby!</p>
                     Would you like to join?
                     </>
-                  : ''
+                  : <>
+                    <p>is already in a duel!</p>
+                    Would you like to spectate?
+                    </>
+                : ''
               }
             </div>
             </>}
