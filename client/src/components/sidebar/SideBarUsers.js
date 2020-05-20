@@ -42,14 +42,19 @@ const SideBarUsers = ({
     let checked = user.ready;
 
     return (
-      <input 
-        type='checkbox'
-        className='user-ready-checkmark'
-        checked={checked}
-        readOnly={true}
+      <label 
+        className="checkmark-container"
         onClick={e => handleReady(e, user, !checked)}
       >
-      </input>
+        <input 
+          type='checkbox'
+          className='user-ready-checkbox'
+          checked={checked}
+          readOnly={true}
+        >
+        </input>
+        <span className='user-ready-checkmark'></span>
+      </label>
     )};
 
   let userList = users.map((user, idx) => (

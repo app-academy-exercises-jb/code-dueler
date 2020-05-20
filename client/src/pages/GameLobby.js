@@ -72,6 +72,7 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
           gameSelfStatus={gameSelfStatus}
           me={me}
           gameId={gameId}
+          showUsers={true}
         />
         <div className="vertical-half">
           <div className="challenge-question-wrapper">

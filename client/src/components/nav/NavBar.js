@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 import HostGameButton from "./HostGameButton";
-import JoinGameButton from "./JoinGameButton";
+import GameLobbyButton from "./GameLobbyButton";
 import StartGameButton from "./StartGameButton";
 import ReadyGameButton from "./ReadyGameButton";
 import SpectatorButton from "./SpectatorButton";
@@ -22,7 +22,9 @@ const NavBar = ({
   players,
   playersReady,
   me,
-  gameId
+  gameId,
+  setShowUsers,
+  showUsers
 }) => {
   const getUserButton = () => {
     if (gameSelfStatus === "host") {
@@ -68,6 +70,7 @@ const NavBar = ({
               userCount={userCount}
               inGame={inGame}
               inGameLobby={inGameLobby}
+              showUsers={showUsers}
             />
           )}
         </div>
@@ -83,7 +86,11 @@ const NavBar = ({
             <ProtectedComponent component={HostGameButton} refetchMe={refetchMe}/>
           </div>
           <div>
-            <ProtectedComponent component={JoinGameButton} />
+            <ProtectedComponent 
+              component={GameLobbyButton}
+              setShowUsers={setShowUsers}
+              showUsers={showUsers}
+            />
           </div>
           </>}
           {inGameLobby && 

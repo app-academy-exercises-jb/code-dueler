@@ -29,11 +29,14 @@ export const GET_ONLINE_USERS = gql`
   }
 `;
 
-export const GET_USERS_IN_GAME = gql`
-  query GameUsers($gameId: ID!) {
-    gameUsers(gameId: $gameId) {
+export const GET_ONLINE_GAMES = gql`
+  query Games {
+    games {
       _id
-      username
+      host
+      challenge
+      connections
+      status
     }
   }
 `;

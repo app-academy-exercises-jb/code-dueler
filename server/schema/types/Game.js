@@ -6,6 +6,7 @@ const Game = mongoose.model('Game');
 const typeDefs = `
   extend type Query {
     queryGameInfo(gameId: String!): GameInfoResponse!
+    games: [GameLog]
   }
   extend type Mutation {
     hostGame(challenge: String!): ID
@@ -33,6 +34,7 @@ const typeDefs = `
   }
   extend type Subscription {
     gameEvent(gameId: String!): GameUpdate!
+    gameLoggedEvent: GameLog!
   }
   type GameUpdate {
     _id: ID!
@@ -56,6 +58,13 @@ const typeDefs = `
     gameStatus: String
     isInGame: Boolean!
     isSpectator: Boolean!
+  }
+  type GameLog {
+    _id: ID!
+    host: String!
+    challenge: String!
+    connections: Int!
+    status: String!
   }
 `;
 
@@ -87,8 +96,6 @@ const resolvers = {
   Query: {
     queryGameInfo: (_, { gameId }, { user, pubsub, ws }) => {
       let game = pubsub.games[gameId];
-
-
       let userInGame = Boolean(game && game.users[user._id]);
 
       return {
@@ -101,6 +108,21 @@ const resolvers = {
         isInGame: Boolean(ws.gameId || pubsub.games.inGame[user._id]),
         isSpectator: Boolean(game && game.spectatorsKey[user._id])
       }
+    },
+    games: (_, __, { pubsub }) => {
+      let games = Object.assign({}, pubsub.games);
+      delete games.inGame;
+
+      return Object.keys(games).map(g => {
+        let game = pubsub.games[g];
+        return {
+          _id: game._id,
+          host: (game.p1 && game.p1.player.username) || 'None',
+          challenge: game.challenge || "FizzBuzz",
+          connections: game.connections,
+          status: game.status
+        }
+      })
     }
   },
   Mutation: {
@@ -138,7 +160,6 @@ const resolvers = {
             || !Boolean(game.p2 && game.p2.ready) ) return "not ok";
           console.log("starting game");
           game.startGame();
-          console.log({game})
           break;
         default:
           throw 'unknown action in handleGame';
@@ -151,7 +172,10 @@ const resolvers = {
     },
     joinGame: async (_, { player: playerId, gameId }, { user, pubsub, ws }) => {
       if ((playerId === undefined && gameId === undefined)
-        || pubsub.subscribers[user._id] === undefined) return "not ok: ";
+        || pubsub.subscribers[user._id] === undefined) {
+          console.log({playerId, gameId, subbed: Boolean(pubsub.subscribers[user._id])})
+          return "not ok: ";
+        }
 
       if (gameId === undefined) {
         // we're joining a game via reference to a player
@@ -164,10 +188,10 @@ const resolvers = {
       const game = pubsub.games[gameId];
       
       if (game === undefined) return "not ok: game not found";
+      if (game.status === "over") return "not ok: game over";
       if (Boolean(game.users[user._id])) return "not ok: duplicate user";
       if (Boolean(pubsub.games.inGame[user._id])) return `not ok: user already in game`;
-      
-      
+
       ws.gameId = gameId;
 
       console.log("joining game")
@@ -291,11 +315,6 @@ const resolvers = {
     gameEvent: {
       subscribe: withFilter(
         (_, __, { pubsub, ws, user }, { variableValues: { gameId } }) => {
-          if (ws.gameId === undefined && user._id === ws.userId) {
-            // reconnected to a stale game, update subscribers
-            ws.gameId = gameId;
-          }
-          
           let game = pubsub.games[ws.gameId];
 
           setTimeout(() => {
@@ -316,6 +335,14 @@ const resolvers = {
       ),
       resolve: payload => {
         // console.log("gameEvent:", {payload});
+        return payload;
+      }
+    },
+    gameLoggedEvent: {
+      subscribe: (_,__,{pubsub}) => {
+        return pubsub.asyncIterator("gameLoggedEvent")
+      },
+      resolve: (payload, _, { pubsub }) => {
         return payload;
       }
     },

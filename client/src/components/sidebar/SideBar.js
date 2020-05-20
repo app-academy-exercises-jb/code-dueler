@@ -5,9 +5,21 @@ import { useMutation } from "@apollo/react-hooks";
 import { JOIN_GAME, HANDLE_GAME } from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
 import ToolTip from "../util/ToolTip";
-import Cross from "../../images/cross.png"
+import InGameUsers from "./InGameUsers";
+import GamesList from "./GamesList";
 
-const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refetchMe, gameId }) => {
+const SideBar = ({ 
+  users,
+  games,
+  players,
+  spectators,
+  inGame,
+  gameSelfStatus,
+  me,
+  refetchMe,
+  gameId,
+  showUsers,
+ }) => {
   ReactModal.setAppElement("#root");
 
   const [errorModelOpen, setErrorModalOpen] = useState(false);
@@ -19,10 +31,14 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
 
   const history = useHistory();
 
-  const joinGame = async (user) => {
+  const joinGame = async ({user, game}) => {
+    let variables = user 
+      ? {player: user._id}
+      : {gameId: game};
+
     const {
       data: { joinGame: gameId },
-    } = await join({ variables: { player: user._id } });
+    } = await join({ variables });
     setSpectateModalOpen(false);
     if (gameId.split("not ok:").length !== 1) {
       let reason = gameId.split("not ok: ")[1];
@@ -35,45 +51,10 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
     }, 10);
   };
 
-  const sectionHandler = section => {
-    if (section === "Spectators") {
-      if (gameSelfStatus !== 'spectator') {
-        handleGame({variables: { gameId, action: "spectate" }});
-      }
-    } else if (section === "Players") {
-      if (players.length < 2 && gameSelfStatus === 'spectator') {
-        handleGame({variables: { gameId, action: "play" }});
-      }
-    }
-  };
-
-  const getContent = (section, users) => {
-    if (section === 'Players') {
-      switch (gameSelfStatus) {
-        case 'host': return "You're already host!";
-        case 'player': return "You're already a player!";
-        case 'spectator': return (
-          players.length === 2 
-            ? "Players already full!"
-            : players.length === 1
-              ? "Challenge host!"
-              : "Claim host!");
-        default: throw `unknown game self status: ${gameSelfStatus}`;
-      }
-    } else {
-        switch (gameSelfStatus) {
-          case 'host': case 'player': 
-            return 'Become a spectator';
-          case 'spectator': return "You're already a spectator!";
-          default: throw `unknown game self status: ${gameSelfStatus}`;
-        }
-    }
-  };
-
-  return (
-    <div className="sidebar-wrapper scroll">
-      <div className="user-list-wrapper">
-        {!inGame && 
+  const sideBarContent = () => {
+    if (showUsers) {
+      if (!inGame) {
+        return (
           <SideBarUsers 
             users={users}
             inGame={inGame}
@@ -83,46 +64,35 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
               setSpectateModalOpen(true);
             }}
           />
-        }
-        {inGame && [
-          ['Players', players],
-          ['Spectators', spectators],
-        ].map(([section, users]) => (
-        <div key={section}>
-          <div className={`sidebar-section`}>
-            <ToolTip 
-              content={getContent(section, users)}
-              time={200}
-              positionClass='section-tooltip'
-            >
-              <p
-                onClick={() => sectionHandler(section)}
-              >{section}</p>
-            </ToolTip>
-            <ToolTip
-              content={getContent(section, users)}
-              time={200}
-              positionClass='section-button-tooltip'
-            >
-              <img
-                src={Cross}
-                onClick={() => sectionHandler(section)}
-                alt={`Join ${section}`}
-              />
-            </ToolTip>
-            
-          </div>
-          <SideBarUsers 
-            users={users}
-            playersSection={section==='Players'}
-            inGame={inGame}
-            action={() => {}}
+        );
+      } else {
+        return (
+          <InGameUsers
+            players={players}
+            spectators={spectators}
             gameSelfStatus={gameSelfStatus}
             me={me}
             gameId={gameId}
+            handleGame={handleGame}
           />
-          <br />
-        </div>))}
+        );
+      }
+    } else {
+      return (
+      <GamesList 
+        games={games}
+        joinGame={joinGame}
+      />
+      );
+    }
+  }
+
+  let className = `sidebar-wrapper scroll ${showUsers ? "" : "game-lobbies"}`;
+
+  return (
+    <div className={className}>
+      <div className="user-list-wrapper">
+        {sideBarContent()}
       </div>
       <ReactModal
         isOpen={spectateModalOpen}
@@ -159,7 +129,7 @@ const SideBar = ({ users, players, spectators, inGame, gameSelfStatus, me, refet
             </button>
             <button
               className="modal-accept"
-              onClick={() => joinGame(selectedUser)}
+              onClick={() => joinGame({user: selectedUser})}
             >
               Accept
             </button>

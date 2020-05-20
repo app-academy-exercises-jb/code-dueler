@@ -10,6 +10,19 @@ const presenceUtils = pubsub => {
       });
     }, 100);
   };
+
+  const publishGameLoggedEvent = game => {
+    setTimeout(() => {
+      pubsub.publish("gameLoggedEvent", {
+        _id: game._id,
+        host: (game.p1 && game.p1.player.username) || 'None',
+        challenge: game.challenge || "FizzBuzz",
+        connections: game.connections,
+        status: game.status
+      });
+    }, 100);
+  };
+
   const addWs = ({ws, user}) => {
     console.log(`${user._id} connected to the websocket`);
 
@@ -37,6 +50,7 @@ const presenceUtils = pubsub => {
       game.users[user._id] = ws;
       ws.gameId = game._id;
       game.connections++;
+      pubsub.publishGameLoggedEvent(game);
     }
   };
 
@@ -85,6 +99,7 @@ const presenceUtils = pubsub => {
   }
 
   pubsub.publishUserLoggedEvent = publishUserLoggedEvent;
+  pubsub.publishGameLoggedEvent = publishGameLoggedEvent;
   pubsub.addWs = addWs;
   pubsub.removeWs = removeWs;
   pubsub.loginUser = loginUser;

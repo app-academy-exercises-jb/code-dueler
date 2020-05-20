@@ -52,6 +52,7 @@ const gameUtil = pubsub => {
 
     // tell everyone the user entered the lobby
     pubsub.publishUserLoggedEvent(user, true);
+    pubsub.publishGameLoggedEvent(inMemGame);
   }
 
   pubsub.initGame = initGame;

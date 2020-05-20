@@ -78,9 +78,12 @@ const resolvers = {
     logout(_, __, { user, pubsub, ws}) {
       if (user._id !== ws.userId
           || pubsub.subscribers[user._id] === undefined
-          || pubsub.subscribers[user._id].every(s =>
-            s.ws !== ws) ) return "not ok";
+          || pubsub.subscribers[user._id].every(subWs =>
+            subWs !== ws) ) {
+        return "not ok";
+      }
 
+      console.log("logging out", user.username)
       setTimeout(() => {
         pubsub.logoutUser({user, ws});
       }, 0);
@@ -90,6 +93,7 @@ const resolvers = {
   Subscription: {
     userLoggedEvent: {
       subscribe: (_, __, { pubsub }) => {
+        console.log("subscribing to user events")
         return pubsub.asyncIterator("userLoggedEvent");
       },
       resolve: async (payload, _, { pubsub }) => {

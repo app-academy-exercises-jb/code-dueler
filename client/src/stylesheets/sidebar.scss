@@ -9,6 +9,7 @@
   font-size: 22px;
   overflow-x: hidden;
   overflow-y: scroll;
+  transition: all .5s ease-in-out;
 }
 
 .user-list-wrapper {
@@ -36,9 +37,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  
   > div {
     display: flex;
+    align-items: center;
   }
   > div > div {
     z-index: 0;
@@ -204,7 +206,7 @@
 .checkbox-tooltip {
   position: absolute;
   top: -2px;
-  left: calc(-100% - 110px);
+  left: calc(-100% - 135px);
   width: 110px;
 }
 
@@ -247,6 +249,96 @@
   border-color: transparent transparent #6E7DAB transparent;
 }
 
-.user-ready-checkmark {
+.user-ready-checkbox {
   justify-self: flex-end;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  -webkit-appearance: none;
+  transition: all .2s ease-in;
+}
+
+.user-ready-checkmark {
+  position: absolute;
+  top: 1.5px;
+  right: -4px;
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border: 3px solid black;
+}
+
+[type="checkbox"]:not(:checked)+.user-ready-checkmark::after,
+[type="checkbox"]:checked+.user-ready-checkmark::after {
+  content: "\2713";
+  position: absolute;
+  top: 0px;
+  left: 8px;
+  color: green;
+  font-size: 16px;
+  transition: all .6s;
+  line-height: 0.3;
+}
+
+[type="checkbox"]:not(:checked)+.user-ready-checkmark::after {
+  // transition: all .2s ease-in;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.user-ready-checkbox:checked+.user-ready-checkmark::after {
+  // transition: all .2s ease-in;
+  opacity: 1;
+  transform: scale(3);
+}
+
+.checkmark-container {
+  justify-self: flex-end;
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+
+.game-lobbies {
+  min-width: 50%;
+}
+
+.games-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 0 !important;
+  >h1 {
+    font-size: 2em;
+    font-weight: 400;
+    text-decoration: underline;
+  }
+}
+
+.games-list {
+  width: 100%;
+  font-weight: 100;
+  border-spacing: 0.5rem;
+}
+
+.games-list-heading {
+  width: 100%;
+  margin: 1rem 0;
+  height: 3rem;
+
+  th {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+.games-item {
+  padding: 0.5rem 12px 0.5rem 0;
+  height: 2rem;
+  
+  &:hover {
+    cursor: pointer;
+    background-color: #45495a;
+    color: #e4e6c3;
+  }
 }

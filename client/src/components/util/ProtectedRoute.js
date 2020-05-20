@@ -1,12 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Route, Redirect } from "react-router-dom";
 import { useQuery, useApolloClient, useLazyQuery } from "@apollo/react-hooks";
 import {
   CURRENT_USER,
   IS_LOGGED_IN,
   GET_ONLINE_USERS,
+  GET_ONLINE_GAMES,
 } from "../../graphql/queries";
-import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
+import { 
+  USER_LOGGED_EVENT,
+  GAME_LOGGED_EVENT, 
+} from "../../graphql/subscriptions";
 
 const subscribeToUserEvents = (
   subscribeToMore,
@@ -25,10 +29,7 @@ const subscribeToUserEvents = (
         next = { users: Object.assign([], prev.users) },
         idx = next.users.findIndex((u) => u._id === user._id);
 
-      if (user._id === me._id
-        && user.inGame === false
-        && user.loggedIn === true
-        && networkStatus !== 4) {
+      if (user._id === me._id) {
           refetchMe();
       }
 
@@ -56,12 +57,24 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
   const client = useApolloClient();
   const { refetch: refetchMeLogged, data, loading, error } = useQuery(IS_LOGGED_IN);
 
-  const [loadMe, { refetch: refetchMe, ...me }] = useLazyQuery(CURRENT_USER, {
+  const subscribedToUsers = useRef(false);
+
+  const [
+    loadMe,
+    { 
+      refetch: refetchMe,
+      ...me
+    }
+  ] = useLazyQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
-  const [loadUsers, { subscribeToMore, ...onlineUsers }] = useLazyQuery(GET_ONLINE_USERS, {
+  const [loadUsers, { subscribeToMore: subscribeToUsers, ...onlineUsers }] = useLazyQuery(GET_ONLINE_USERS, {
+    fetchPolicy: "network-only",
+  });
+  
+  const [loadGames, { subscribeToMore: subscribeToGames, ...games }] = useLazyQuery(GET_ONLINE_GAMES, {
     fetchPolicy: "network-only",
   });
 
@@ -70,25 +83,48 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
 
     if (me.called === false) {
       loadMe();
+      loadGames();
       loadUsers();
     } 
     
     if (me.loading === false
         && me.called === true
-        && onlineUsers.loading === false) {
-      setTimeout(() => {
-        subscribeToUserEvents(subscribeToMore, me, client, refetchMe, refetchMeLogged);
-      }, 10);
+        && onlineUsers.loading === false
+        && subscribedToUsers.current === false) {
+      subscribeToUserEvents(subscribeToUsers, me, client, refetchMe, refetchMeLogged);
+      subscribeToGames({
+        document: GAME_LOGGED_EVENT,
+        updateQuery: (prev, { subscriptionData }) => {
+          const { gameLoggedEvent: game } = subscriptionData.data,
+            next = { games: Object.assign([], prev.games) },
+            idx = next.games.findIndex((g) => g._id === game._id);
+
+          if (idx === -1 && game.status !== "over") {
+            // if we have a brand new game, splice it in
+            next.games.splice(0, 0, game);
+          } else {
+            if (game.status === "over") {
+              next.games.splice(idx, 1);
+            } else {
+              next.games.splice(idx, 1, game);
+            }
+          }
+            
+          return next;
+        }
+      });
+      subscribedToUsers.current = true;
     }
-  }, [data, onlineUsers.loading, me.loading, me.called]);
+  }, [data, onlineUsers.loading, me.loading, me.called, subscribedToUsers]);
 
   if (!redirectTo) redirectTo = "/login";
   if (loading || error || !data || 
       (data.isLoggedIn && 
-        (!me.called || (me.called && me.loading)))) {
+        (!me.called || (me.called && !me.data)))) {
     return null;
   } else if (data.isLoggedIn) {
-    if (!onlineUsers.data || onlineUsers.error) return null;
+    if (!onlineUsers.data || onlineUsers.error
+        || !games.data || games.error) return null;
     
     return (
       <Route
@@ -97,6 +133,7 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
         render={() => {
           return (
             <Component
+              games={games.data.games}
               users={onlineUsers.data.users}
               me={{networkStatus: me.networkStatus, ...me.data.me}}
               refetchMeLogged={refetchMeLogged}

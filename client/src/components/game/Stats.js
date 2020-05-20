@@ -17,7 +17,7 @@ export default ({
     name = "opponent";
   }
 
-  const username = stats ? stats.player.username : title;
+  const username = stats ? stats.player.username : "";
   return (
     <>
       <div className="stats-form">

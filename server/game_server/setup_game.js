@@ -18,26 +18,24 @@ const setupGame = pubsub => game => {
     game.status = "started";
     await game.Game.findOneAndUpdate(
       {_id: game._id},
-      { $set: { status: "started" }}
+      { $set: { status: "started" }},
+      { new: true }
     );
     pubsub.publish("gameEvent", game);
+    pubsub.publishGameLoggedEvent(game);
+    Object.keys(game.users).forEach(user => {
+      pubsub.publishUserLoggedEvent({_id: user}, Boolean(pubsub.subscribers[user]));
+    });
   };
 
   const endGame = (player) => {
     const finishGame = async () => {
       console.log("finishing game")
-      // Object.keys(game.users).forEach(user => {
-      //   pubsub.publishUserLoggedEvent({_id: user}, Boolean(pubsub.subscribers[user]));
-      // });
-      // game.users = {};
       game.status = "over";
       
       //__TODO__ sometimes we'll have to delete as follows, but not always
       // delete game.users[user._id];
       pubsub.games.inGame[player._id] = false;
-      
-      pubsub.publish("gameEvent", game);
-      pubsub.publishUserLoggedEvent(player, Boolean(pubsub.subscribers[player._id]));
 
       await game.Game.findOneAndUpdate({_id: game._id}, { $set: {status: "over"}}, { new: true })
         // __TODO__ change these console logs to something useful
@@ -51,6 +49,10 @@ const setupGame = pubsub => game => {
         .catch(err => {
           console.log(err);
         });
+      
+      pubsub.publish("gameEvent", game);
+      pubsub.publishUserLoggedEvent(player, Boolean(pubsub.subscribers[player._id]));
+      pubsub.publishGameLoggedEvent(game);
     };
     // this function should only be called by one of the two players
     // if (player._id !== game.p1.player._id
@@ -58,7 +60,7 @@ const setupGame = pubsub => game => {
       
     setTimeout(() => {
       const{ p1, p2, _id } = game;
-      // check if both p1 and p2 are still connected .2s after a DC
+      // check if both p1 and p2 are still connected .6s after a DC
       if (
         (p1 && pubsub.subscribers[p1.player._id] !== undefined) ||
         (p2 && pubsub.subscribers[p2.player._id] !== undefined)
@@ -75,7 +77,7 @@ const setupGame = pubsub => game => {
           console.log("not finishing after all:")
         }
       }
-    }, 200);
+    }, 600);
   };
 
   const initializeGame = () => {
@@ -84,10 +86,11 @@ const setupGame = pubsub => game => {
     game.status = "started"
     pubsub.games.inGame[game.p1.player._id] = game._id;
     pubsub.games.inGame[game.p2.player._id] = game._id;
-    pubsub.games.pendingInvites[game.p2.player._id] = false;
-    pubsub.games.pendingInvites[game.p2.player._id] = false;
+    // pubsub.games.pendingInvites[game.p2.player._id] = false;
+    // pubsub.games.pendingInvites[game.p2.player._id] = false;
     setTimeout(() => {
       pubsub.publish("gameEvent", game);
+      pubsub.publishGameLoggedEvent(game);
     }, 0);
   };
 
@@ -121,7 +124,7 @@ const setupGame = pubsub => game => {
   }
 
   const handleAction = async (userClass, action, user) => {
-    console.log(`${action}ing ${userClass}: ${user.username}`);
+    console.log(`${action}ing ${userClass}: ${user.username || user._id}`);
 
     let find = findUser(userClass),
       isSpectator = userClass === "spectator",
@@ -150,12 +153,12 @@ const setupGame = pubsub => game => {
             game.p1 = setupPlayer(user, player);
             game.p1.ready = true;
             await player.save();
-            await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p1: player }});
+            await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p1: player }}, {new: true});
           } else if (!Boolean(game.p2)) {
             console.log("adding p2")
             game.p2 = setupPlayer(user, player);
             await player.save();
-            await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p2: player }});
+            await game.Game.findOneAndUpdate({_id: game._id}, { $set: { p2: player }}, {new: true});
           } else {
             console.log('can\'t add player when already full')
             throw "can't add player when already full"
@@ -169,7 +172,7 @@ const setupGame = pubsub => game => {
         pubsub.publish("gameEvent", game);
         pubsub.publishUserLoggedEvent(user, Boolean(pubsub.subscribers[user._id]));
 
-        isSpectator && await game.Game.findOneAndUpdate({_id: game._id}, { $push: { spectators: user._id }})
+        isSpectator && await game.Game.findOneAndUpdate({_id: game._id}, { $push: { spectators: user._id }}, { new: true })
           .then(() => {
             console.log("added spectator")
           })
@@ -178,6 +181,8 @@ const setupGame = pubsub => game => {
             console.log("failed to add spectator")
           });
       }
+
+      pubsub.publishGameLoggedEvent(game);
     } else if (action === "remove") {
       if (find(user)) {
         console.log(`found ${userClass}, removing`);
@@ -250,10 +255,14 @@ const setupGame = pubsub => game => {
 
         game.connections -= 1;
         
+        if (game.connections === 0 && game.status !== "initializing") {
+          console.log("deleting in memory game")
+          delete pubsub.games[game._id];
+        }
+
         pubsub.publish("gameEvent", game);
         pubsub.publishUserLoggedEvent(user, Boolean(pubsub.subscribers[user._id]));
-
-        
+        pubsub.publishGameLoggedEvent(game);
       } else {
         throw `can't remove ${userClass} which is not in game`
       }

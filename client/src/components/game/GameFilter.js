@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import GameLobby from "../../pages/GameLobby";
 import GameScreen from "../../pages/GameScreen";
 import Spectator from "../spectator/Spectator";
@@ -11,15 +11,14 @@ import GameData from "./GameData";
 export default ({ me, ...props }) => {
   const { id: gameId } = useParams();
   let history = useHistory();
-  let [joinedGame, setJoinedGame] = useState(me.inGame);
-  let [gameStarted, setGameStarted] = useState("initializing");
+  const joinedGame = useRef(false);
+  const [gameStarted, setGameStarted] = useState("initializing");
 
   const { 
     data: gameData,
     loading: gameLoading,
     error: gameError,
     refetch: refetchGame,
-    networkStatus
   } = useQuery(
     IN_GAME_INFO, {
     variables: { gameId },
@@ -56,38 +55,38 @@ export default ({ me, ...props }) => {
           if (res.data 
               && !(res.data.joinGame === 'wrong ws'
               || res.data.joinGame === 'not ok')) {
+            joinedGame.current = true;
             return await props.refetchMe();
           }
         })
-        .then(res => {
-          if (res.data && res.data.me.inGame === true) {
-            setJoinedGame(true);
-          }
-        });
     }
 
     if (shouldUpdateExists === undefined) return () => {};
     if (shouldUpdateExists === false
-        || gameStatus === 'wrong ws') {
+        || gameStatus === 'wrong ws'
+        || ((gameStatus === "not ok"
+        || shouldUpdateInGame === false)
+        && joinedGame.current === true)) {
       history.push('/');
     }
 
-    if (joinedGame === false
+    if (joinedGame.current === false
         && shouldUpdateSpectator === false
         && shouldUpdateInGame === false) {
       joinGame();
-    } else if ((gameStatus === "not ok"
-      || shouldUpdateInGame === false)
-      && joinedGame === false) {
-        history.push('/');
+    } else if (shouldUpdateInGame === true
+        && me.inGame === true
+        && joinedGame.current === false
+        && gameStatus !== "not ok"
+        && gameStatus !== "wrong ws") {
+      joinedGame.current = true;
     }
   }, [me.inGame, shouldUpdateInGame, shouldUpdateSpectator, gameStatus, gameData, gameLoading]);
 
   // function returned from useEffect will run on component unmount
   useEffect(
     () => () => {
-      leaveGame();
-      history.push('/');
+      if (joinedGame.current) leaveGame();
     },
     []
   );
@@ -103,7 +102,8 @@ export default ({ me, ...props }) => {
     return <Redirect to={'/'} />
   } else {
     if (me.inGame === false
-        && joinedGame === true
+        && me.networkStatus !== 4
+        && joinedGame.current === true
         && isInGame === true) {
       history.push('/');
       return null;

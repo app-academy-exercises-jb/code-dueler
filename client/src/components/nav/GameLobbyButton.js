@@ -1,11 +1,15 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-const JoinGameButton = props => {
+const GameLobbyButton = ({ 
+  setShowUsers,
+  showUsers,
+  ...props
+}) => {
   const history = useHistory();
 
   const handleClick = e => {
-    history.push('/games')
+    setShowUsers(!showUsers);
   };
 
   return (
@@ -13,9 +17,9 @@ const JoinGameButton = props => {
       className="nav-button"
       onClick={handleClick}
     >
-      <button>Join Game</button>
+      <button>{showUsers ? "Join Game" : "Global Lobby"} </button>
     </div>
   );
 };
 
-export default JoinGameButton;
+export default GameLobbyButton;

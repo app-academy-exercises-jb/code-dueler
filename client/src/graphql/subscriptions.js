@@ -29,6 +29,18 @@ export const USER_LOGGED_EVENT = gql`
   }
 `;
 
+export const GAME_LOGGED_EVENT = gql`
+  subscription gameUpdates {
+    gameLoggedEvent {
+      _id
+      host
+      challenge
+      connections
+      status
+    }
+  }
+`;
+
 export const ON_INVITATION = gql`
   subscription onInvitation {
     invitationEvent {
