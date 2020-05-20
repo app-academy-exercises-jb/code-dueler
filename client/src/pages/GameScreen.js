@@ -3,11 +3,10 @@ import NavBar from "../components/nav/NavBar";
 import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
-import { useMutation } from "@apollo/react-hooks";
 import { useHistory } from "react-router-dom";
 import ReactModal from "react-modal";
-import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
+import GameTour from "../components/tour/GameTour";
 
 export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
   const history = useHistory();
@@ -74,6 +73,8 @@ export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
         refetchMeLogged={refetchMeLogged}
       />
 
+      <GameTour />
+
       <div className="main">
         <div className="game-screen">
           <div className="game-left">
@@ -102,7 +103,7 @@ export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
           className={`modal-overlay`}
           shouldCloseOnEsc={true}
           onRequestClose={() => setModalOpen(false)}
-          >
+        >
           <div className={`modal`}>
             <div className={`modal-info center`}>
               <h1>{gameOverMessage}</h1>
@@ -111,7 +112,7 @@ export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
               <button
                 className="modal-decline decline-hover"
                 onClick={handleModalClose}
-                >
+              >
                 Go back to the lobby
               </button>
               {/* <button className="game-over-stay">

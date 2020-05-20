@@ -1,0 +1,79 @@
+.credits {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  font-family: 'Roboto', sans-serif;
+  color: #D4F2D2;
+}
+
+.credits-inner {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: #575366;
+  flex-direction: column;
+  width: 800px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+  padding: 1rem 1rem;
+}
+
+.credits-header {
+  font-size: 4rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.creators {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 2rem;
+}
+
+.creator {
+  text-align: center;
+}
+
+.portrait-wrapper {
+  background-color: #32292F;
+  border: 1px solid #0E1428;
+  border-radius: 50%;
+  padding: .7rem;
+}
+
+.portrait {
+  background-position: center;
+  background-size: cover;
+  width: 300px;
+  height: 300px;
+  overflow: hidden;
+  
+  
+}
+
+.creator-name {
+  margin-bottom: 1rem;
+}
+
+.creator-links {
+  font-size: 3rem;
+  display: flex;
+  justify-content: space-evenly;
+  margin: 1rem;
+}
+
+.jacob {
+  background-image: url(https://codedueler.s3.us-east-2.amazonaws.com/Profile.jpg);
+  border-radius: 50%;
+}
+
+.jorge {
+  background-image: url(https://codedueler.s3.us-east-2.amazonaws.com/headshot.png);
+}
+
+@media only screen and (max-width: 600px) {
+  .creators {
+    flex-direction: column;
+  }
+}

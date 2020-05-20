@@ -41,10 +41,9 @@ const subscribeToUserEvents = (
         if (me._id === next.users[idx]._id) {
           client.subscriptionClient.unsubscribeAll();
           client.subscriptionClient.close();
-          client.clearStore()
-            .then(() => {
-              refetchMeLogged();
-            });
+          client.clearStore().then(() => {
+            refetchMeLogged();
+          });
         }
         next.users.splice(idx, 1);
       }
@@ -117,7 +116,7 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
     }
   }, [data, onlineUsers.loading, me.loading, me.called, subscribedToUsers]);
 
-  if (!redirectTo) redirectTo = "/login";
+  if (!redirectTo) redirectTo = "/welcome";
   if (loading || error || !data || 
       (data.isLoggedIn && 
         (!me.called || (me.called && !me.data)))) {

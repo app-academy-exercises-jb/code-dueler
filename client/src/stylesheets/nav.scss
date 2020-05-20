@@ -24,6 +24,8 @@
   font-size: 48px;
   padding: 0rem 0rem;
   // margin-right: 3.5rem;
+  // margin-left: 9rem;
+  // width: 15%;
   &:hover {
     cursor: pointer;
   }
@@ -85,4 +87,10 @@
   &:hover {
     background-color: #63656a;
   }
+}
+
+.nav-right {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

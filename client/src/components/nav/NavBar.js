@@ -9,6 +9,7 @@ import StartGameButton from "./StartGameButton";
 import ReadyGameButton from "./ReadyGameButton";
 import SpectatorButton from "./SpectatorButton";
 import ToolTip from "../util/ToolTip";
+import Credits from "../credits/Credits";
 
 const NavBar = ({
   userCount,
@@ -102,6 +103,9 @@ const NavBar = ({
           <div>
             <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />
           </div>
+          <Link className="nav-button" to="/credits">
+            Credits
+          </Link>
         </div>
       </div>
       <div className="nav-bar-spacer"></div>
