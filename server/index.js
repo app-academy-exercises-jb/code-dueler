@@ -117,7 +117,10 @@ app.listen = function () {
             process.env.SECRET_OR_KEY
           );
 
-          if (!user._id) return false;
+          if (!user._id) {
+            console.log("found rogue user:", {user})
+            return false;
+          }
 
           pubsub.addWs({ws, user});
 
@@ -131,6 +134,7 @@ app.listen = function () {
       onDisconnect: (ws) => {
         if (ws.userId === undefined) {
           console.log('found rogue ws:', {ws});
+          ws.close();
           return;
         }
         console.log(`${ws.userId} disconnected from the websocket`);

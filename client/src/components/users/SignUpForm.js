@@ -63,7 +63,7 @@ export default () => {
       <button className="session-button" disabled={loading}>
         Sign Up
       </button>
-      <Link to="/login" className="logo-nav">
+      <Link to="/login">
         Already have an account? Sign in
       </Link>
     </form>

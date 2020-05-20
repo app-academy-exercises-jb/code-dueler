@@ -2,10 +2,10 @@ Before following the instructions below, please ensure you have a local .env fil
 
 ```
 git clone https://github.com/app-academy-exercises-jb/code-dueler.git
-cd client 
-  && npm install 
-  && cd ../server
-  && npm install && cd ..
+cd client \
+  && npm install \
+  && cd ../server \
+  && npm install && cd .. 
 docker-compose up
 ```
 

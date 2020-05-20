@@ -109,11 +109,11 @@ const createClient = async () => {
   }
 
   client.onResetStore(() => {
-    localStorage.clear();
+    localStorage.removeItem('token');
   });
 
   client.onClearStore(() => {
-    localStorage.clear();
+    localStorage.removeItem('token');
   });
 
   if (localStorage.getItem("token")) {

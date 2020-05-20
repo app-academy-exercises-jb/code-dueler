@@ -63,6 +63,7 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
         gameId={gameId}
         playersReady={playersReady}
         players={playersInGame}
+        refetchMeLogged={refetchMeLogged}
       />
       <div className="main" id="game-lobby">
         <SideBar

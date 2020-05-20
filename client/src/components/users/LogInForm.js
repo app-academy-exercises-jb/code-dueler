@@ -80,7 +80,7 @@ export default () => {
       >
         Demo User
       </button>
-      <Link to="/signup" className="logo-nav">
+      <Link to="/signup">
         Create an account
       </Link>
     </form>

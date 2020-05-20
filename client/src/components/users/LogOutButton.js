@@ -11,7 +11,6 @@ export default ({ refetchMeLogged }) => {
   return (
     <div
       className="nav-button"
-      // className="button-nav"
       onClick={async () => {
         const {
           data: { logout: ok },

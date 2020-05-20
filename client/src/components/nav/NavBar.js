@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import LogOutButton from "../users/LogOutButton";
 import { Link } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
@@ -10,6 +10,7 @@ import ReadyGameButton from "./ReadyGameButton";
 import SpectatorButton from "./SpectatorButton";
 import ToolTip from "../util/ToolTip";
 import Credits from "../credits/Credits";
+import {ReactComponent as BurgerIcon} from "../../images/hamburger_icon.svg"
 
 const NavBar = ({
   userCount,
@@ -27,6 +28,18 @@ const NavBar = ({
   setShowUsers,
   showUsers
 }) => {
+  const burger = useRef();
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    function handleResize() {
+      setWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const getUserButton = () => {
     if (gameSelfStatus === "host") {
       if (playersReady) {
@@ -59,6 +72,69 @@ const NavBar = ({
         />
       );
     } 
+  };
+
+  const getNavButtons = () => {
+    let lobbyComponent;
+
+    if (inLobby) {
+      lobbyComponent = <>
+        <div>
+          <ProtectedComponent component={HostGameButton} refetchMe={refetchMe}/>
+        </div>
+        <div>
+          <ProtectedComponent 
+            component={GameLobbyButton}
+            setShowUsers={setShowUsers}
+            showUsers={showUsers}
+          />
+        </div>
+      </>;
+    } else if (inGameLobby) {
+      lobbyComponent = <ProtectedComponent>
+        <div>
+          {getUserButton()}
+        </div>
+      </ProtectedComponent>;
+    }
+
+    return <>
+      {lobbyComponent}
+      <div>
+        <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />
+      </div>
+      <div>
+        <div className="nav-button">
+        <Link to="/credits">
+          Credits
+        </Link>
+        </div>
+      </div>
+    </>;
+  }
+
+  const shouldBurger = () => {
+    if (width > 1000) return true;
+    if (width < 681 && width > 610) return true;
+    return false;
+  }
+
+  const closeMenu = e => {
+    if (burger.current && !burger.current.contains(e.target)) {
+      burger.current.classList.add("hidden");
+      window.removeEventListener('click', closeMenu);
+    }
+  }
+
+  const clickHandler = (e) => {
+    e.stopPropagation();
+    if (burger.current.classList.contains('hidden')) {
+      burger.current.classList.remove("hidden");
+      window.addEventListener('click', closeMenu);
+    } else {
+      burger.current.classList.add("hidden");
+      window.removeEventListener('click', closeMenu);
+    }
   }
 
   return (
@@ -75,38 +151,23 @@ const NavBar = ({
             />
           )}
         </div>
-        <div className="other-left">&nbsp;</div>
         <div className="logo-wrapper">
           <Link to="/" className="logo-nav">
             CodeDueler
           </Link>
         </div>
-        <div className="nav-buttons">
-          {inLobby && <>
-          <div>
-            <ProtectedComponent component={HostGameButton} refetchMe={refetchMe}/>
+        
+        {shouldBurger()
+        ? <div className="nav-buttons">
+            {getNavButtons()}
           </div>
-          <div>
-            <ProtectedComponent 
-              component={GameLobbyButton}
-              setShowUsers={setShowUsers}
-              showUsers={showUsers}
-            />
-          </div>
-          </>}
-          {inGameLobby && 
-          <ProtectedComponent>
-            <div>
-              {getUserButton()}
+        : <div className="nav-burger" onClick={clickHandler}>
+            <BurgerIcon fill="#D4F2D2" />
+            <div className="burger-content hidden" ref={burger}>
+              {getNavButtons()}
             </div>
-          </ProtectedComponent>}
-          <div>
-            <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />
           </div>
-          <Link className="nav-button" to="/credits">
-            Credits
-          </Link>
-        </div>
+        }
       </div>
       <div className="nav-bar-spacer"></div>
     </>
