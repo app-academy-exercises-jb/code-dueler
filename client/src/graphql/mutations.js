@@ -42,6 +42,12 @@ export const ADD_MESSAGE = gql`
   }
 `;
 
+export const KICK_PLAYER = gql`
+  mutation KickPlayer($player: ID!, $action: String!) {
+    kickPlayer(player: $player, action: $action)
+  }
+`;
+
 export const INVITE_PLAYER = gql`
   mutation InvitePlayer($invitee: ID!) {
     invitePlayer(invitee: $invitee) {
@@ -124,10 +130,10 @@ export const UPDATE_GAME_USER_CODE = gql`
 export const UPDATE_GAME_USER_STATUS = gql`
   mutation UpdateGameUserStatus(
     $player: ID!
-    $status: String!
-    $gameId: String!
+    $ready: Boolean!
+    $gameId: ID!
   ) {
-    updateGameUserStatus(player: $player, status: $status, gameId: $gameId) {
+    updateGameUserStatus(player: $player, ready: $ready, gameId: $gameId) {
       ...GameUserDetails
     }
   }
@@ -140,14 +146,20 @@ export const LEAVE_GAME = gql `
   }
 `;
 
-export const SPECTATE_GAME = gql`
-  mutation SpectateGame($gameId: String!) {
-    spectateGame(gameId: $gameId)
+export const HANDLE_GAME = gql`
+  mutation HandleGame($gameId: String!, $action: String!) {
+    handleGame(gameId: $gameId, action: $action)
   }
 `;
 
-export const SPECTATE_USER = gql`
-  mutation SpectateUser($player: ID!) {
-    spectateUser(player: $player)
+export const JOIN_GAME = gql`
+  mutation JoinGame($player: ID, $gameId: ID) {
+    joinGame(player: $player, gameId: $gameId)
+  }
+`;
+
+export const HOST_GAME = gql`
+  mutation HostGame($challenge: String!) {
+    hostGame(challenge: $challenge)
   }
 `;

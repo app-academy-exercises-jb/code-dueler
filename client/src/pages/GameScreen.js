@@ -3,49 +3,23 @@ import NavBar from "../components/nav/NavBar";
 import Chat from "../components/chat/Chat";
 import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import CodeEditor from "../components/codeEditor/CodeEditor";
-import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useHistory } from "react-router-dom";
-import { ON_GAME } from "../graphql/subscriptions";
 import ReactModal from "react-modal";
-import { LEAVE_GAME } from "../graphql/mutations";
 import PlayerStats from "../components/game/PlayerStats";
 import GameTour from "../components/tour/GameTour";
 
-export default ({ me, gameId, refetchMe }) => {
-  const { loading, error, data } = me;
+export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
   const history = useHistory();
-  const [gameEvent, setGameEvent] = useState(null);
   const [opponentStats, setOpponentStats] = useState(null);
   const [ownStats, setOwnStats] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState("");
-  const [leaveGame] = useMutation(LEAVE_GAME);
+  const [spectators, setSpectators] = useState([]);
 
-  // function returned from useEffect will run on component unmount
-  useEffect(
-    () => () => {
-      if (!data) return;
-      leaveGame({
-        variables: {
-          player: data.me._id,
-          gameId,
-        },
-      });
-    },
-    []
-  );
-
-  useSubscription(ON_GAME, {
-    fetchPolicy: "network-only",
-    variables: {
-      gameId,
-    },
-    onSubscriptionData: ({ client, subscriptionData }) => {
-      const e = subscriptionData.data.gameEvent;
-      setGameEvent(e);
-
+  useEffect(() => {
+    if (gameEvent) {
       let self, opponent;
-      if (e.p1.player._id === data.me._id) {
+      if (gameEvent.p1.player._id === me._id) {
         self = "p1";
         opponent = "p2";
       } else {
@@ -53,26 +27,27 @@ export default ({ me, gameId, refetchMe }) => {
         self = "p2";
       }
 
-      if (e.status === "initializing") {
-        console.log("initializing");
-      } else if (e.status === "ready") {
-        console.log("ready");
-      } else if (e.status === "ongoing") {
-        setOwnStats(e[self]);
-        setOpponentStats(e[opponent]);
-      } else if (e.status === "over") {
-        if (e.winner === null) {
+      if (gameEvent.status === "initializing") {
+        
+      } else if (gameEvent.status === "started") {
+        setOwnStats(gameEvent[self]);
+        setOpponentStats(gameEvent[opponent]);
+      } else if (gameEvent.status === "over") {
+        if (gameEvent.winner === null) {
           handleGameOver("disconnect");
-        } else if (e.winner === self) {
+        } else if (gameEvent.winner === self) {
           handleGameOver("victory");
         } else {
           handleGameOver("defeat");
         }
       }
-    },
-  });
 
-  if (loading || error || !data) return null;
+      setSpectators(gameEvent.spectators);
+    }
+  
+  }, [gameEvent]);
+
+  if (gameEvent === null) return null;
 
   const handleGameOver = (wincon) => {
     if (wincon === "defeat") {
@@ -94,8 +69,8 @@ export default ({ me, gameId, refetchMe }) => {
     <div className="global">
       <NavBar
         inGame={true}
-        data={gameEvent && gameEvent.connections - 2}
-        refetchMe={refetchMe}
+        userCount={spectators.length}
+        refetchMeLogged={refetchMeLogged}
       />
 
       <GameTour />
@@ -104,11 +79,11 @@ export default ({ me, gameId, refetchMe }) => {
         <div className="game-screen">
           <div className="game-left">
             <div className="code-editor-wrapper">
-              <CodeEditor gameId={gameId} me={data.me} />
+              <CodeEditor gameId={gameId} me={me} />
             </div>
             <div className="stats-wrapper">
               <PlayerStats
-                me={data.me}
+                me={me}
                 ownStats={ownStats}
                 opponentStats={opponentStats}
               />

@@ -23,7 +23,7 @@ UserSchema.statics.login = async function (username, password) {
     user = await User.findOne({ username });
 
   if (user && (await bcrypt.compare(password, user.password))) {
-    user.token = "Bearer " + jwt.sign({ _id: user._id, username: username }, secretOrKey);
+    user.token = "Bearer " + jwt.sign({ _id: user._id.toString(), username: username }, secretOrKey);
     user.loggedIn = true;
     return user;
   }
@@ -43,7 +43,7 @@ UserSchema.statics.signup = async function (username, password) {
 
   await newUser.save();
 
-  newUser.token = "Bearer " + jwt.sign({ _id: newUser._id, username: newUser.username }, secretOrKey);
+  newUser.token = "Bearer " + jwt.sign({ _id: newUser._id.toString(), username: newUser.username }, secretOrKey);
   newUser.loggedIn = true;
 
   return newUser;

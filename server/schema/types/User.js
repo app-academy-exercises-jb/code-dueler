@@ -8,6 +8,8 @@ const typeDefs = `
     _id: ID!
     username: String!
     loggedIn: Boolean
+    inGame: Boolean
+    inLobby: Boolean
   }
   extend type Query {
     me: User
@@ -32,18 +34,37 @@ const typeDefs = `
   }
 `;
 
+const gameLobbyResolver = (pubsub, user) => {
+  let game = pubsub.games[pubsub.games.inGame[user._id]],
+    inGame = Boolean(pubsub.games.inGame[user._id]);
+
+  user.inGame = inGame;
+  user.inLobby = inGame && game && game.status === "initializing";
+}
+
 const resolvers = {
   Query: {
-    me(_, __, context) {
+    me(_, __, { user: doc, pubsub,}) {
       // user provided by passport
-      // console.log("querying for current user");
-      return context.user;
+      if (doc === undefined) return;
+
+      let user = { 
+        _id: doc._id.toString(),
+        username: doc.username
+      };
+      
+      gameLobbyResolver(pubsub, user);
+      // console.log('fetching me:', {user});
+      return user;
     },
-    users: (_, __, { pubsub }) => {
-      // console.log("resolving users:", { subscribers: pubsub.subscribers });
+    users: async (_, __, { pubsub }) => {
       if (!pubsub.subscribers) return [];
-      return User.find({
+      return (await User.find({
         _id: { $in: Object.keys(pubsub.subscribers) },
+      })).map(user => {
+        user.loggedIn = true;
+        gameLobbyResolver(pubsub, user);
+        return user;
       });
     },
   },
@@ -57,9 +78,12 @@ const resolvers = {
     logout(_, __, { user, pubsub, ws}) {
       if (user._id !== ws.userId
           || pubsub.subscribers[user._id] === undefined
-          || pubsub.subscribers[user._id].every(s =>
-            s.ws !== ws) ) return "not ok";
+          || pubsub.subscribers[user._id].every(subWs =>
+            subWs !== ws) ) {
+        return "not ok";
+      }
 
+      console.log("logging out", user.username)
       setTimeout(() => {
         pubsub.logoutUser({user, ws});
       }, 0);
@@ -68,19 +92,21 @@ const resolvers = {
   },
   Subscription: {
     userLoggedEvent: {
-      subscribe: (_, __, { pubsub, ws }) => {
+      subscribe: (_, __, { pubsub }) => {
+        console.log("subscribing to user events")
         return pubsub.asyncIterator("userLoggedEvent");
       },
-      resolve: async (payload) => {
+      resolve: async (payload, _, { pubsub }) => {
         const user = await User.findById(payload);
-        // payload.userLoggedEvent.user = payload.user;
-        delete payload._id;
+
         payload.user = {
-          _id: user._id,
+          _id: payload._id,
           username: user.username,
           loggedIn: payload.loggedIn,
         };
-        payload.id = user._id;
+        
+        gameLobbyResolver(pubsub, payload.user);
+
         return payload;
       },
     },

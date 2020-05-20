@@ -35,6 +35,7 @@ html,body {
   display: flex;
   flex: 1;
   max-height: calc(100vh - 56px);
+  min-height: fit-content;
 }
 
 .global {
@@ -42,4 +43,41 @@ html,body {
   flex-direction: column;
   height: inherit;
   width: inherit;
+}
+
+.vertical-half {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.vertical-half > div {
+  height: 50%;
+}
+
+.vertical-half > div:first-of-type {
+  flex: 1;
+  max-height: fit-content;
+}
+
+.vertical-half > div:last-of-type {
+  flex: 2;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: block;
+}
+
+.pointer {
+  cursor: pointer !important;
+}
+
+.cursor-default {
+  cursor: default;
 }

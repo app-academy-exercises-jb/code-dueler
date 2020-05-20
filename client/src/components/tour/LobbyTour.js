@@ -14,7 +14,6 @@ class LobbyTour extends React.Component {
   }
 
   tourNext() {
-    console.log("inside the thing");
     if (this.state.idx < 3) {
       this[`lobby${this.state.idx + 1}`].current.classList.remove(
         "tour-modal-hidden"
@@ -28,7 +27,6 @@ class LobbyTour extends React.Component {
   }
 
   tourPrevious() {
-    console.log("inside the other");
     if (this.state.idx > 1) {
       this[`lobby${this.state.idx - 1}`].current.classList.remove(
         "tour-modal-hidden"

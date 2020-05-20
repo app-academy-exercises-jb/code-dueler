@@ -1,5 +1,8 @@
 const presenceUtils = pubsub => {
   const publishUserLoggedEvent = (user, loggedIn) => {
+    console.log(`logging ${user.username || user._id} \
+      ${loggedIn === true ? 'in' : loggedIn === false ? 'out' : 'ERROR'} \
+    `);
     setTimeout(() => {
       pubsub.publish("userLoggedEvent", {
         _id: user._id,
@@ -8,22 +11,16 @@ const presenceUtils = pubsub => {
     }, 100);
   };
 
-  const updateSubscribersGameId = (action, players, gameId) => {
-    const game = pubsub.games[gameId];
-    if (game === undefined || game.p1 === undefined || game.p2 === undefined) return;
-    players.forEach((p) => {
-      if (action === "add") {
-        game.connections += 1;
-        pubsub.subscribers[p._id].forEach((c) => (c.gameId = gameId));
-      } else if (action === "remove") {
-        game.connections -= 1;
-        if (p._id === game.p1.player._id || p._id === game.p2.player._id) {
-          console.log("ending game from subs")
-          game.endGame(p);
-        }
-        delete pubsub.subscribers[p._id].gameId;
-      }
-    });
+  const publishGameLoggedEvent = game => {
+    setTimeout(() => {
+      pubsub.publish("gameLoggedEvent", {
+        _id: game._id,
+        host: (game.p1 && game.p1.player.username) || 'None',
+        challenge: game.challenge || "FizzBuzz",
+        connections: game.connections,
+        status: game.status
+      });
+    }, 100);
   };
 
   const addWs = ({ws, user}) => {
@@ -32,48 +29,67 @@ const presenceUtils = pubsub => {
     user.ws = ws;
     // mark the socket object with the appropriate ID so we can remove it on DC
     ws.userId = user._id;
+    ws.username = user.username;
 
     if (pubsub.subscribers[user._id] === undefined) {
-      pubsub.subscribers[user._id] = [user];
+      pubsub.subscribers[user._id] = [ws];
       pubsub.publishUserLoggedEvent(user, true);
     } else {
-      pubsub.subscribers[user._id].push(user);
+      pubsub.subscribers[user._id].push(ws);
+    }
+
+    let gameId = pubsub.games.inGame[user._id],
+        game = pubsub.games[gameId],
+        oldWs = game && game.users[user._id];
+
+    // user is in game, rescue ws
+    if (Boolean(gameId) && game
+        && Boolean(oldWs)
+        && !pubsub.subscribers[user._id].includes(oldWs)) {
+      console.log("switching ws");
+      game.users[user._id] = ws;
+      ws.gameId = game._id;
+      game.connections++;
+      pubsub.publishGameLoggedEvent(game);
     }
   };
 
   const removeWs = ws => {
-    if (ws.invited) {
-      pubsub.games.pendingInvites[ws.userId] = false;
-    }
+    if (ws.gameId) (() => {
+      let game = pubsub.games[ws.gameId];
+      if (game === undefined) return;
+      if (game.spectatorsKey[ws.userId]) {
+        game.removeSpectator({_id: ws.userId, username: ws.username});
+      } else {
+        game.removePlayer({_id: ws.userId, username: ws.username});
+      }
+    })();
 
     if (!pubsub.subscribers[ws.userId]) return;
 
     const userIdx = pubsub.subscribers[ws.userId].findIndex(
-      (s) => s.ws === ws
+      subWs => subWs === ws
     );
-    const user = pubsub.subscribers[ws.userId][userIdx];
+
+    if (userIdx === -1) throw "tried to remove nonexistent WS"
+    
+    const oldWs = pubsub.subscribers[ws.userId][userIdx],
+      user = {
+        username: oldWs.username,
+        _id: oldWs.userId,
+      };
+
 
     pubsub.subscribers[ws.userId].splice(userIdx, 1);
 
-    // user.ws === ws, as per above findIndex
-    if (user.ws.gameId) {
-      pubsub.updateSubscribersGameId("remove", [user], user.ws.gameId);
-    }
-
     if (pubsub.subscribers[ws.userId].length === 0) {
-      delete pubsub.subscribers[ws.userId];
+      pubsub.subscribers[ws.userId].push({username: ws.username})
       pubsub.publishUserLoggedEvent(user, false);
+      delete pubsub.subscribers[ws.userId];
     }
   }
 
   const logoutUser = ({user}) => {
-    // if (!pubsub.subscribers[user._id]) return;
-    pubsub.subscribers[user._id].forEach(sub => {
-      if (sub.ws.gameId) {
-        pubsub.updateSubscribersGameId("remove", [sub], sub.ws.gameId);
-      }
-    });
-
     pubsub.publishUserLoggedEvent(user, false);
     delete pubsub.subscribers[user._id];
   }
@@ -83,7 +99,7 @@ const presenceUtils = pubsub => {
   }
 
   pubsub.publishUserLoggedEvent = publishUserLoggedEvent;
-  pubsub.updateSubscribersGameId = updateSubscribersGameId;
+  pubsub.publishGameLoggedEvent = publishGameLoggedEvent;
   pubsub.addWs = addWs;
   pubsub.removeWs = removeWs;
   pubsub.loginUser = loginUser;

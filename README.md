@@ -1,4 +1,4 @@
-How to set up dev environment:
+Before following the instructions below, please ensure you have a local .env file. How to set up dev environment:
 
 ```
 git clone https://github.com/app-academy-exercises-jb/code-dueler.git

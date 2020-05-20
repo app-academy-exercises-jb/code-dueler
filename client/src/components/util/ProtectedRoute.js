@@ -1,18 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Route, Redirect } from "react-router-dom";
-import { useQuery, useApolloClient } from "@apollo/react-hooks";
+import { useQuery, useApolloClient, useLazyQuery } from "@apollo/react-hooks";
 import {
   CURRENT_USER,
   IS_LOGGED_IN,
   GET_ONLINE_USERS,
+  GET_ONLINE_GAMES,
 } from "../../graphql/queries";
-import { USER_LOGGED_EVENT } from "../../graphql/subscriptions";
+import { 
+  USER_LOGGED_EVENT,
+  GAME_LOGGED_EVENT, 
+} from "../../graphql/subscriptions";
 
 const subscribeToUserEvents = (
   subscribeToMore,
-  { data: { me } },
+  { 
+    data: { me },
+    networkStatus,
+  },
   client,
-  refetchMe
+  refetchMe,
+  refetchMeLogged
 ) =>
   subscribeToMore({
     document: USER_LOGGED_EVENT,
@@ -20,6 +28,10 @@ const subscribeToUserEvents = (
       const { user } = subscriptionData.data.userLoggedEvent,
         next = { users: Object.assign([], prev.users) },
         idx = next.users.findIndex((u) => u._id === user._id);
+
+      if (user._id === me._id) {
+          refetchMe();
+      }
 
       if (user.loggedIn === true && idx === -1) {
         // if we have a brand new user, splice them in
@@ -30,7 +42,7 @@ const subscribeToUserEvents = (
           client.subscriptionClient.unsubscribeAll();
           client.subscriptionClient.close();
           client.clearStore().then(() => {
-            refetchMe();
+            refetchMeLogged();
           });
         }
         next.users.splice(idx, 1);
@@ -42,35 +54,77 @@ const subscribeToUserEvents = (
 
 export default ({ component: Component, path, redirectTo, ...rest }) => {
   const client = useApolloClient();
-  const { refetch: refetchMe, data, loading, error } = useQuery(IS_LOGGED_IN);
+  const { refetch: refetchMeLogged, data, loading, error } = useQuery(IS_LOGGED_IN);
 
-  const { ...me } = useQuery(CURRENT_USER, {
+  const subscribedToUsers = useRef(false);
+
+  const [
+    loadMe,
+    { 
+      refetch: refetchMe,
+      ...me
+    }
+  ] = useLazyQuery(CURRENT_USER, {
     fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
   });
 
-  const { subscribeToMore, ...onlineUsers } = useQuery(GET_ONLINE_USERS, {
+  const [loadUsers, { subscribeToMore: subscribeToUsers, ...onlineUsers }] = useLazyQuery(GET_ONLINE_USERS, {
+    fetchPolicy: "network-only",
+  });
+  
+  const [loadGames, { subscribeToMore: subscribeToGames, ...games }] = useLazyQuery(GET_ONLINE_GAMES, {
     fetchPolicy: "network-only",
   });
 
   useEffect(() => {
-    if (
-      data &&
-      data.isLoggedIn &&
-      onlineUsers.loading === false &&
-      me.loading === false
-    ) {
-      setTimeout(() => {
-        subscribeToUserEvents(subscribeToMore, me, client, refetchMe);
-      }, 10);
+    if (!data || !data.isLoggedIn) return;
+
+    if (me.called === false) {
+      loadMe();
+      loadGames();
+      loadUsers();
+    } 
+    
+    if (me.loading === false
+        && me.called === true
+        && onlineUsers.loading === false
+        && subscribedToUsers.current === false) {
+      subscribeToUserEvents(subscribeToUsers, me, client, refetchMe, refetchMeLogged);
+      subscribeToGames({
+        document: GAME_LOGGED_EVENT,
+        updateQuery: (prev, { subscriptionData }) => {
+          const { gameLoggedEvent: game } = subscriptionData.data,
+            next = { games: Object.assign([], prev.games) },
+            idx = next.games.findIndex((g) => g._id === game._id);
+
+          if (idx === -1 && game.status !== "over") {
+            // if we have a brand new game, splice it in
+            next.games.splice(0, 0, game);
+          } else {
+            if (game.status === "over") {
+              next.games.splice(idx, 1);
+            } else {
+              next.games.splice(idx, 1, game);
+            }
+          }
+            
+          return next;
+        }
+      });
+      subscribedToUsers.current = true;
     }
-  }, [data, onlineUsers.loading, me.loading]);
+  }, [data, onlineUsers.loading, me.loading, me.called, subscribedToUsers]);
 
   if (!redirectTo) redirectTo = "/welcome";
-  if (loading || error || !data || !me.data || me.loading) {
+  if (loading || error || !data || 
+      (data.isLoggedIn && 
+        (!me.called || (me.called && !me.data)))) {
     return null;
   } else if (data.isLoggedIn) {
-    if (!onlineUsers.data || onlineUsers.error) return null;
-
+    if (!onlineUsers.data || onlineUsers.error
+        || !games.data || games.error) return null;
+    
     return (
       <Route
         path={path}
@@ -78,8 +132,10 @@ export default ({ component: Component, path, redirectTo, ...rest }) => {
         render={() => {
           return (
             <Component
-              onlineUsers={onlineUsers}
-              me={me}
+              games={games.data.games}
+              users={onlineUsers.data.users}
+              me={{networkStatus: me.networkStatus, ...me.data.me}}
+              refetchMeLogged={refetchMeLogged}
               refetchMe={refetchMe}
             />
           );

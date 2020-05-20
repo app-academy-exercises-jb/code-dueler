@@ -1,113 +1,99 @@
 import React, { useState } from "react";
 import SideBarUsers from "./SideBarUsers";
 import ReactModal from "react-modal";
-import { useMutation, useSubscription } from "@apollo/react-hooks";
-import { ON_INVITATION } from "../../graphql/subscriptions";
-import {
-  ACCEPT_INVITE,
-  DECLINE_INVITE,
-  SPECTATE_USER,
-} from "../../graphql/mutations";
+import { useMutation } from "@apollo/react-hooks";
+import { JOIN_GAME, HANDLE_GAME } from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
+import ToolTip from "../util/ToolTip";
+import InGameUsers from "./InGameUsers";
+import GamesList from "./GamesList";
 
-const SideBar = ({ data }) => {
+const SideBar = ({ 
+  users,
+  games,
+  players,
+  spectators,
+  inGame,
+  gameSelfStatus,
+  me,
+  refetchMe,
+  gameId,
+  showUsers,
+ }) => {
   ReactModal.setAppElement("#root");
 
-  const [challengeModalOpen, setChallengeModalOpen] = useState(false);
+  const [errorModelOpen, setErrorModalOpen] = useState(false);
   const [spectateModalOpen, setSpectateModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  const [selectedUser, setSelectedUser] = useState(data.users[0]);
-
-  const [acceptInvite] = useMutation(ACCEPT_INVITE);
-  const [declineInvite] = useMutation(DECLINE_INVITE);
-  const [spectate] = useMutation(SPECTATE_USER);
+  const [handleGame] = useMutation(HANDLE_GAME);
+  const [join] = useMutation(JOIN_GAME);
 
   const history = useHistory();
 
-  useSubscription(ON_INVITATION, {
-    fetchPolicy: "network-only",
-    onSubscriptionData: ({ client, subscriptionData }) => {
-      const e = subscriptionData.data.invitationEvent;
-      console.log(e);
-      if (e.status === "inviting") {
-        handleModalOpen(e.inviter);
-      } else if (e.status === "declined") {
-        // setSelectedUser(e.invitee)
-        // setDeclineModalOpen(true)
-        // // => "invitee declined your invite"
-        alert(`${e.invitee.username} declined`);
-      } else if (e.status === "accepted") {
-        // Go to the game screen
-        history.push(`/game/${e.gameId}`);
-      } else if (e.status === "rejected") {
-        if (e.reason === "That player's already in another game!") {
-          setSelectedUser(e.invitee);
-          setSpectateModalOpen(true);
-        } else {
-          alert(`Sorry! ${e.reason}`);
-        }
-      }
-    },
-  });
+  const joinGame = async ({user, game}) => {
+    let variables = user 
+      ? {player: user._id}
+      : {gameId: game};
 
-  const handleModalOpen = (user) => {
-    setSelectedUser(user);
-    setChallengeModalOpen(true);
-  };
-
-  const handleAccept = (user) => {
-    acceptInvite({ variables: { inviter: user._id } });
-    setChallengeModalOpen(false);
-  };
-
-  const handleDecline = (user) => {
-    declineInvite({ variables: { inviter: user._id } });
-    setChallengeModalOpen(false);
-  };
-
-  const spectateUser = async (user) => {
     const {
-      data: { spectateUser: gameId },
-    } = await spectate({ variables: { player: user._id } });
+      data: { joinGame: gameId },
+    } = await join({ variables });
     setSpectateModalOpen(false);
-    if (gameId === "not ok") return;
-    history.push(`/game/${gameId}`);
+    if (gameId.split("not ok:").length !== 1) {
+      let reason = gameId.split("not ok: ")[1];
+      setErrorModalOpen(true);
+      throw 'implement me';
+    }
+    await refetchMe();
+    setTimeout(() => {
+      history.push(`/game/${gameId}`);
+    }, 10);
   };
+
+  const sideBarContent = () => {
+    if (showUsers) {
+      if (!inGame) {
+        return (
+          <SideBarUsers 
+            users={users}
+            inGame={inGame}
+            action={(user) => {
+              if (!(user.inGame || user.inLobby)) return;
+              setSelectedUser(user);
+              setSpectateModalOpen(true);
+            }}
+          />
+        );
+      } else {
+        return (
+          <InGameUsers
+            players={players}
+            spectators={spectators}
+            gameSelfStatus={gameSelfStatus}
+            me={me}
+            gameId={gameId}
+            handleGame={handleGame}
+          />
+        );
+      }
+    } else {
+      return (
+      <GamesList 
+        games={games}
+        joinGame={joinGame}
+      />
+      );
+    }
+  }
+
+  let className = `sidebar-wrapper scroll ${showUsers ? "" : "game-lobbies"}`;
 
   return (
-    <div className="sidebar-wrapper">
+    <div className={className}>
       <div className="user-list-wrapper">
-        <SideBarUsers data={data} handleModalOpen={handleModalOpen} />
+        {sideBarContent()}
       </div>
-      <ReactModal
-        isOpen={challengeModalOpen}
-        className="modal-overlay"
-        shouldCloseOnEsc={true}
-        onRequestClose={() => handleDecline(selectedUser)}
-      >
-        <div className="modal">
-          <div className="modal-info">
-            <h1>{selectedUser && selectedUser.username}</h1>
-            <div>
-              has challenged you to a <p>CODE DUEL!</p>
-            </div>
-          </div>
-          <div className="modal-buttons">
-            <button
-              className="modal-decline"
-              onClick={() => handleDecline(selectedUser)}
-            >
-              Decline
-            </button>
-            <button
-              className="modal-accept"
-              onClick={() => handleAccept(selectedUser)}
-            >
-              Accept
-            </button>
-          </div>
-        </div>
-      </ReactModal>
       <ReactModal
         isOpen={spectateModalOpen}
         className="modal-overlay"
@@ -116,11 +102,23 @@ const SideBar = ({ data }) => {
       >
         <div className="modal">
           <div className="modal-info">
-            <h1>{selectedUser && selectedUser.username}</h1>
+            {selectedUser && <>
+            <h1>{selectedUser.username}</h1>
             <div>
-              <p>is already in a duel!</p>
-              Would you like to spectate?
+              {selectedUser.inGame
+                ? selectedUser.inLobby
+                  ? <>
+                    <p>is currently in a duel lobby!</p>
+                    Would you like to join?
+                    </>
+                  : <>
+                    <p>is already in a duel!</p>
+                    Would you like to spectate?
+                    </>
+                : ''
+              }
             </div>
+            </>}
           </div>
           <div className="modal-buttons">
             <button
@@ -131,7 +129,7 @@ const SideBar = ({ data }) => {
             </button>
             <button
               className="modal-accept"
-              onClick={() => spectateUser(selectedUser)}
+              onClick={() => joinGame({user: selectedUser})}
             >
               Accept
             </button>

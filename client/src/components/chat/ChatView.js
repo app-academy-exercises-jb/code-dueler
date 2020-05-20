@@ -51,13 +51,13 @@ const ChatView = ({ channelId, id }) => {
 
   let oldData;
   useEffect(() => {
+    let timeout;
     if (messagesRef.current
         && messagesRef.current.clientHeight === messagesRef.current.scrollHeight) {
-          const timeout = setInterval(() => {
+          timeout = setInterval(() => {
             if (messagesRef.current.clientHeight === messagesRef.current.scrollHeight
                 && (oldData === undefined || 
                     data.messages.some((msg, idx) => msg._id !== oldData.messages[idx]._id))) {
-              console.log({data});
               oldData = data;
               fetchMoreMessages();
             } else {
@@ -66,6 +66,7 @@ const ChatView = ({ channelId, id }) => {
             }
           }, 100);
         }
+    return () => {clearInterval(timeout)};
   }, [messagesRef.current]);
 
   const fetchMoreMessages = () => {
@@ -76,7 +77,10 @@ const ChatView = ({ channelId, id }) => {
         offset
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult.messages) return prev;
+        if (fetchMoreResult.messages.length === 0) {
+          setShouldFetch(false);
+          return prev;
+        }
         const next = { messages: [...fetchMoreResult.messages, ...prev.messages] };
         setOffset(offset + 15);
         setShouldFetch(true);

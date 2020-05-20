@@ -22,7 +22,21 @@ export const USER_LOGGED_EVENT = gql`
         _id
         username
         loggedIn
+        inGame
+        inLobby
       }
+    }
+  }
+`;
+
+export const GAME_LOGGED_EVENT = gql`
+  subscription gameUpdates {
+    gameLoggedEvent {
+      _id
+      host
+      challenge
+      connections
+      status
     }
   }
 `;
@@ -48,6 +62,7 @@ export const ON_INVITATION = gql`
 export const ON_GAME = gql`
   subscription onGame($gameId: String!) {
     gameEvent(gameId: $gameId) {
+      _id
       p1 {
         ...GameUserDetails
       }
@@ -59,7 +74,6 @@ export const ON_GAME = gql`
         username
       }
       status
-      gameId
       connections
       winner
     }

@@ -9,7 +9,7 @@ const setupGameServer = (pubsub) => {
   pubsub.subscribers = {};
   pubsub.games = {};
   pubsub.games.inGame = {};
-  pubsub.games.pendingInvites = {};
+  // pubsub.games.pendingInvites = {};
 
   presenceUtil(pubsub);
   gameUtil(pubsub);

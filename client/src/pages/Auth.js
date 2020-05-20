@@ -10,8 +10,6 @@ export default ({action}) => {
     Form = LogInForm;
   } else if (action === "signup") {
     Form = SignUpForm;
-  } else {
-    throw "unrecognized action";
   }
 
   return (
@@ -22,6 +20,7 @@ export default ({action}) => {
           <Form />
         </div>
       </div>
+      <footer></footer>
     </div>
   );
 };

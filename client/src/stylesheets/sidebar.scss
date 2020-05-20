@@ -5,9 +5,11 @@
   flex: 1;
   max-width: 300px;
   min-width: 200px;
-  overflow-y: scroll;
   font-family: 'VT323', monospace;
   font-size: 22px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  transition: all .5s ease-in-out;
 }
 
 .user-list-wrapper {
@@ -20,31 +22,323 @@
   color: #e4e6c3;
 }
 
+.user-list-wrapper > div {
+  margin-left: 0.75rem;
+}
+
+.user-list-wrapper > div:nth-of-type(n+2) {
+  margin-top: 1rem;
+}
+
 .user-list-item {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-  padding-left: 2rem;
+  padding: 0.25rem 1rem 0.25rem 2rem;
+  margin: 0.25rem 0;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  > div {
+    display: flex;
+    align-items: center;
+  }
+  > div > div {
+    z-index: 0;
+  }
+  p {
+    margin-left: 1rem;
+  }
+}
+
+.user-list-item>div:first-of-type {
+  // margin-right: 0.75rem;
+  margin-left: -0.75rem;
+}
+
+.sidebar-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 1rem;
+  padding: 0.25rem 1rem 0.25rem 0;
+}
+
+.sidebar-section > * {
   cursor: pointer;
 }
 
-.sidebar-wrapper::-webkit-scrollbar-track {
+.sidebar-section:hover > div:first-of-type > div:first-of-type {
+  text-decoration: underline;
+}
+
+.sidebar-section:hover > *:last-of-type {
+  display: flex;
+}
+
+.sidebar-section > *:last-of-type {
+  width: 18px;
+  height: 18px;
+  display: none;
+  align-items: center;
+  justify-items: center;
+}
+
+.status-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.cancellable {
+  position: relative;
+}
+
+.cancellable > .tooltipped-icon > div:first-of-type > img {
+  position: absolute;
+  top: calc(-25%);
+  left: calc(-25%);
+  height: 150%;
+  width: 150%;
+  display: none;
+  z-index: 20;
+}
+
+.cancellable:hover > .tooltipped-icon > div:first-of-type > img  {
+  display: block;
+  cursor: pointer;
+}
+
+.scroll {
+  scrollbar-color: #D4F2D2 #0E1428;
+}
+
+.scroll::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   border-radius: 10px;
   background-color: #0E1428;
 }
 
-.sidebar-wrapper::-webkit-scrollbar {
+.scroll::-webkit-scrollbar {
   width: 12px;
   background-color: #0E1428;
 }
 
-.sidebar-wrapper::-webkit-scrollbar-thumb {
+.scroll::-webkit-scrollbar-thumb {
   border-radius: 10px;
   box-shadow: inset 0 0 6px rgba(0,0,0,.3);
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
   background-color: #D4F2D2;
 }
 
+.tooltip-container {
+  position: absolute;
+  top: 0rem;
+  width: 125px;
+  left: 1.5rem;
+}
+
+.tooltipped-icon {
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar-section>.tooltipped-icon:nth-child(n) {
+  z-index: 10;
+}
+
+.user-list-item > .tooltipped-icon:nth-child(n) {
+  z-index: 5;
+}
+
+.tooltip {
+  z-index: 30;
+  text-decoration: none;
+  width: 100%;
+  height: fit-content;
+  line-height: 1em;
+  font-size: 1em;
+  background-color: #6E7DAB;
+  opacity: 1;
+  border: 1px solid #6E7DAB;
+  border-radius: 4px;
+  padding: 1px;
+  color: white;
+}
+
+.tooltip-tail {
+  position: absolute;
+  top: 3px;
+  left: -10px;
+  border: 5px solid;
+  border-color: transparent #6E7DAB transparent transparent;
+}
+
+.section-tooltip {
+  position: absolute;
+  top: 26px;
+  left: 0.5rem;
+  width: 150px;
+}
+
+.section-tooltip-tail {
+  position: absolute;
+  top: -10px;
+  left: 9px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
+.section-button-tooltip {
+  position: absolute;
+  top: 22px;
+  right: 1px;
+  width: 150px;
+}
+
+.section-button-tooltip-tail {
+  position: absolute;
+  top: -10px;
+  right: 3px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
+.checkbox-tooltip {
+  position: absolute;
+  top: -2px;
+  left: calc(-100% - 135px);
+  width: 110px;
+}
+
+.checkbox-tooltip-tail {
+  position: absolute;
+  top: 7.5px;
+  right: -14px;
+  border: 5px solid;
+  border-color: transparent transparent transparent #6E7DAB;
+}
+
+.kick-tooltip {
+  position: absolute;
+  top: -2px;
+  left: calc(100% + 12px);
+  width: 110px;
+}
+
+.kick-tooltip-tail {
+  position: absolute;
+  top: 7.5px;
+  left: -10px;
+  border: 5px solid;
+  border-color: transparent #6E7DAB transparent transparent;
+}
+
+.nav-tooltip {
+  font-size: 0.7em;
+  position: absolute;
+  top: 34px;
+  right: 9px;
+  width: 180px;
+}
+
+.nav-tooltip-tail {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  border: 5px solid;
+  border-color: transparent transparent #6E7DAB transparent;
+}
+
+.user-ready-checkbox {
+  justify-self: flex-end;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  -webkit-appearance: none;
+  transition: all .2s ease-in;
+}
+
+.user-ready-checkmark {
+  position: absolute;
+  top: 1.5px;
+  right: -4px;
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border: 3px solid black;
+}
+
+[type="checkbox"]:not(:checked)+.user-ready-checkmark::after,
+[type="checkbox"]:checked+.user-ready-checkmark::after {
+  content: "\2713";
+  position: absolute;
+  top: 0px;
+  left: 8px;
+  color: green;
+  font-size: 16px;
+  transition: all .6s;
+  line-height: 0.3;
+}
+
+[type="checkbox"]:not(:checked)+.user-ready-checkmark::after {
+  // transition: all .2s ease-in;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.user-ready-checkbox:checked+.user-ready-checkmark::after {
+  // transition: all .2s ease-in;
+  opacity: 1;
+  transform: scale(3);
+}
+
+.checkmark-container {
+  justify-self: flex-end;
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+
+.game-lobbies {
+  min-width: 50%;
+}
+
+.games-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 0 !important;
+  >h1 {
+    font-size: 2em;
+    font-weight: 400;
+    text-decoration: underline;
+  }
+}
+
+.games-list {
+  width: 100%;
+  font-weight: 100;
+  border-spacing: 0.5rem;
+}
+
+.games-list-heading {
+  width: 100%;
+  margin: 1rem 0;
+  height: 3rem;
+
+  th {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+.games-item {
+  padding: 0.5rem 12px 0.5rem 0;
+  height: 2rem;
+  
+  &:hover {
+    cursor: pointer;
+    background-color: #45495a;
+    color: #e4e6c3;
+  }
+}

@@ -17,6 +17,16 @@ span, article, footer, time, small {
   background: transparent;
 }
 
+th {
+  font-weight: 100;
+  padding: 0;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
 ul {
   list-style: none;
 }

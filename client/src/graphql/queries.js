@@ -5,6 +5,8 @@ export const CURRENT_USER = gql`
     me {
       _id
       username
+      inGame
+      inLobby
     }
   }
 `;
@@ -21,6 +23,20 @@ export const GET_ONLINE_USERS = gql`
       _id
       username
       loggedIn
+      inGame
+      inLobby
+    }
+  }
+`;
+
+export const GET_ONLINE_GAMES = gql`
+  query Games {
+    games {
+      _id
+      host
+      challenge
+      connections
+      status
     }
   }
 `;
@@ -43,6 +59,7 @@ export const IN_GAME_INFO = gql`
   query InGameInfo($gameId: String!) {
     queryGameInfo(gameId: $gameId) {
       gameExists
+      gameStatus
       isInGame
       isSpectator
     }

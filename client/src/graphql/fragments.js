@@ -19,5 +19,6 @@ export const GAME_USER_DETAILS = gql`
     charCount
     lineCount
     currentCode
+    ready
   }
 `;

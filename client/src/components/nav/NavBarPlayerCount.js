@@ -1,18 +1,16 @@
 import React from "react";
 
-const NavBarPlayerCount = ({ data, inGame }) => {
-  let usersCount;
-  
-  if (!data) {
-    usersCount = 0;
-  } else {
-    usersCount = data.users ? data.users.length : 0;
-  }
-
+const NavBarPlayerCount = ({ showUsers, userCount, inGame, inGameLobby }) => {
   if (inGame) {
-    return <>{data || 0} {data === 1 ? 'spectator' : 'spectators'}</>;
+    return <>{userCount || 0} {userCount === 1 ? 'spectator' : 'spectators'}</>;
+  } else if (inGameLobby) {
+    return <>{userCount || 0} {userCount === 1 ? 'player' : 'players'} in lobby</>;
   } else {
-    return <>{usersCount} {usersCount === 1 ? 'user' : 'users'} ready to duel</>;
+    if (showUsers) {
+      return <>{userCount} {userCount === 1 ? 'user' : 'users'} online</>;
+    } else {
+      return <>{userCount} {userCount === 1 ? 'game' : 'games'} being played</>;
+    }
   }
 };
 

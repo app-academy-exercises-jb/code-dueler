@@ -69,8 +69,16 @@ export default () => {
         </div>
       </div>
 
-      <button className="session-button" disabled={loading}>
+      <button id="login" className="session-button" disabled={loading}>
         Log In
+      </button>
+      <button 
+        id="demo"
+        className="session-button"
+        disabled={loading}
+        onClick={() => {setUsername('scobyLover'); setPassword('asdfasdf')}}
+      >
+        Demo User
       </button>
       <Link to="/signup" className="logo-nav">
         Create an account

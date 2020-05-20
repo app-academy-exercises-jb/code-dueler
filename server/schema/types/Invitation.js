@@ -102,7 +102,6 @@ const resolvers = {
               (inviter._id === user._id || invitee._id === user._id)
             ) {
               ws.gameId = gameId;
-              pubsub.updateSubscribersGameId("add", [user], gameId);
             }
 
             delete ws.inviting;
