@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import LogOutButton from "../users/LogOutButton";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import ProtectedComponent from "../util/ProtectedComponent";
 import NavBarPlayerCount from "./NavBarPlayerCount";
 import HostGameButton from "./HostGameButton";
@@ -30,6 +30,7 @@ const NavBar = ({
 }) => {
   const burger = useRef();
   const [width, setWidth] = useState(window.innerWidth);
+  const history = useHistory();
 
   useEffect(() => {
     function handleResize() {
@@ -104,10 +105,10 @@ const NavBar = ({
         <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />
       </div>
       <div>
-        <div className="nav-button">
-        <Link to="/credits">
+        <div className="nav-button" onClick={() => history.push('/credits')}>
+        <button>
           Credits
-        </Link>
+        </button>
         </div>
       </div>
     </>;
