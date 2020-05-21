@@ -50,7 +50,7 @@ class SplashComponent extends React.Component {
             className={`splash-arrow ${leftArrow}`}
             onClick={() => this.moveLeft()}
           >
-            <i className="fas fa-arrow-left"></i>
+            <i className="arrow-left"></i>
           </button>
           <div className="card">
             <div ref={this.photo1} className="card_part card_part-1 card-in">
@@ -100,7 +100,7 @@ class SplashComponent extends React.Component {
             onClick={() => this.moveRight()}
             className={`splash-arrow ${rightArrow}`}
           >
-            <i className="fas fa-arrow-right"></i>
+            <i className="fas arrow-right"></i>
           </button>
         </div>
         <div className="splash-controls-bottom">

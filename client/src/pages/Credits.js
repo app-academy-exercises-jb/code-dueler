@@ -5,7 +5,7 @@ import NavBar from "../components/nav/NavBar";
 export default (props) => {
   return (
     <div className="global">
-      <NavBar />
+      <NavBar noData={true} />
       <div className="main">
         <CreditsComponent />
       </div>

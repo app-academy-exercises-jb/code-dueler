@@ -1,0 +1,79 @@
+.fas, .fab, .fa, .fad, .fal, .far {
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+}
+
+.arrow-right::after {
+  content: "\2794";
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 0.5;
+  display: block;
+  -webkit-font-smoothing: antialiased;
+}
+
+.arrow-left::after {
+  content: "\2794";
+  transform: rotate(180deg);
+  transition: all 0s linear;
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 0.5;
+  display: block;
+  -webkit-font-smoothing: antialiased;
+}
+
+.arrow-up::after {
+  content: "\2794";
+  transform: rotate(270deg);
+  transition: all 0s linear;
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 0.5;
+  display: block;
+  -webkit-font-smoothing: antialiased;
+}
+
+.arrow-down::after {
+  content: "\2794";
+  transform: rotate(90deg);
+  transition: all 0s linear;
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 0.5;
+  display: block;
+  -webkit-font-smoothing: antialiased;
+}
+
+.left-right-arrow::after {
+  content: "\2194";
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 0.5;
+  display: block;
+  -webkit-font-smoothing: antialiased;
+}
+
+.credits-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.credits-icon path {
+  transform: scale(3);
+}
+
+.angellist > img {
+  width: 36px;
+  height: 48px;
+}
+
+.porfolio > path {
+  transform: scale(0.125);
+  width: 36px;
+  height: 48px;
+}

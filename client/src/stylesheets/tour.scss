@@ -20,8 +20,8 @@
   position: fixed;
   width: 15rem;
   height: 10rem;
-  right: 1rem;
-  top: 4.7rem;
+  right: 2rem;
+  top: 5.5rem;
 }
 
 .lobby-chat {
@@ -32,7 +32,7 @@
   width: 15rem;
   height: 10rem;
   left: 20rem;
-  bottom: 5.6rem;
+  bottom: 8rem;
 }
 
 .game-challenge {
@@ -75,8 +75,8 @@
   position: fixed;
   width: 18rem;
   height: 12rem;
-  left: 17.5%;
-  top: 54%;
+  left: 16%;
+  top: 39%;
 }
 
 .tour-text-wrapper {
@@ -98,14 +98,15 @@
 }
 
 .tour-arrow-left {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #0E1428;
   animation: left-right 1s ease-in-out infinite;
   margin-right: 9px;
+  margin-top: 8px;
 }
 
 .tour-arrow-right {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #0E1428;
   animation: left-right 1s ease-in-out infinite;
   margin-left: 18px;
@@ -113,23 +114,25 @@
 
 .tour-arrow-left-right {
   font-size: 3rem;
-  color: #D4F2D2;
+  color: #0E1428;
   animation: left-right 1s ease-in-out infinite;
   margin-left: 18px;
 }
 
 .tour-arrow-up {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #0E1428;
   animation: up-down 1s ease-in-out infinite;
   margin-left: 13.25rem;
 }
 
 .tour-arrow-down {
-  font-size: 2rem;
+  position: absolute;
+  font-size: 1.5rem;
   color: #0E1428;
   animation: up-down 1s ease-in-out infinite;
-  margin-top: 1rem;
+  bottom: -52px;
+  left: 0px;
 }
 
 .code-duel {

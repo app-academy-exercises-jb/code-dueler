@@ -5,7 +5,7 @@ class GameTour extends React.Component {
     super(props);
     this.state = {
       idx: 1,
-      seen: localStorage.getItem('lobby-seen') === 'true',
+      seen: localStorage.getItem('game-seen') === 'true',
     };
     this.endTour = this.endTour.bind(this);
     this.tourNext = this.tourNext.bind(this);
@@ -63,10 +63,10 @@ class GameTour extends React.Component {
               </button>
             </div>
           </div>
-          <i className="fas fa-arrow-right tour-arrow-right"></i>
+          <i className="fas arrow-right tour-arrow-right"></i>
         </div>
         <div ref={this.game2} className="game-editor hidden">
-          <i className="fas fa-arrow-left tour-arrow-left"></i>
+          <i className="fas arrow-left tour-arrow-left"></i>
           <div className="tour-text-wrapper">
             <p className="tour-text">
               Here is the editor section where you can type your solution
@@ -82,7 +82,7 @@ class GameTour extends React.Component {
           </div>
         </div>
         <div ref={this.game3} className="game-submit hidden">
-          <i className="fas fa-arrow-left tour-arrow-left"></i>
+          <i className="fas arrow-left tour-arrow-left"></i>
           <div className="tour-text-wrapper">
             <p className="tour-text">
               Click here to submit your code. (It may take a few seconds)
@@ -118,7 +118,7 @@ class GameTour extends React.Component {
               </button>
             </div>
           </div>
-          <i className="fas fa-arrows-alt-h tour-arrow-left-right"></i>
+          <i className="fas left-right-arrow tour-arrow-left-right"></i>
         </div>
       </div>
     );

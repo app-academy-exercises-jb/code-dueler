@@ -49,7 +49,7 @@ class LobbyTour extends React.Component {
     return (
       <div className="tour-wrapper">
         <div ref={this.lobby1} className="lobby-sidebar">
-          <i className="fas fa-arrow-left tour-arrow-left"></i>
+          <i className="fas arrow-left tour-arrow-left"></i>
           <div className="tour-text-wrapper">
             <div className="tour-text">
               If a player is in a
@@ -80,10 +80,10 @@ class LobbyTour extends React.Component {
               </button>
             </div>
           </div>
-          <i className="fas fa-arrow-down tour-arrow-down"></i>
+          <i className="fas arrow-down tour-arrow-down"></i>
         </div>
         <div ref={this.lobby3} className="lobby-button hidden">
-          <i className="fas fa-arrow-up tour-arrow-up"></i>
+          <i className="fas arrow-up tour-arrow-up"></i>
           <div className="tour-text-wrapper">
             <p className="tour-text">Here, you can create or join a game, log out, or see the credits page</p>
             <div className="button-wrapper">
