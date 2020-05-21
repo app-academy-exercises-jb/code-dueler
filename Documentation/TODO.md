@@ -1,9 +1,6 @@
-* host should be able to click on challenge Q title and see choose challenge modal
-* when hosting game, one should see the choose challenge modal
 * make choose challenge modal
-* challenge Q's should take titles
-
-* non-persisting status messages
+* host should be able to click on challenge Q title and see choose challenge modal in game lobby
+* when hosting game, one should see the choose challenge modal
 
 * work on coding judge so that it does more than one thing
 
@@ -11,8 +8,6 @@ Soon-Mi:
 * ability to choose which problem you want to duel in
 * more probs than just fizzbuzz
 
-- add welcome message
-​
 - It would be nice if the editor saved its value to the cache (for reconnections in a single game)
 ​
 - when a players submits submit, they should see an indication, and the button should be locked

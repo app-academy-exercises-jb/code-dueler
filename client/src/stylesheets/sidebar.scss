@@ -47,11 +47,13 @@
   }
   p {
     margin-left: 1rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 95px;
   }
 }
 
 .user-list-item>div:first-of-type {
-  // margin-right: 0.75rem;
   margin-left: -0.75rem;
 }
 
@@ -151,6 +153,7 @@
 }
 
 .tooltip {
+  word-wrap: break-word;
   z-index: 30;
   text-decoration: none;
   width: 100%;

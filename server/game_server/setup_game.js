@@ -26,6 +26,16 @@ const setupGame = pubsub => game => {
     Object.keys(game.users).forEach(user => {
       pubsub.publishUserLoggedEvent({_id: user}, Boolean(pubsub.subscribers[user]));
     });
+    pubsub.publish("messageAdded", {
+      _id: mongoose.Types.ObjectId(),
+      author: {
+        _id: '5ec67c304d861000117bf90f',
+        username: 'CodeDueler'
+      },
+      body: `${game.p1.player.username} and ${game.p2.player.username} have started a code duel!`,
+      createdAt: Date.now(),
+      channelId: 'global',
+    });
   };
 
   const endGame = (player) => {
@@ -128,7 +138,7 @@ const setupGame = pubsub => game => {
 
     let find = findUser(userClass),
       isSpectator = userClass === "spectator",
-      Player = mongoose.model('Player');;
+      Player = mongoose.model('Player');
 
     if (action === "add") {
       if (find(user)) {

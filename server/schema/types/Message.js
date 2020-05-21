@@ -60,7 +60,6 @@ const resolvers = {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator("messageAdded"),
         (payload, _, { user, pubsub, ws }) => {
-
           if (ws.gameId === undefined && payload.channelId === "global") {
             return true;
           }

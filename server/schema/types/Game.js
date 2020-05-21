@@ -86,6 +86,21 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
     if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
       Object.assign(game, { [player]: { ...gameUser } });
       pubsub.publish("gameEvent", game);
+      if (Boolean(game.winner)) {
+        let loser = game.winner._id === game.p1.player._id 
+          ? game.p1.player
+          : game.p2.player;
+        pubsub.publish("messageAdded", {
+          _id: mongoose.Types.ObjectId(),
+          author: {
+            _id: '5ec67c304d861000117bf90f',
+            username: 'CodeDueler'
+          },
+          body: `${game.winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}` : 'code duel'}`,
+          createdAt: Date.now(),
+          channelId: 'global',
+        });
+      }
     }
   };
 
@@ -224,11 +239,11 @@ const resolvers = {
 
       if (game.spectatorsKey[_id]) {
         console.log('removing self from spectators')
-        game.removeSpectator({ _id });
+        game.removeSpectator(user);
       } else if ((game.p1 && game.p1.player._id === _id)
           || (game.p2 && game.p2.player._id === _id)) {
         console.log('removing self from players')
-        game.removePlayer({ _id })
+        game.removePlayer(user);
       }
 
       return "ok";
@@ -241,15 +256,16 @@ const resolvers = {
         || _id === user._id
         || !Boolean(game.users[_id])) return "not ok";
 
+      let username = game.users[_id].username;
       if (action === "boot") {
         Boolean(game.spectatorsKey[_id])
-          ? game.removeSpectator({_id})
-          : game.removePlayer({_id});
+          ? game.removeSpectator({_id, username })
+          : game.removePlayer({ _id, username });
         
       } else if (action === "spectate") {
         if (game.p2 && game.p2.player._id !== _id) return "not ok";
-        game.addSpectator({_id});
-        game.removePlayer({_id});
+        game.addSpectator({_id, username });
+        game.removePlayer({ _id, username });
       }
       
       return "ok";
