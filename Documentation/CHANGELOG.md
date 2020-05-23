@@ -21,3 +21,7 @@
 
   * Non-persisting messages are now sent to the main chat when a game is started or won
   * Names longer than 95px ellipse in the sidebar
+
+## 0.8.3.1 - 5/22/2020
+
+  * Fix problem where games would not be finished when all players disconnect

@@ -75,10 +75,12 @@ const setupGame = pubsub => game => {
         (p1 && pubsub.subscribers[p1.player._id] !== undefined) ||
         (p2 && pubsub.subscribers[p2.player._id] !== undefined)
         ) {
-        const found = pubsub.subscribers[player._id];
-        if (found === undefined) {
+        const playerWSArr = pubsub.subscribers[player._id];
+        if (playerWSArr === undefined) {
+          // finish game if player is disconnected, 
+          // but the other player is connected
           finishGame();
-        } else if (found.every(ws => 
+        } else if (playerWSArr.every(ws => 
           ws.gameId !== _id)) {
             // finish game if player is connected, 
             // but not to game screen
@@ -86,6 +88,9 @@ const setupGame = pubsub => game => {
         } else {
           console.log("not finishing after all:")
         }
+      } else {
+        // we have noone in game, finish it
+        finishGame();
       }
     }, 600);
   };
