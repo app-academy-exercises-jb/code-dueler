@@ -1,9 +1,25 @@
 version: '3'
 services: 
+  code_judge:
+    build: ./code_judge
+    depends_on: 
+      - redis
+    ports: 
+      - 5005:5005
+    environment:
+      NODE_ENV: development
+      SECRET_OR_KEY: ${SECRET_OR_KEY}
+      PORT: 5005
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./code_judge:/usr/src/app
+    command: npm run dev
+
   server:
     build: ./server
     depends_on: 
       - redis
+      - code_judge
     ports:
       - 5000:5000
     environment: 
@@ -21,10 +37,12 @@ services:
     build: ./client
     depends_on: 
       - server
+      - code_judge
     ports:
       - 3000:3000
     environment: 
       NODE_ENV: development
+      CODE_JDG: http://code_judge:5005
     stdin_open: true
     volumes: 
       - ./client:/usr/src/app
