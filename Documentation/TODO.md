@@ -1,4 +1,12 @@
 ### needs to get done:
+* plus signs not working in prod (in game lobby, Players / Spectators buttons)
+
+* game won notif does: "undefined just beat x at a code duel!", should actually use the winning player's username
+
+* credits link should not appear on credits page
+
+* dropdown menu lies behind welcome screen
+
 * when a players submits code, they should see an indication (animation), and the button should be locked
 
 * make choose challenge modal
