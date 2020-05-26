@@ -63,8 +63,7 @@ const SideBar = ({
               setSelectedUser(user);
               setSpectateModalOpen(true);
             }}
-          />
-        );
+          />);
       } else {
         return (
           <InGameUsers

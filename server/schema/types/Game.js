@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 const { withFilter } = require("apollo-server-express");
 
+if (process.env.NODE_ENV === 'development') {
+  const http = require('http');
+} else {
+  const http = require('https');
+}
+
 const Game = mongoose.model('Game');
 
 const typeDefs = `
@@ -31,6 +37,7 @@ const typeDefs = `
       ready: Boolean!,
       gameId: ID!
     ): GameUser!
+    submitCode(code: String!): String
   }
   extend type Subscription {
     gameEvent(gameId: String!): GameUpdate!
@@ -141,6 +148,55 @@ const resolvers = {
     }
   },
   Mutation: {
+    submitCode: (_, { code }, { user, pubsub, ws }) => {
+      let game = pubsub.games[ws.gameId];
+      if (game === undefined) return "not ok";
+
+      let data = JSON.stringify({
+        data: { 
+          code,
+          testCases: {
+            // gotta fetch the test cases based on the game's q
+            // the game should have a Question_id that we can use to
+            // Mongo-lookup the test cases
+            1: ["1"],
+            2: ["1", "2"],
+            3: ["1", "2", "Fizz"],
+            4: ["1", "2", "Fizz", "4"],
+            5: ["1", "2", "Fizz", "4", "Buzz"],
+          }
+        },
+      });
+
+      let req = http.request(process.env.CODE_JDG_URI, {
+        method: 'POST',
+        port: 5005,
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": data.length,
+        }
+      }, res => {
+        res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', (chunk) => { rawData += chunk; });
+        res.on('end', () => {
+          try {
+            const parsedData = JSON.parse(rawData);
+            console.log({parsedData});
+          } catch (e) {
+            console.error("error", e.message);
+          }
+        });
+
+      }).on('error', e => {
+        console.log("error in submit code:", {e})
+      })
+
+      req.write(data);
+      req.end();
+
+      return "ok";
+    },
     hostGame: (_, { challenge }, { user, pubsub, ws}) => {
       if (ws.userId !== user._id
           || !pubsub.subscribers[user._id]

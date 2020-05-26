@@ -5,6 +5,7 @@ import { useMutation } from "@apollo/react-hooks";
 import {
   UPDATE_GAME_USER_CODE,
   UPDATE_GAME_LAST_SUBMITTED,
+  SUBMIT_CODE,
 } from "../../graphql/mutations";
 
 const CodeEditor = ({ gameId, me, spectator, data }) => {
@@ -17,6 +18,7 @@ const CodeEditor = ({ gameId, me, spectator, data }) => {
 
   const [updateUserCode] = useMutation(UPDATE_GAME_USER_CODE);
   const [updateLastSubmission] = useMutation(UPDATE_GAME_LAST_SUBMITTED);
+  const [pingJudge] = useMutation(SUBMIT_CODE);
 
   useEffect(() => {
     data && setCode(data);
@@ -44,31 +46,7 @@ const CodeEditor = ({ gameId, me, spectator, data }) => {
       <button
         className="code-submit"
         onClick={(e) => {
-          fetch(
-            "https://us-central1-code-dueler.cloudfunctions.net/parseCode",
-            {
-              method: "POST",
-              mode: "cors",
-              body: JSON.stringify({
-                data: { codeToRun: editorRef.current.props.value },
-              }),
-              headers: {
-                "Content-Type": "application/json",
-                authorization: localStorage.getItem("token"),
-              },
-            }
-          )
-            .then((res) => res.json())
-            .then(({ data: { ...result } }) => {
-              updateLastSubmission({
-                variables: {
-                  lastSubmittedResult: JSON.stringify(result),
-                  player: me._id,
-                  gameId,
-                },
-              });
-            })
-            .catch((err) => console.log(err));
+          pingJudge({variables: { code: editorRef.current.props.value }});
         }}
       >
         <h1>Submit your code</h1>

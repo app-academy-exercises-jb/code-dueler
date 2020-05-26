@@ -9,7 +9,9 @@ services:
     environment:
       NODE_ENV: development
       SECRET_OR_KEY: ${SECRET_OR_KEY}
+      SERVER_URI: http://server:5000
       PORT: 5005
+      TESTING_DIR: $PWD/code_judge/test
     volumes: 
       - /var/run/docker.sock:/var/run/docker.sock
       - ./code_judge:/usr/src/app
@@ -26,6 +28,7 @@ services:
       NODE_ENV: development
       SECRET_OR_KEY: ${SECRET_OR_KEY}
       PRODUCTION_URI: http://client:3000
+      CODE_JDG_URI: http://code_judge:5005
       MONGO_URI: ${MONGO_URI}
       REDIS_URI: redis
       DOCKERIZED: 'true'
@@ -42,7 +45,6 @@ services:
       - 3000:3000
     environment: 
       NODE_ENV: development
-      CODE_JDG: http://code_judge:5005
     stdin_open: true
     volumes: 
       - ./client:/usr/src/app

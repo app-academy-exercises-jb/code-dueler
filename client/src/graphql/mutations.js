@@ -163,3 +163,9 @@ export const HOST_GAME = gql`
     hostGame(challenge: $challenge)
   }
 `;
+
+export const SUBMIT_CODE = gql`
+  mutation SubmitCode($code: String!) {
+    submitCode(code: $code)
+  }
+`;
