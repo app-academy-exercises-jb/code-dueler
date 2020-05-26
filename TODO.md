@@ -1,7 +1,19 @@
 ### needs to get done:
-* plus signs not working in prod (in game lobby, Players / Spectators buttons)
+* tooltip can sometimes be made to stay visible. find out how to reproduce and fix
 
-* game won notif does: "undefined just beat x at a code duel!", should actually use the winning player's username
+* certain games with status "over" sometimes stay in the game list. find out how and fix
+
+* when in game lobby, and screen width is such that the hamburger menu is visible, put the relevant game action button (start game, un/ready, claim/challenge) at the bottom of the sidebar
+
+* leaving game from spectators (when one is the last player) doesn't properly delete the in-memory game
+
+* splash page slideshow slides / gifs need to be reworked
+  - would be nice to show off the spectator's view
+
+* plus signs not working in prod (in game lobby, Players / Spectators buttons)
+  - for some reason webpack is parsing that image as a `data:` URI as opposed to a local file, like every other PNG in the project
+
+* game won notif does: "undefined just beat $LOSER_USERNAME at a code duel!". `undefined` should actually be the winning player's username
 
 * credits link should not appear on credits page
 
