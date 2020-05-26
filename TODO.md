@@ -1,7 +1,11 @@
 ### needs to get done:
-* plus signs not working in prod (in game lobby, Players / Spectators buttons)
+* splash page slideshow slides / gifs need to be reworked
+  - would be nice to show off the spectator's view
 
-* game won notif does: "undefined just beat x at a code duel!", should actually use the winning player's username
+* plus signs not working in prod (in game lobby, Players / Spectators buttons)
+  - for some reason webpack is parsing that image as a `data:` URI as opposed to a local file, like every other PNG in the project
+
+* game won notif does: "undefined just beat $LOSER_USERNAME at a code duel!". `undefined` should actually be the winning player's username
 
 * credits link should not appear on credits page
 
