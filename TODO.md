@@ -1,4 +1,8 @@
 ### needs to get done:
+* in game screen, player stats boxes become deformed when the stats popup is visible
+
+* logout in one browser causes logout in every browser. should only log out the one browser
+
 * tooltip can sometimes be made to stay visible. find out how to reproduce and fix
 
 * certain games with status "over" sometimes stay in the game list. find out how and fix
