@@ -10,71 +10,97 @@ const express = require("express"),
 app.use(bodyParser.json())
 app.use(cors({ origin: process.env.SERVER_URI }));
 
-
-// app.use(
-//   "/",
-//   async (req, res, next) => {
-//     if (!req.headers.authorization) return res.end();
-
-//     const user = jwt.verify(
-//       req.headers.authorization.replace("Bearer ", ""),
-//       process.env.SECRET_OR_KEY
-//     );
-
-//     if (user) {
-//       next();
-//     } else {
-//       res.end();
-//     }
-//   },
-// );
-
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
   res.set("Content-Type", "application/json");
 
-  const { data: { code }} = req.body;
-  fs.writeFileSync("./test/test.js", code);
+  const { data: { 
+    code,
+    testCases,
+    testName,
+    language
+  }} = req.body;
 
-  let containerRef = null;
 
-  docker.createContainer({
-    Image: "node:13.12.0-alpine",
-    Cmd: [
-      "node",
-      "test.js",
-    ],
-    NetworkDisabled: true,
-    WorkingDir: "/usr/src/app",
-    // AttachStdout: true,
-    // Tty: true,
-    HostConfig: {
-      Memory: 128 * 1024 * 1024, //128MB
-      DiskQuota: 1024,
-      Binds: [
-        `${process.env.TESTING_DIR}:/usr/src/app:ro`
+  let passedTests = 0
+    attemptedTests = 0;
+
+  for (let idx = 0; idx < testCases.length; idx++) {
+    const [test, sol] = testCases[idx];
+    // capture console.log and console.error and send them to 
+    let codeTester = `\n\n
+      const isEqual = require('lodash.isequal'),
+        userAns = ${testName}(${test}),
+        sol = ${JSON.stringify(sol)};
+      if (!isEqual(userAns, sol))
+        process.exit(1);
+    `;
+
+    let containerRef = null;
+
+    await docker.createContainer({
+      Image: "node-judge",
+      Cmd: [
+        "node",
+        "-e",
+        code + codeTester,
       ],
-      NetworkMode: "none",
-      AutoRemove: true,
-    }
-  })
-  .then(container => {
-    containerRef = container;
-    return container.start();
-  })
-  .then(data => {
-    setTimeout(() => {
-      containerRef.inspect((err, data) => {
-        if (err) return;
-        if (data.State.Status === 'running') 
-          console.log("stopping"), containerRef.stop();
+      NetworkDisabled: true,
+      WorkingDir: "/usr/src/app",
+      Tty: true,
+      HostConfig: {
+        Memory: 128 * 1024 * 1024, //128MB
+        DiskQuota: 1024,
+        NetworkMode: "none",
+        AutoRemove: true,
+      }
+    })
+    .then(async container => {
+      containerRef = container;
+      return await containerRef.attach({
+        stream: true,
+        stdout: false,
+        stderr: true
       });
-    }, 10 * 1000); // 10second hard limit for processing
-  })
-  .catch(err => console.log({err}));
+    })
+    .then(async stream => {
+      containerRef.modem.demuxStream(stream, process.stdout, process.stderr);
+      
+      stream.on('end', () => {
+        containerRef.inspect()
+          .then(data => {
+            // console.log({state: data.State})
+            if (data.State.ExitCode === 0) passedTests ++;
+            attemptedTests++;
 
-  return res.status(200).send({
-    data: { isTrue: true }
-  })
+            if (attemptedTests === testCases.length) {
+              res.status(200).send({
+                data: {
+                  passed: passedTests === testCases.length,
+                  score: passedTests / testCases.length,
+                }
+              });
+            }
+          });
+      });
+
+      // stream.on('data', () => console.log("received data up front"))
+
+      return await containerRef.start();
+    })
+    .then(async data => {
+      setTimeout(() => {
+        containerRef.stop()
+          .then(data => console.log("stopping", {data}), passedTests--)
+          .catch(e => {})
+      }, 10 * 1000); // 10second hard limit for processing
+      
+      return await data;
+    })
+    .catch(err => {
+      console.log({err});
+      res.sendStatus(500);
+    });
+  }
 });
 
 const PORT = process.env.PORT || 8080;
@@ -87,17 +113,17 @@ exports.app = app;
 
 
 // const fizzBuzzReference = function (n) {
-//   let ans = [];
-//   for (let i = 1; i <= n; i++) {
-//     if (i % 3 === 0 && i % 5 === 0) {
-//       ans.push("FizzBuzz");
-//     } else if (i % 3 === 0) {
-//       ans.push("Fizz");
-//     } else if (i % 5 === 0) {
-//       ans.push("Buzz");
-//     } else {
-//       ans.push(i.toString());
-//     }
-//   }
-//   return ans;
+  // let ans = [];
+  // for (let i = 1; i <= n; i++) {
+  //   if (i % 3 === 0 && i % 5 === 0) {
+  //     ans.push("FizzBuzz");
+  //   } else if (i % 3 === 0) {
+  //     ans.push("Fizz");
+  //   } else if (i % 5 === 0) {
+  //     ans.push("Buzz");
+  //   } else {
+  //     ans.push(i.toString());
+  //   }
+  // }
+  // return ans;
 // };

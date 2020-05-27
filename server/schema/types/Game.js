@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 const { withFilter } = require("apollo-server-express");
 
+let http;
 if (process.env.NODE_ENV === 'development') {
-  const http = require('http');
+  http = require('http');
 } else {
-  const http = require('https');
+  http = require('https');
 }
 
 const Game = mongoose.model('Game');
@@ -155,16 +156,18 @@ const resolvers = {
       let data = JSON.stringify({
         data: { 
           code,
-          testCases: {
+          testCases: [
             // gotta fetch the test cases based on the game's q
             // the game should have a Question_id that we can use to
             // Mongo-lookup the test cases
-            1: ["1"],
-            2: ["1", "2"],
-            3: ["1", "2", "Fizz"],
-            4: ["1", "2", "Fizz", "4"],
-            5: ["1", "2", "Fizz", "4", "Buzz"],
-          }
+            [1, ['1']],
+            [2, ['1', '2']],
+            [3, ['1', '2', 'Fizz']],
+            [4, ['1', '2', 'Fizz', '4']],
+            [5, ['1', '2', 'Fizz', '4', 'Buzz']],
+            [15, [ "1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz" ]]
+          ],
+          testName: "fizzBuzz"
         },
       });
 
