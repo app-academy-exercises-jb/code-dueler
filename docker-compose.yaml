@@ -10,6 +10,7 @@ services:
       NODE_ENV: development
       SECRET_OR_KEY: ${SECRET_OR_KEY}
       SERVER_URI: http://server:5000
+      REDIS_URI: redis://redis
       PORT: 5005
     volumes: 
       - ./code_judge_server:/usr/src/app
@@ -26,6 +27,7 @@ services:
       NODE_ENV: development
       SECRET_OR_KEY: ${SECRET_OR_KEY}
       SERVER_URI: http://code_judge_server:5005
+      REDIS_URI: redis://redis
       PORT: 5006
       TESTING_DIR: $PWD/code_judge_worker/test
     volumes: 

@@ -2,7 +2,22 @@ const express = require("express"),
   jwt = require("jsonwebtoken"),
   cors = require("cors"),
   app = express(),
-  bodyParser = require("body-parser");
+  bodyParser = require("body-parser"),
+  Queue = require("bull");
+
+const jobQueue = new Queue('code-review', process.env.REDIS_URI);
+
+jobQueue.on('error', err => console.log('job error', {err}));
+jobQueue.on('stalled', job => console.log('job stalled',{job}));
+jobQueue.on('failed', (job,err) => console.log('job failed', {err}));
+
+jobQueue.on('active', (job, jobPromise) => {
+  console.log('job started',{job});
+});
+
+jobQueue.on('completed', (job, result) => {
+  console.log('job completed', {result});
+});
 
 app.use(bodyParser.json())
 app.use(cors({ origin: process.env.SERVER_URI }));
@@ -12,23 +27,35 @@ app.post("/", async (req, res) => {
 
   const { data: { 
     code,
-    testCases,
-    testName,
-    language
+    questionId
   }} = req.body;
 
+  await jobQueue
+    .add(Date.now().toString(), {
+      code,
+      questionId,
+    })
+    .then(async job => {
+      // console.log({job})
+      await job
+        .finished()
+        .then(data => {
+          console.log({data})
+
+          res.status(200).send({
+            passed: false,
+            logs: [],
+            error: 'whoops'
+          });
+        });
+    })
+    .catch(err => console.log("error processing job",{err}));
   // res.status(200).send({
   //   passed,
   //   ...results,
   //   logs: capturedInfo.logs,
   //   error: capturedInfo.error[0],
   // });
-
-  res.status(200).send({
-    passed: false,
-    logs: [],
-    error: 'whoops'
-  })
 });
 
 const PORT = process.env.PORT || 8080;
