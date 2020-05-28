@@ -20,87 +20,123 @@ app.post("/", async (req, res) => {
     language
   }} = req.body;
 
+  let nonce = `${Date.now()}`;
 
-  let passedTests = 0
-    attemptedTests = 0;
+  fs.mkdirSync(`./test/${nonce}`);
+  
+  // capture console.log and console.error and send them to 
+  let codeTester = `\n\n
+    const isEqual = require('lodash.isequal'),
+      testCases = ${JSON.stringify(testCases)};
 
-  for (let idx = 0; idx < testCases.length; idx++) {
-    const [test, sol] = testCases[idx];
-    // capture console.log and console.error and send them to 
-    let codeTester = `\n\n
-      const isEqual = require('lodash.isequal'),
-        userAns = ${testName}(${test}),
-        sol = ${JSON.stringify(sol)};
-      if (!isEqual(userAns, sol))
+    let results = {},
+      score = 0;
+
+    for (let i = 0; i < testCases.length; i++) {
+      let [test, sol] = testCases[i],
+        userAns;
+      try {
+        userAns = ${testName}(test);
+      } catch (error) {
+        console.error(error);
         process.exit(1);
-    `;
-
-    let containerRef = null;
-
-    await docker.createContainer({
-      Image: "node-judge",
-      Cmd: [
-        "node",
-        "-e",
-        code + codeTester,
-      ],
-      NetworkDisabled: true,
-      WorkingDir: "/usr/src/app",
-      Tty: true,
-      HostConfig: {
-        Memory: 128 * 1024 * 1024, //128MB
-        DiskQuota: 1024,
-        NetworkMode: "none",
-        AutoRemove: true,
       }
-    })
-    .then(async container => {
-      containerRef = container;
-      return await containerRef.attach({
-        stream: true,
-        stdout: false,
-        stderr: true
-      });
-    })
-    .then(async stream => {
-      containerRef.modem.demuxStream(stream, process.stdout, process.stderr);
-      
-      stream.on('end', () => {
-        containerRef.inspect()
-          .then(data => {
-            // console.log({state: data.State})
-            if (data.State.ExitCode === 0) passedTests ++;
-            attemptedTests++;
 
-            if (attemptedTests === testCases.length) {
-              res.status(200).send({
-                data: {
-                  passed: passedTests === testCases.length,
-                  score: passedTests / testCases.length,
-                }
-              });
+      if (isEqual(userAns, sol)) {
+        score++;
+      }
+    }
+
+    results.score = score / ${testCases.length};
+
+    fs.writeFileSync('./test/${nonce}.js', JSON.stringify(results));
+  `;
+
+  let containerRef = null;
+
+  await docker.createContainer({
+    Image: "node-judge",
+    Cmd: [
+      "node",
+      "-e",
+      code + codeTester,
+    ],
+    NetworkDisabled: true,
+    WorkingDir: "/usr/src/app",
+    Tty: false,
+    HostConfig: {
+      Memory: 128 * 1024 * 1024, //128MB
+      Binds: [
+        `${process.env.TESTING_DIR}/${nonce}:/usr/src/app/test:rw`
+      ],
+      DiskQuota: 1024,
+      NetworkMode: "none",
+      AutoRemove: true,
+    }
+  })
+  .then(async container => {
+    containerRef = container;
+    return await containerRef.attach({
+      stream: true,
+      stdout: true,
+      stderr: true
+    });
+  })
+  .then(async stream => {
+    let capturedInfo = {
+      errors: [],
+      logs: [],
+      write: (stream) => ({
+        write: data => {
+          let key = stream === 'err' ? 'errors' : 'logs';
+          capturedInfo[key].push(data.toString().trim());
+        }
+      })
+    };
+
+    containerRef.modem.demuxStream(stream, capturedInfo.write("log"), capturedInfo.write("err"));
+    
+    stream.on('end', () => {
+      containerRef.inspect()
+        .then(data => {
+          let testFile = `./test/${nonce}/${nonce}.js`,
+            results, passed, score;
+          if (fs.existsSync(testFile)) {
+            results = JSON.parse(fs.readFileSync(testFile).toString());
+            passed = results.score === 1;
+            score = results.score;
+          } else {
+            passed = false;
+            score = 0;
+          }
+
+          res.status(200).send({
+            data: {
+              passed,
+              score,
+              logs: capturedInfo.logs,
+              errors: capturedInfo.errors,
             }
           });
-      });
-
-      // stream.on('data', () => console.log("received data up front"))
-
-      return await containerRef.start();
-    })
-    .then(async data => {
-      setTimeout(() => {
-        containerRef.stop()
-          .then(data => console.log("stopping", {data}), passedTests--)
-          .catch(e => {})
-      }, 10 * 1000); // 10second hard limit for processing
-      
-      return await data;
-    })
-    .catch(err => {
-      console.log({err});
-      res.sendStatus(500);
+          fs.rmdirSync(`./test/${nonce}`, {recursive: true});
+        });
     });
-  }
+
+    return await containerRef.start();
+  })
+  .then(async data => {
+    setTimeout(() => {
+      containerRef.stop()
+        .then(data => console.log("stopping", {data}))
+        .catch(e => {})
+    }, 10 * 1000); // 10second hard limit for processing
+    
+    return await data;
+  })
+  .catch(err => {
+    console.log({err});
+    res.sendStatus(500);
+  });
 });
 
 const PORT = process.env.PORT || 8080;
