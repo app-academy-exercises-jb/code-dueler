@@ -4,7 +4,6 @@ import Prism from "prismjs";
 import { useMutation } from "@apollo/react-hooks";
 import {
   UPDATE_GAME_USER_CODE,
-  UPDATE_GAME_LAST_SUBMITTED,
   SUBMIT_CODE,
 } from "../../graphql/mutations";
 
@@ -17,8 +16,7 @@ const CodeEditor = ({ gameId, me, spectator, data }) => {
   const [lineCount, setLineCount] = useState(0);
 
   const [updateUserCode] = useMutation(UPDATE_GAME_USER_CODE);
-  const [updateLastSubmission] = useMutation(UPDATE_GAME_LAST_SUBMITTED);
-  const [pingJudge] = useMutation(SUBMIT_CODE);
+  const [submitCode] = useMutation(SUBMIT_CODE);
 
   useEffect(() => {
     data && setCode(data);
@@ -46,7 +44,7 @@ const CodeEditor = ({ gameId, me, spectator, data }) => {
       <button
         className="code-submit"
         onClick={(e) => {
-          pingJudge({variables: { code: editorRef.current.props.value }});
+          submitCode({variables: { code: editorRef.current.props.value }});
         }}
       >
         <h1>Submit your code</h1>

@@ -9,11 +9,13 @@ export default ({ownStats, opponentStats, spectator}) => {
   };
 
   const setResultsProps = parsed => {
+    debugger
     if (!parsed || (parsed && parsed.error !== undefined)) return;
     setProps({ 
-      test: parsed.checkedTests[parsed.checkedTests.length - 1],
+      test: parsed.test,
       expected: parsed.expected,
       output: parsed.output,
+      score: parsed.score,
       handleModalClose
     });
   }
@@ -47,24 +49,29 @@ export default ({ownStats, opponentStats, spectator}) => {
   const shouldUpdateOnLastOwnSubmitted = ownStats && ownStats.lastSubmittedResult;
   useEffect(() => {
     if (ownStats && ownStats.lastSubmittedResult && !spectator) {
-        const parsed = JSON.parse(ownStats.lastSubmittedResult);
-        setOwnParsed(parsed);
-        
-        if (parsed.error) {
-          setModalToOpen("error");
-          setErrorProps(parsed);
-        } else {
-          setModalToOpen("results");
-          setResultsProps(parsed);
+      debugger
+      const parsed = JSON.parse(ownStats.lastSubmittedResult);
+      setOwnParsed(parsed);
+      
+      if (parsed.error) {
+        parsed.error = {
+          snippet: parsed.error.substring(0, parsed.error.indexOf('\n')),
+          stackTrace: parsed.error
         }
-
-        if (modalOpen === false) {
-          setModalOpen(true);
-        }
-      } else if (ownStats && ownStats.lastSubmittedResult && spectator) {
-        const parsed = JSON.parse(ownStats.lastSubmittedResult);
-        setOwnParsed(parsed);
+        setModalToOpen("error");
+        setErrorProps(parsed);
+      } else {
+        setModalToOpen("results");
+        setResultsProps(parsed);
       }
+
+      if (modalOpen === false) {
+        setModalOpen(true);
+      }
+    } else if (ownStats && ownStats.lastSubmittedResult && spectator) {
+      const parsed = JSON.parse(ownStats.lastSubmittedResult);
+      setOwnParsed(parsed);
+    }
     return () => setModalOpen(false);
   }, [shouldUpdateOnLastOwnSubmitted]);
 
@@ -82,6 +89,7 @@ export default ({ownStats, opponentStats, spectator}) => {
       <div className="stats-players">
         <Stats 
           ownStats={ownStats} 
+          ownParsed={ownParsed} 
           title={"Own Stats"} 
           {...statsProps}
         />
@@ -89,6 +97,7 @@ export default ({ownStats, opponentStats, spectator}) => {
       <div className="stats-players">
         <Stats
           opponentStats={opponentStats}
+          opponentParsed={opponentParsed}
           title={"Opponent Stats"}
           {...statsProps}
         />

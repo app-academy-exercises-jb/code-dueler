@@ -44,9 +44,18 @@ app.post("/", async (req, res) => {
 
       if (isEqual(userAns, sol)) {
         score++;
+      } else {
+        results = {
+          test,
+          expected: sol,
+          output: userAns,
+          ...results
+        };
+        break;
       }
     }
 
+    
     results.score = score / ${testCases.length};
 
     fs.writeFileSync('./test/${nonce}.js', JSON.stringify(results));
@@ -84,11 +93,11 @@ app.post("/", async (req, res) => {
   })
   .then(async stream => {
     let capturedInfo = {
-      errors: [],
+      error: [],
       logs: [],
       write: (stream) => ({
         write: data => {
-          let key = stream === 'err' ? 'errors' : 'logs';
+          let key = stream === 'err' ? 'error' : 'logs';
           capturedInfo[key].push(data.toString().trim());
         }
       })
@@ -111,12 +120,10 @@ app.post("/", async (req, res) => {
           }
 
           res.status(200).send({
-            data: {
-              passed,
-              score,
-              logs: capturedInfo.logs,
-              errors: capturedInfo.errors,
-            }
+            passed,
+            ...results,
+            logs: capturedInfo.logs,
+            error: capturedInfo.error[0],
           });
           fs.rmdirSync(`./test/${nonce}`, {recursive: true});
         });

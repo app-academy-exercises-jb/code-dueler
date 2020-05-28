@@ -76,7 +76,7 @@ const typeDefs = `
   }
 `;
 
-const getPlayer = (game, user) => {
+const getPlayerKey = (game, user) => {
   if (game.p1.player._id === user._id) {
     return "p1";
   } else if (game.p2.player._id === user._id) {
@@ -98,15 +98,8 @@ const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input
         let loser = game.winner._id === game.p1.player._id 
           ? game.p1.player
           : game.p2.player;
-        pubsub.publish("messageAdded", {
-          _id: mongoose.Types.ObjectId(),
-          author: {
-            _id: '5ec67c304d861000117bf90f',
-            username: 'CodeDueler'
-          },
-          body: `${game.winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}` : 'code duel'}`,
-          createdAt: Date.now(),
-          channelId: 'global',
+        pubsub.publishMessage({
+          message: `${game.winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}` : 'code duel'}`
         });
       }
     }
@@ -186,7 +179,20 @@ const resolvers = {
         res.on('end', () => {
           try {
             const parsedData = JSON.parse(rawData);
-            console.log({parsedData});
+            // console.log({parsedData});
+            let player = game.p1.player._id === user._id ? "p1" : "p2";
+            if (parsedData.passed === true) {
+              game.status = "over";
+              game.winner = player;
+            }
+
+            game.updateGameUser(user, {
+              lastSubmittedResult: rawData
+            });
+            
+            game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: game[player] } })
+              .then(res => console.log("game updated"))
+              .catch(error => console.log("unable to update game:", {error}));
           } catch (e) {
             console.error("error", e.message);
           }
@@ -198,6 +204,10 @@ const resolvers = {
 
       req.write(data);
       req.end();
+
+
+      
+
 
       return "ok";
     },
@@ -331,60 +341,56 @@ const resolvers = {
       return "ok";
     },
     updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
-      const { player: _id, lastSubmittedResult, gameId } = input;
+      // const { player: _id, lastSubmittedResult, gameId } = input;
 
-      const game = pubsub.games[gameId];
+      // const game = pubsub.games[gameId];
       
-      const player = getPlayer(game, user);
+      // const player = getPlayerKey(game, user);
 
-      const parsedResult = JSON.parse(lastSubmittedResult);
-      if (parsedResult.passed === true) {
-        game.status = "over";
-        game.winner = player;
-      }
+      // const parsedResult = JSON.parse(lastSubmittedResult);
+      // if (parsedResult.passed === true) {
+      //   game.status = "over";
+      //   game.winner = player;
+      // }
       
-      const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
-        pubsub, ws, gameId, player, _id, game, input, user
-      });
+      // const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
+      //   pubsub, ws, gameId, player, _id, game, input, user
+      // });
     
-      publishGameUpdate(gameUser);
-      game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: gameUser } })
-        .then(res => console.log("game updated"))
-        .catch(error => console.log("unable to update game:", {error}));
+      // publishGameUpdate(gameUser);
+      // game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: gameUser } })
+      //   .then(res => console.log("game updated"))
+      //   .catch(error => console.log("unable to update game:", {error}));
 
-      return gameUser;
+      // return gameUser;
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
       const { player: _id, gameId } = input;
-
       const game = pubsub.games[gameId];
 
-      if (game === undefined) return false;
+      if (game === undefined
+        || _id !== user._id
+        || ws.gameId !== gameId) return false;
 
-      game.status = "started";
+      // these were only necessary to verify the input
+      delete input.player, delete input.gameId;
 
-      const player = getPlayer(game, user);
+      let playerKey = game.updateGameUser(user, input);
 
-      const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
-        pubsub, ws, gameId, player, _id, game, input, user
-      });
-
-      publishGameUpdate(gameUser);
-      return gameUser;
+      return game[playerKey];
     },
     updateGameUserStatus: (_, { player: _id, ready, gameId }, {user, pubsub, ws}) => {
       const game = pubsub.games[gameId];
 
-      if (game === undefined) return false;
+      if (game === undefined
+        || _id !== user._id
+        || ws.gameId !== gameId) return false;
 
-      const player = getPlayer(game, user);
-
-      const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
-        pubsub, ws, gameId, player, _id, game, input: { ready }, user
+      let playerKey = game.updateGameUser(user, {
+        ready
       });
-
-      publishGameUpdate(gameUser);
-      return gameUser;
+      
+      return game[playerKey];
     },
   },
   Subscription: {
