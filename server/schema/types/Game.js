@@ -179,7 +179,7 @@ const resolvers = {
         res.on('end', () => {
           try {
             const parsedData = JSON.parse(rawData);
-            // console.log({parsedData});
+            
             let player = game.p1.player._id === user._id ? "p1" : "p2";
             if (parsedData.passed === true) {
               game.status = "over";
@@ -191,7 +191,6 @@ const resolvers = {
             });
             
             game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: game[player] } })
-              .then(res => console.log("game updated"))
               .catch(error => console.log("unable to update game:", {error}));
           } catch (e) {
             console.error("error", e.message);

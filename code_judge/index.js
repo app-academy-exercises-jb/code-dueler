@@ -55,8 +55,9 @@ app.post("/", async (req, res) => {
       }
     }
 
-    
-    results.score = score / ${testCases.length};
+    score = score / ${testCases.length};
+    if (score !== 0 && score !== 1) score = parseFloat(score.toFixed(2));
+    results.score = score;
 
     fs.writeFileSync('./test/${nonce}.js', JSON.stringify(results));
   `;
