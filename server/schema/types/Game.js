@@ -116,7 +116,8 @@ const resolvers = {
   Mutation: {
     submitCode: (_, { code }, { user, pubsub, ws }) => {
       let game = pubsub.games[ws.gameId];
-      if (game === undefined) return "not ok";
+      if (game === undefined
+          || ws.processing === true) return "not ok";
         
       let data = JSON.stringify({
           code,
@@ -152,6 +153,8 @@ const resolvers = {
             game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: game[player] } })
               .catch(error => console.log("unable to update game:", {error}));
 
+            ws.processing = false;
+
             return "ok";
           } catch (e) {
             console.error("error", e.message);
@@ -162,6 +165,8 @@ const resolvers = {
       }).on('error', e => {
         console.log("error in submit code:", {e})
       })
+
+      ws.processing = true;
 
       req.write(data);
       req.end();

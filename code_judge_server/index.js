@@ -7,18 +7,6 @@ const express = require("express"),
 
 const jobQueue = new Queue('code-review', process.env.REDIS_URI);
 
-jobQueue.on('error', err => console.log('job error', {err}));
-jobQueue.on('stalled', job => console.log('job stalled',{job}));
-jobQueue.on('failed', (job,err) => console.log('job failed', {err}));
-
-jobQueue.on('active', (job, jobPromise) => {
-  console.log('job started',{job});
-});
-
-jobQueue.on('completed', (job, result) => {
-  console.log('job completed', {result});
-});
-
 app.use(bodyParser.json())
 app.use(cors({ origin: process.env.SERVER_URI }));
 

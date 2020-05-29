@@ -1,13 +1,8 @@
-const express = require("express"),
-  jwt = require("jsonwebtoken"),
-  cors = require("cors"),
-  app = express(),
-  bodyParser = require("body-parser"),
-  mongoose = require("mongoose"),
+const mongoose = require("mongoose"),
   fs = require("fs"),
   Docker = require("dockerode"),
-  docker = new Docker({socketPath: "/var/run/docker.sock"}),
-  Queue = require("bull");
+  Queue = require("bull"),
+  docker = new Docker({socketPath: "/var/run/docker.sock"});
 
 require('./Question');
 
@@ -23,14 +18,6 @@ mongoose
 
 
 const jobQueue = new Queue('code-review', process.env.REDIS_URI);
-
-jobQueue.on('error', err => console.log('job error', {err}));
-jobQueue.on('stalled', job => console.log('job stalled',{job}));
-jobQueue.on('failed', (job,err) => console.log('job failed', {err}));
-
-// jobQueue.on('completed', (job, result) => {
-//   console.log('job completed in worker', {result});
-// });
 
 jobQueue.process('submitCode', async job => {
   const Question = mongoose.model('Question'),
@@ -164,7 +151,7 @@ jobQueue.process('submitCode', async job => {
       containerRef.stop()
         .then(data => console.log("stopping", {data}))
         .catch(e => {})
-    }, 0 * 1000); // 10second hard limit for processing
+    }, 10 * 1000); // 10s min limit for processing, ~20s max
     
     return data;
   })
@@ -174,5 +161,3 @@ jobQueue.process('submitCode', async job => {
 
   });
 });
-
-exports.app = app;
