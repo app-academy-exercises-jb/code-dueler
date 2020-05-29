@@ -6,7 +6,7 @@ import ChallengeQuestion from "../components/game/ChallengeQuestion";
 import { useHistory } from "react-router-dom";
 import ReactModal from "react-modal";
 
-export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
+export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me, questionData }) => {
   const history = useHistory();
   const [playersInGame, setPlayersInGame] = useState([]),
     [spectatorsInGame, setSpectatorsInGame] = useState([]),
@@ -49,8 +49,6 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
   }
 
   if (gameEvent === null) return null;
-
-  
   
   return (
     <div className="global">
@@ -77,7 +75,10 @@ export default ({ gameId, gameEvent, refetchMe, refetchMeLogged, me}) => {
         />
         <div className="vertical-half">
           <div className="challenge-question-wrapper">
-            <ChallengeQuestion />
+            <ChallengeQuestion 
+              challenge={questionData && questionData.challenge}
+              body={questionData && questionData.body}
+            />
           </div>
           <div className="game-chat-wrapper">
             <Chat channelId={gameId} id={"game-chat"} me={me} />

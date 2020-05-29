@@ -66,6 +66,8 @@ const typeDefs = `
     gameStatus: String
     isInGame: Boolean!
     isSpectator: Boolean!
+    challenge: String!
+    body: String!
   }
   type GameLog {
     _id: ID!
@@ -122,7 +124,9 @@ const resolvers = {
             : "wrong ws")
           : "not ok"),
         isInGame: Boolean(ws.gameId || pubsub.games.inGame[user._id]),
-        isSpectator: Boolean(game && game.spectatorsKey[user._id])
+        isSpectator: Boolean(game && game.spectatorsKey[user._id]),
+        challenge: game.challenge,
+        body: game.challengeBody
       }
     },
     games: (_, __, { pubsub }) => {
@@ -146,24 +150,24 @@ const resolvers = {
       let game = pubsub.games[ws.gameId];
       if (game === undefined) return "not ok";
 
-      let data = JSON.stringify({
-        data: { 
-          code,
-          testCases: [
-            // gotta fetch the test cases based on the game's q
-            // the game should have a Question_id that we can use to
-            // Mongo-lookup the test cases
-            [1, ['1']],
-            [2, ['1', '2']],
-            [3, ['1', '2', 'Fizz']],
-            [4, ['1', '2', 'Fizz', '4']],
-            [5, ['1', '2', 'Fizz', '4', 'Buzz']],
-            [15, [ "1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz" ]]
-          ],
-          testName: game.challenge || "fizzBuzz",
-          language: game.language || "javascript"
-        },
-      });
+      // let data = JSON.stringify({
+      //   data: { 
+      //     code,
+      //     testCases: [
+      //       // gotta fetch the test cases based on the game's q
+      //       // the game should have a Question_id that we can use to
+      //       // Mongo-lookup the test cases
+      //       [1, ['1']],
+      //       [2, ['1', '2']],
+      //       [3, ['1', '2', 'Fizz']],
+      //       [4, ['1', '2', 'Fizz', '4']],
+      //       [5, ['1', '2', 'Fizz', '4', 'Buzz']],
+      //       [15, [ "1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz" ]]
+      //     ],
+      //     testName: game.challenge || "fizzBuzz",
+      //     language: game.language || "javascript"
+      //   },
+      // });
 
       let req = http.request(process.env.CODE_JDG_URI, {
         method: 'POST',
@@ -192,8 +196,11 @@ const resolvers = {
             
             game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: game[player] } })
               .catch(error => console.log("unable to update game:", {error}));
+
+            return "ok";
           } catch (e) {
             console.error("error", e.message);
+            return "not ok";
           }
         });
 
@@ -203,19 +210,13 @@ const resolvers = {
 
       req.write(data);
       req.end();
-
-
-      
-
-
-      return "ok";
     },
     hostGame: (_, { challenge }, { user, pubsub, ws}) => {
       if (ws.userId !== user._id
           || !pubsub.subscribers[user._id]
           || Boolean(pubsub.games.inGame[user._id])) return null;
 
-      return Game.start(challenge, user, ws, pubsub);
+      return Game.start(challenge, 'javascript', user, ws, pubsub);
     },
     handleGame: (_, { gameId, action }, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
@@ -383,7 +384,9 @@ const resolvers = {
 
       if (game === undefined
         || _id !== user._id
-        || ws.gameId !== gameId) return false;
+        || ws.gameId !== gameId) {
+          return false
+        };
 
       let playerKey = game.updateGameUser(user, {
         ready

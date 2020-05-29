@@ -152,3 +152,9 @@ export const SUBMIT_CODE = gql`
     submitCode(code: $code)
   }
 `;
+
+export const ADD_QUESTION = gql`
+  mutation AddQuestion {
+    addQuestion
+  }
+`;

@@ -73,13 +73,12 @@ const setupGame = pubsub => game => {
           // finish game if player is disconnected, 
           // but the other player is connected
           finishGame();
-        } else if (playerWSArr.every(ws => 
-          ws.gameId !== _id)) {
+        } else if (playerWSArr.every(ws => ws.gameId !== _id)) {
             // finish game if player is connected, 
             // but not to game screen
             finishGame();
         } else {
-          console.log("not finishing after all:")
+          console.log("not finishing after all")
         }
       } else {
         // we have noone in game, finish it
