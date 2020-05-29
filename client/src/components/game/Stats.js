@@ -1,8 +1,8 @@
 import React from "react";
 
 export default ({
-  ownStats,
-  opponentStats,
+  ownStats, ownParsed,
+  opponentStats, opponentParsed,
   title,
   openTestResults,
   openErrorResults,
@@ -11,9 +11,11 @@ export default ({
 
   if (ownStats) {
     stats = ownStats;
+    parsed = ownParsed;
     name = "own";
   } else {
     stats = opponentStats;
+    parsed = opponentParsed;
     name = "opponent";
   }
 
@@ -27,8 +29,8 @@ export default ({
           <h2>Lines of Code: {(stats && stats.lineCount) || 0}</h2>
           <h2>
             Passed Tests:{" "}
-            {(parsed && parsed.passedTests && parsed.passedTests.toString()) ||
-              "None"}
+            {(parsed && parsed.score && `${parsed.score * 100}%`) ||
+              "0%"}
           </h2>
           <div className="stats-results">
             <h2 onClick={() => openTestResults(name)}>Results</h2>

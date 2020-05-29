@@ -8,7 +8,7 @@ import ReactModal from "react-modal";
 import PlayerStats from "../components/game/PlayerStats";
 import GameTour from "../components/tour/GameTour";
 
-export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
+export default ({ me, gameId, refetchMeLogged, gameEvent, questionData }) => {
   const history = useHistory();
   const [opponentStats, setOpponentStats] = useState(null);
   const [ownStats, setOwnStats] = useState(null);
@@ -90,7 +90,10 @@ export default ({ me, gameId, refetchMeLogged, gameEvent }) => {
           </div>
           <div className="game-right">
             <div className="challenge-question-wrapper">
-              <ChallengeQuestion />
+              <ChallengeQuestion 
+                challenge={questionData && questionData.challenge}
+                body={questionData && questionData.body}
+              />
             </div>
             <div className="game-chat-wrapper">
               <Chat channelId={gameId} id={"game-chat"} me={me} />

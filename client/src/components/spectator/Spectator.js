@@ -10,7 +10,7 @@ import { LEAVE_GAME } from "../../graphql/mutations";
 import PlayerStats from "../game/PlayerStats";
 import NavBar from "../nav/NavBar";
 
-export default ({ me, gameEvent, ...props }) => {
+export default ({ me, gameEvent, questionData, ...props }) => {
   const { id: gameId } = useParams();
   const history = useHistory();
   const [player1Stats, setPlayer1Stats] = useState(null);
@@ -52,8 +52,6 @@ export default ({ me, gameEvent, ...props }) => {
     history.push("/");
   };
 
-  // console.log(player1Stats);
-
   return (
     <div className="global">
       <NavBar
@@ -94,7 +92,10 @@ export default ({ me, gameEvent, ...props }) => {
           </div>
           <div className="screen-bottom">
             <div className="challenge-question-wrapper-spectator">
-              <ChallengeQuestion />
+              <ChallengeQuestion 
+                challenge={questionData && questionData.challenge}
+                body={questionData && questionData.body}
+              />
             </div>
             <div className="game-chat-wrapper-spectator">
               <Chat channelId={gameId} id={"game-chat"} me={me} />

@@ -96,7 +96,8 @@ export default ({ me, ...props }) => {
     || gameStatus === "not ok") return null;
 
   const { queryGameInfo } = gameData,
-  { isInGame, isSpectator, gameExists } = queryGameInfo;
+    { isInGame, isSpectator, gameExists, challenge, body } = queryGameInfo,
+    questionData = {challenge, body};
 
   if (!gameExists) {
     return <Redirect to={'/'} />
@@ -118,6 +119,7 @@ export default ({ me, ...props }) => {
         >
           {gameEvent => <GameLobby 
             {...props}
+            questionData={questionData}
             queryGameInfo={queryGameInfo}
             gameEvent={gameEvent}
             gameId={gameId}
@@ -136,6 +138,7 @@ export default ({ me, ...props }) => {
           >
             {gameEvent => <GameScreen
               { ...props }
+              questionData={questionData}
               gameEvent={gameEvent}
               gameId={gameId}
               me={me}
@@ -153,6 +156,7 @@ export default ({ me, ...props }) => {
           >
             {gameEvent => <Spectator
               { ...props }
+              questionData={questionData}
               gameEvent={gameEvent}
               gameId={gameId}
               me={me}

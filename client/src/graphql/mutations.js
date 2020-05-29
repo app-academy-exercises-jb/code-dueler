@@ -89,23 +89,6 @@ export const DECLINE_INVITE = gql`
   }
 `;
 
-export const UPDATE_GAME_LAST_SUBMITTED = gql`
-  mutation UpdateGameUserLastSubmitted(
-    $player: ID!
-    $lastSubmittedResult: String!
-    $gameId: String!
-  ) {
-    updateGameUserLastSubmitted(
-      player: $player
-      gameId: $gameId
-      lastSubmittedResult: $lastSubmittedResult
-    ) {
-      ...GameUserDetails
-    }
-  }
-  ${GAME_USER_DETAILS}
-`;
-
 export const UPDATE_GAME_USER_CODE = gql`
   mutation UpdateGameUserCurrentCode(
     $charCount: Int!
@@ -159,7 +142,19 @@ export const JOIN_GAME = gql`
 `;
 
 export const HOST_GAME = gql`
-  mutation HostGame($challenge: String!) {
-    hostGame(challenge: $challenge)
+  mutation HostGame($challenge: String!, $language: String!) {
+    hostGame(challenge: $challenge, language: $language)
+  }
+`;
+
+export const SUBMIT_CODE = gql`
+  mutation SubmitCode($code: String!) {
+    submitCode(code: $code)
+  }
+`;
+
+export const ADD_QUESTION = gql`
+  mutation AddQuestion {
+    addQuestion
   }
 `;

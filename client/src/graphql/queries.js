@@ -62,6 +62,8 @@ export const IN_GAME_INFO = gql`
       gameStatus
       isInGame
       isSpectator
+      challenge
+      body
     }
   }
 `;

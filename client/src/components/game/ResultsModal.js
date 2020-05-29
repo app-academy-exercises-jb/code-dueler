@@ -6,11 +6,11 @@ export default ({ test, expected, output, handleModalClose }) => {
       <div className={`stats-modal results-block`}>
         <div className={`stats-modal-info center`}>
           <div className="stats-modal-results">
-            Test case = {test}
+            Failed test case: {test}
             <br />
-            Expected result = <code>{JSON.stringify(expected)}</code>
+            Expected result: <code>{JSON.stringify(expected)}</code>
             <br />
-            Submitted code result = {JSON.stringify(output)}
+            Submitted code result: {JSON.stringify(output)}
             <br />
           </div>
         </div>

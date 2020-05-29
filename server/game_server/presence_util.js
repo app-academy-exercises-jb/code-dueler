@@ -48,7 +48,7 @@ const presenceUtils = pubsub => {
         && !pubsub.subscribers[user._id].includes(oldWs)) {
       console.log("switching ws");
       game.users[user._id] = ws;
-      ws.gameId = game._id;
+      ws.gameId = game._id.toString();
       game.connections++;
       pubsub.publishGameLoggedEvent(game);
     }

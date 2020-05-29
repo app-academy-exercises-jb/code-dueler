@@ -26,15 +26,8 @@ const setupGame = pubsub => game => {
     Object.keys(game.users).forEach(user => {
       pubsub.publishUserLoggedEvent({_id: user}, Boolean(pubsub.subscribers[user]));
     });
-    pubsub.publish("messageAdded", {
-      _id: mongoose.Types.ObjectId(),
-      author: {
-        _id: '5ec67c304d861000117bf90f',
-        username: 'CodeDueler'
-      },
-      body: `${game.p1.player.username} and ${game.p2.player.username} have started a code duel!`,
-      createdAt: Date.now(),
-      channelId: 'global',
+    pubsub.publishMessage({
+      message: `${game.p1.player.username} and ${game.p2.player.username} have started a code duel!`,
     });
   };
 
@@ -80,13 +73,12 @@ const setupGame = pubsub => game => {
           // finish game if player is disconnected, 
           // but the other player is connected
           finishGame();
-        } else if (playerWSArr.every(ws => 
-          ws.gameId !== _id)) {
+        } else if (playerWSArr.every(ws => ws.gameId !== _id)) {
             // finish game if player is connected, 
             // but not to game screen
             finishGame();
         } else {
-          console.log("not finishing after all:")
+          console.log("not finishing after all")
         }
       } else {
         // we have noone in game, finish it
@@ -284,6 +276,29 @@ const setupGame = pubsub => game => {
     }
   }
 
+  const updateGameUser = (user, input) => {
+    let playerKey = game.p1.player._id === user._id 
+      ? "p1"
+      : "p2";
+    // must update the game, in memory and in mongo
+    // only update mongo on gameover events
+    Object.assign(game[playerKey], input);
+    pubsub.publish("gameEvent", game);
+
+    // if the game has a winner, we have to publish a message about it
+    if (Boolean(game.winner)) {
+      let loser = game.winner._id === game.p1.player._id 
+        ? game.p1.player
+        : game.p2.player;
+      pubsub.publishMessage({
+        message: `${game.winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}` : 'code duel'}`,
+      });
+    }
+
+    return playerKey;
+  }
+
+  game.updateGameUser = updateGameUser;
   game.startGame = startGame;
   game.endGame = endGame;
   game.initializeGame = initializeGame;

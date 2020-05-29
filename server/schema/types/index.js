@@ -3,4 +3,5 @@ module.exports = [
   require('./Message'),
   require('./Invitation'),
   require('./Game'),
+  require('./Question'),
 ];

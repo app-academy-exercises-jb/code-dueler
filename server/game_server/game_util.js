@@ -10,7 +10,7 @@ const gameUtil = pubsub => {
     pubsub.games[gameId] = game;
   };
 
-  const initGame = ({Game, game, user, ws, p1}) => {
+  const initGame = ({Game, game, user, ws, language, challenge, challengeBody}) => {
     // setup useful in-memory variables to make find operations O(1)
     const details = {
       spectatorsKey: {},
@@ -23,9 +23,12 @@ const gameUtil = pubsub => {
     // the objects contained inside game have no setters, so we have to manually copy values
     // or mongoose objects are just weird -- idk?
     const inMemGame = {
+      challenge,
+      challengeBody,
+      language,
       spectators: [],
       status: game.status,
-      _id: game._id,
+      _id: game._id.toString(),
       p1: {
         lastSubmittedResult: '',
         charCount: 0,

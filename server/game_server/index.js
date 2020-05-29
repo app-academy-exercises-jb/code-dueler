@@ -1,6 +1,7 @@
-const presenceUtil = require('./presence_util');
-const gameUtil = require('./game_util');
-const invitationUtil = require('./invitation_util');
+const messageUtil = require('./message_util'),
+  presenceUtil = require('./presence_util'),
+  gameUtil = require('./game_util'),
+  invitationUtil = require('./invitation_util');
 
 // setupGameServer is a factory function to imbue pubsub with ease-of-use,
 // game-related functions. The functions we define within it are 
@@ -11,6 +12,7 @@ const setupGameServer = (pubsub) => {
   pubsub.games.inGame = {};
   // pubsub.games.pendingInvites = {};
 
+  messageUtil(pubsub);
   presenceUtil(pubsub);
   gameUtil(pubsub);
   invitationUtil(pubsub);

@@ -1,8 +1,6 @@
 const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
-const CHALLENGES = ['fizz-buzz'];
-
 const PlayerSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
@@ -58,8 +56,18 @@ const GameSchema = new Schema({
 
 mongoose.Schema.Types.String.checkRequired(v => v !== null);
 
-GameSchema.statics.start = async (challenge, user, ws, pubsub) => {
-  if (CHALLENGES.every(c => c !== challenge)) return null;
+GameSchema.statics.start = async (challenge, language, user, ws, pubsub) => {
+  const Question = mongoose.model('Question');
+  let question = false;
+  await Question
+    .find({ challenge })
+    .then(res => {
+      if (res.length === 0) return;
+      question = res[0];
+    })
+    .catch(err => console.log({err}));
+  
+  if (!Boolean(question)) return null;
   
   const Game = mongoose.model('Game'),
     Player = mongoose.model('Player'),
@@ -75,7 +83,15 @@ GameSchema.statics.start = async (challenge, user, ws, pubsub) => {
   await game.save();
 
   user.pId = p1._id;
-  pubsub.initGame({ws, user, game, Game});
+  pubsub.initGame({
+    ws,
+    user,
+    game,
+    Game,
+    language,
+    challenge,
+    challengeBody: question.body
+  });
 
   return game._id;
 }
