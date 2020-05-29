@@ -25,6 +25,7 @@ services:
       - 5006:5006
     environment:
       NODE_ENV: development
+      MONGO_URI: ${WORKER_MONGO_URI}
       SECRET_OR_KEY: ${SECRET_OR_KEY}
       SERVER_URI: http://code_judge_server:5005
       REDIS_URI: redis://redis

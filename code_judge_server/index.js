@@ -25,37 +25,29 @@ app.use(cors({ origin: process.env.SERVER_URI }));
 app.post("/", async (req, res) => {
   res.set("Content-Type", "application/json");
 
-  const { data: { 
+  const {
     code,
-    questionId
-  }} = req.body;
+    challenge,
+    language
+  } = req.body;
 
   await jobQueue
-    .add(Date.now().toString(), {
+    .add('submitCode', {
       code,
-      questionId,
+      challenge,
+      language
     })
     .then(async job => {
-      // console.log({job})
       await job
         .finished()
         .then(data => {
-          console.log({data})
-
-          res.status(200).send({
-            passed: false,
-            logs: [],
-            error: 'whoops'
-          });
+          res.status(200).send(data);
         });
     })
-    .catch(err => console.log("error processing job",{err}));
-  // res.status(200).send({
-  //   passed,
-  //   ...results,
-  //   logs: capturedInfo.logs,
-  //   error: capturedInfo.error[0],
-  // });
+    .catch(err => {
+      console.log("error processing job",{err});
+      res.sendStatus(500);
+    });
 });
 
 const PORT = process.env.PORT || 8080;

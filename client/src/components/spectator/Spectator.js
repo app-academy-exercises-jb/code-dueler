@@ -52,8 +52,6 @@ export default ({ me, gameEvent, questionData, ...props }) => {
     history.push("/");
   };
 
-  // console.log(player1Stats);
-
   return (
     <div className="global">
       <NavBar

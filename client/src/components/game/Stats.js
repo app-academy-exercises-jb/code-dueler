@@ -19,7 +19,6 @@ export default ({
     name = "opponent";
   }
 
-  console.log({parsed});
   const username = stats ? stats.player.username : "";
   return (
     <>

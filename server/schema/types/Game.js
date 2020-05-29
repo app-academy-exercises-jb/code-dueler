@@ -78,38 +78,6 @@ const typeDefs = `
   }
 `;
 
-const getPlayerKey = (game, user) => {
-  if (game.p1.player._id === user._id) {
-    return "p1";
-  } else if (game.p2.player._id === user._id) {
-    return "p2";
-  }
-};
-
-const generatePublishGameUpdate = ({pubsub, ws, gameId, player, _id, game, input, user}) => {
-  const gameUser = Object.assign(
-    {...game[player]},
-    { ...input },
-    {player: user}
-  ),
-  publishGameUpdate = gameUser => {
-    if (ws.gameId === gameId && player !== undefined && _id === ws.userId) {
-      Object.assign(game, { [player]: { ...gameUser } });
-      pubsub.publish("gameEvent", game);
-      if (Boolean(game.winner)) {
-        let loser = game.winner._id === game.p1.player._id 
-          ? game.p1.player
-          : game.p2.player;
-        pubsub.publishMessage({
-          message: `${game.winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}` : 'code duel'}`
-        });
-      }
-    }
-  };
-
-  return [gameUser, publishGameUpdate];
-}
-
 const resolvers = {
   Query: {
     queryGameInfo: (_, { gameId }, { user, pubsub, ws }) => {
@@ -149,25 +117,12 @@ const resolvers = {
     submitCode: (_, { code }, { user, pubsub, ws }) => {
       let game = pubsub.games[ws.gameId];
       if (game === undefined) return "not ok";
-
-      // let data = JSON.stringify({
-      //   data: { 
-      //     code,
-      //     testCases: [
-      //       // gotta fetch the test cases based on the game's q
-      //       // the game should have a Question_id that we can use to
-      //       // Mongo-lookup the test cases
-      //       [1, ['1']],
-      //       [2, ['1', '2']],
-      //       [3, ['1', '2', 'Fizz']],
-      //       [4, ['1', '2', 'Fizz', '4']],
-      //       [5, ['1', '2', 'Fizz', '4', 'Buzz']],
-      //       [15, [ "1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz" ]]
-      //     ],
-      //     testName: game.challenge || "fizzBuzz",
-      //     language: game.language || "javascript"
-      //   },
-      // });
+        
+      let data = JSON.stringify({
+          code,
+          challenge: game.challenge,
+          language: game.language
+      });
 
       let req = http.request(process.env.CODE_JDG_URI, {
         method: 'POST',
@@ -383,10 +338,10 @@ const resolvers = {
       const game = pubsub.games[gameId];
 
       if (game === undefined
-        || _id !== user._id
-        || ws.gameId !== gameId) {
-          return false
-        };
+          || _id !== user._id
+          || ws.gameId !== gameId) {
+        return false
+      };
 
       let playerKey = game.updateGameUser(user, {
         ready
