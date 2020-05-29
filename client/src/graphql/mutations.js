@@ -142,8 +142,8 @@ export const JOIN_GAME = gql`
 `;
 
 export const HOST_GAME = gql`
-  mutation HostGame($challenge: String!) {
-    hostGame(challenge: $challenge)
+  mutation HostGame($challenge: String!, $language: String!) {
+    hostGame(challenge: $challenge, language: $language)
   }
 `;
 

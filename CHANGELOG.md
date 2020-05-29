@@ -25,3 +25,12 @@
 ## 0.8.3.1 - 5/22/2020
 
   * Fix problem where games would not be finished when all players disconnect
+
+## 0.9.0 - 5/29/2020
+
+  * rework coding judge to locally run docker service consisting of a master and an indefinite amount of worker processes. the master runs a redis job queue which the workers consume
+  * judge workers create a docker container to run user code in. this makes it simple to add more languages
+  * coding judge made resilient against fork bombs, timeouts, and other such malicious use
+  * coding judge rate limited at the game server level -- only one running submission per WS at a time
+  * coding judge now accurately captures user code's console.logs and error stack trace
+  * questions now on Mongo. adding new questions should now be fairly simple

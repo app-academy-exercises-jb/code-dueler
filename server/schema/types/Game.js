@@ -16,7 +16,7 @@ const typeDefs = `
     games: [GameLog]
   }
   extend type Mutation {
-    hostGame(challenge: String!): ID
+    hostGame(challenge: String!, language: String!): ID
     handleGame(gameId: String!, action: String!): String!
     joinGame(player: ID, gameId: ID): String!
     leaveGame(player: ID!, gameId: String!): String!
@@ -163,20 +163,22 @@ const resolvers = {
         });
 
       }).on('error', e => {
-        console.log("error in submit code:", {e})
+        console.log("error in submit code:", {e});
+        ws.processing = false;
       })
 
+      console.log("hello")
       ws.processing = true;
 
       req.write(data);
       req.end();
     },
-    hostGame: (_, { challenge }, { user, pubsub, ws}) => {
+    hostGame: (_, { challenge, language }, { user, pubsub, ws}) => {
       if (ws.userId !== user._id
           || !pubsub.subscribers[user._id]
           || Boolean(pubsub.games.inGame[user._id])) return null;
 
-      return Game.start(challenge, 'javascript', user, ws, pubsub);
+      return Game.start(challenge, language || 'javascript', user, ws, pubsub);
     },
     handleGame: (_, { gameId, action }, { user, pubsub, ws }) => {
       const game = pubsub.games[gameId];
