@@ -1,4 +1,12 @@
 ### needs to get done:
+* tooltip can sometimes be made to stay visible. find out how to reproduce and fix
+
+* certain games with status "over" sometimes stay in the game list. find out how and fix
+
+* when in game lobby, and screen width is such that the hamburger menu is visible, put the relevant game action button (start game, un/ready, claim/challenge) at the bottom of the sidebar
+
+* leaving game from spectators (when one is the last player) doesn't properly delete the in-memory game
+
 * splash page slideshow slides / gifs need to be reworked
   - would be nice to show off the spectator's view
 
