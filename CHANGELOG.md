@@ -34,3 +34,7 @@
   * coding judge rate limited at the game server level -- only one running submission per WS at a time
   * coding judge now accurately captures user code's console.logs and error stack trace
   * questions now on Mongo. adding new questions should now be fairly simple
+
+## 0.9.1 - 6/1/2020
+
+  * simplify coding judge to just one worker, which can be horizontally scaled. code submission queue is now run by the game server.
