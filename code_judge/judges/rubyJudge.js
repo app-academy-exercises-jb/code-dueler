@@ -2,11 +2,9 @@ const fs = require("fs"),
   Docker = require("dockerode"),
   docker = new Docker({socketPath: "/var/run/docker.sock"});
 
-const nodeJudge = (
-  {
-    code, testName, testCases
-  }, resolve, reject
-) => {
+const nodeJudge = ({
+  code, testName, testCases
+}) => {
   let nonce = `${Date.now()}`;
   fs.mkdirSync(`./test/${nonce}`);
   
@@ -36,7 +34,7 @@ const nodeJudge = (
         results = {
           test,
           expected: solution,
-          output: userAns,
+          output: JSON.stringify(userAns),
           ...results
         };
         break;
@@ -119,7 +117,6 @@ const nodeJudge = (
         });
     });
 
-    console.log("starting container")
     return containerRef.start();
   })
   .then(data => {

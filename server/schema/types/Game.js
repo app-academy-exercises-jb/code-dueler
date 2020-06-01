@@ -1,8 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose"),
+  Queue = require("bull"),
+  jobQueue = new Queue('code-review', process.env.REDIS_URI);
 const { withFilter } = require("apollo-server-express");
 
+
 let http;
-if (process.env.NODE_ENV === 'development') {
+if (process.env.HTTPS !== 'true') {
   http = require('http');
 } else {
   http = require('https');
@@ -21,11 +24,6 @@ const typeDefs = `
     joinGame(player: ID, gameId: ID): String!
     leaveGame(player: ID!, gameId: String!): String!
     kickPlayer(player: ID!, action: String!): String!
-    updateGameUserLastSubmitted(
-      player: ID!,
-      lastSubmittedResult: String!,
-      gameId: String!
-    ): GameUser!
     updateGameUserCurrentCode(
       player: ID!,
       charCount: Int!,
@@ -114,64 +112,50 @@ const resolvers = {
     }
   },
   Mutation: {
-    submitCode: (_, { code }, { user, pubsub, ws }) => {
+    submitCode: async (_, { code }, { user, pubsub, ws }) => {
       let game = pubsub.games[ws.gameId];
       if (game === undefined
-          || ws.processing === true) return "not ok";
-        
-      let data = JSON.stringify({
+          || ws.processing === true
+          || !game.isPlayer(user)) return "not ok";
+      
+      ws.processing = true;
+      const submission = await jobQueue
+        .add('submitCode', {
           code,
           challenge: game.challenge,
           language: game.language
-      });
+        })
+        .then(async job => {
+          let j = await job
+            .finished()
+            .then(data => {            
+              let player = game.getPlayer(user);
+              if (player === "not ok") return player;
 
-      let req = http.request(process.env.CODE_JDG_URI, {
-        method: 'POST',
-        port: 5005,
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": data.length,
-        }
-      }, res => {
-        res.setEncoding('utf8');
-        let rawData = '';
-        res.on('data', (chunk) => { rawData += chunk; });
-        res.on('end', () => {
-          try {
-            const parsedData = JSON.parse(rawData);
-            
-            let player = game.p1.player._id === user._id ? "p1" : "p2";
-            if (parsedData.passed === true) {
-              game.status = "over";
-              game.winner = player;
-            }
-
-            game.updateGameUser(user, {
-              lastSubmittedResult: rawData
+              if (data.passed === true) {
+                game.status = "over";
+                game.winner = player;
+              }
+              console.log({data});
+              
+              game.updateGameUser(user, {
+                lastSubmittedResult: JSON.stringify(data)
+              });      
+              game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: game[player] } })
+                .catch(error => console.log("unable to update game:", {error}));
+              ws.processing = false;
+        
+              return "ok";
             });
-            
-            game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: game[player] } })
-              .catch(error => console.log("unable to update game:", {error}));
-
-            ws.processing = false;
-
-            return "ok";
-          } catch (e) {
-            console.error("error", e.message);
-            return "not ok";
-          }
+          return j;
+        })
+        .catch(err => {
+          console.log("error processing job",{err});
+          ws.processing = false;
+          return "not ok";
         });
 
-      }).on('error', e => {
-        console.log("error in submit code:", {e});
-        ws.processing = false;
-      })
-
-      console.log("hello")
-      ws.processing = true;
-
-      req.write(data);
-      req.end();
+      return submission;
     },
     hostGame: (_, { challenge, language }, { user, pubsub, ws}) => {
       if (ws.userId !== user._id
@@ -301,30 +285,6 @@ const resolvers = {
       }
       
       return "ok";
-    },
-    updateGameUserLastSubmitted: (_, input, { user, pubsub, ws }) => {
-      // const { player: _id, lastSubmittedResult, gameId } = input;
-
-      // const game = pubsub.games[gameId];
-      
-      // const player = getPlayerKey(game, user);
-
-      // const parsedResult = JSON.parse(lastSubmittedResult);
-      // if (parsedResult.passed === true) {
-      //   game.status = "over";
-      //   game.winner = player;
-      // }
-      
-      // const [gameUser, publishGameUpdate] = generatePublishGameUpdate({
-      //   pubsub, ws, gameId, player, _id, game, input, user
-      // });
-    
-      // publishGameUpdate(gameUser);
-      // game.Game.findOneAndUpdate({_id: game._id}, { $set: { [player]: gameUser } })
-      //   .then(res => console.log("game updated"))
-      //   .catch(error => console.log("unable to update game:", {error}));
-
-      // return gameUser;
     },
     updateGameUserCurrentCode: (_, input, { user, pubsub, ws }) => {
       const { player: _id, gameId } = input;

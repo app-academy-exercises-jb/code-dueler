@@ -2,11 +2,13 @@ const fs = require("fs"),
   Docker = require("dockerode"),
   docker = new Docker({socketPath: "/var/run/docker.sock"});
 
-const nodeJudge = ({
-  code, testName, testCases
-}) => {
-  let nonce = `${Date.now()}`;
-  fs.mkdirSync(`./test/${nonce}`);
+const nodeJudge = (
+  {
+    code, testName, testCases
+  }, resolve, reject
+) => {
+  let nonce = Date.now().toString();
+  fs.mkdirSync(`${process.env.TESTING_DIR}/${nonce}`, {recursive: true});
   
   let codeTester = `\n\n
     const isEqual = require('lodash.isequal'),
@@ -92,29 +94,28 @@ const nodeJudge = ({
     containerRef.modem.demuxStream(stream, capturedInfo.write("log"), capturedInfo.write("err"));
     
     stream.on('end', () => {
-      containerRef.inspect()
-        .then(data => {
-          let testFile = `./test/${nonce}/${nonce}.js`,
-            results, passed;
+      let testFile = `./test/${nonce}/${nonce}.js`,
+        results, passed;
 
-          if (fs.existsSync(testFile)) {
-            results = JSON.parse(fs.readFileSync(testFile).toString());
-            passed = results.score === 1;
-            score = results.score;
-          } else {
-            passed = false;
-            score = 0;
-          }
+      if (fs.existsSync(testFile)) {
+        results = JSON.parse(fs.readFileSync(testFile).toString());
+        // console.log({results});
+        passed = results.score === 1;
+        score = results.score;
+      } else {
 
-          resolve({
-            passed,
-            ...results,
-            logs: capturedInfo.logs,
-            error: capturedInfo.error[0],
-          });
+        passed = false;
+        score = 0;
+      }
 
-          fs.rmdirSync(`./test/${nonce}`, {recursive: true});
-        });
+      resolve({
+        passed,
+        ...results,
+        logs: capturedInfo.logs,
+        error: capturedInfo.error[0],
+      });
+
+      fs.rmdirSync(`./test/${nonce}`, {recursive: true});
     });
 
     return containerRef.start();

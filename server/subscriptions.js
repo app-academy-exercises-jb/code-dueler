@@ -6,7 +6,7 @@ if (process.env.DOCKERIZED === 'true') {
   const { RedisPubSub } = require('graphql-redis-subscriptions');
   pubsub = new RedisPubSub({
     connection: {
-      host: process.env.REDIS_URI,
+      host: process.env.REDIS_HOST,
       port: 6379
     }
   });

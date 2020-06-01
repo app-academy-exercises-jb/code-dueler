@@ -1,50 +1,34 @@
 version: '3'
-services: 
-  code_judge_server:
-    build: ./code_judge_server
+services:
+  code_judge:
+    build: ./code_judge
     depends_on: 
       - redis
-    ports: 
-      - 5005:5005
-    environment:
-      NODE_ENV: development
-      SECRET_OR_KEY: ${SECRET_OR_KEY}
-      SERVER_URI: http://server:5000
-      REDIS_URI: redis://redis
-      PORT: 5005
-    volumes: 
-      - ./code_judge_server:/usr/src/app
-    command: npm run dev
-
-  code_judge_worker:
-    build: ./code_judge_worker
-    depends_on: 
-      - redis
-      - code_judge_server
     environment:
       NODE_ENV: development
       MONGO_URI: ${WORKER_MONGO_URI}
       REDIS_URI: redis://redis
-      TESTING_DIR: $PWD/code_judge_worker/test
+      TESTING_DIR: $PWD/code_judge/test
     volumes: 
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./code_judge_worker:/usr/src/app
+      - ./code_judge/test:/usr/src/app/test
+      - ./code_judge:/usr/src/app
     command: npm run dev
 
   server:
     build: ./server
     depends_on: 
       - redis
-      - code_judge_worker
+      - code_judge
     ports:
       - 5000:5000
     environment: 
       NODE_ENV: development
       SECRET_OR_KEY: ${SECRET_OR_KEY}
       PRODUCTION_URI: http://client:3000
-      CODE_JDG_URI: http://code_judge_server:5005
       MONGO_URI: ${MONGO_URI}
-      REDIS_URI: redis
+      REDIS_URI: redis://redis
+      REDIS_HOST: redis
       DOCKERIZED: 'true'
     volumes: 
       - ./server:/usr/src/app
@@ -54,7 +38,7 @@ services:
     build: ./client
     depends_on: 
       - server
-      - code_judge_worker
+      - code_judge
     ports:
       - 3000:3000
     environment: 

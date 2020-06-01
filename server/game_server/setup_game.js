@@ -14,6 +14,18 @@ const setupPlayer = (user, player) => {
 };
 
 const setupGame = pubsub => game => {
+  const getPlayer = user => (
+    user._id === game.p1.player._id
+      ? "p1"
+      : user._id === game.p2.player._id
+        ? "p2"
+        : "not ok"
+  );
+
+  const isPlayer = user => (
+    user._id === game.p1.player._id 
+    || user._id === game.p2.player._id
+  );
   const startGame = async () => {
     game.status = "started";
     await game.Game.findOneAndUpdate(
@@ -298,6 +310,8 @@ const setupGame = pubsub => game => {
     return playerKey;
   }
 
+  game.isPlayer = isPlayer;
+  game.getPlayer = getPlayer;
   game.updateGameUser = updateGameUser;
   game.startGame = startGame;
   game.endGame = endGame;
