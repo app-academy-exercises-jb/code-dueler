@@ -1,6 +1,7 @@
 const mongoose = require("mongoose"),
   Queue = require("bull"),
-  nodeJudge = require('./judges/nodeJudge');
+  nodeJudge = require('./judges/nodeJudge'),
+  rubyJudge = require('./judges/rubyJudge');
 
 require('./Question');
 
@@ -59,7 +60,7 @@ jobQueue.process('submitCode', async job => {
         nodeJudge(runtimeDetails, resolve, reject);
         break;
       case 'ruby':
-        nodeJudge(runtimeDetails, resolve, reject);
+        rubyJudge(runtimeDetails, resolve, reject);
         break;
       default:
     }

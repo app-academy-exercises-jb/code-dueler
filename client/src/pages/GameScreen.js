@@ -78,7 +78,11 @@ export default ({ me, gameId, refetchMeLogged, gameEvent, questionData }) => {
         <div className="game-screen">
           <div className="game-left">
             <div className="code-editor-wrapper">
-              <CodeEditor gameId={gameId} me={me} />
+              <CodeEditor
+                gameId={gameId}
+                me={me}
+                questionData={questionData}
+              />
             </div>
             <div className="stats-wrapper">
               <PlayerStats

@@ -35,6 +35,7 @@ export const GAME_LOGGED_EVENT = gql`
       _id
       host
       challenge
+      language
       connections
       status
     }

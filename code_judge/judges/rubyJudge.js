@@ -2,57 +2,49 @@ const fs = require("fs"),
   Docker = require("dockerode"),
   docker = new Docker({socketPath: "/var/run/docker.sock"});
 
-const nodeJudge = ({
+const rubyJudge = ({
   code, testName, testCases
-}) => {
+}, resolve, reject) => {
   let nonce = `${Date.now()}`;
-  fs.mkdirSync(`./test/${nonce}`);
+  fs.mkdirSync(`${process.env.TESTING_DIR}/${nonce}`, {recursive: true});
   
   let codeTester = `\n\n
-    const isEqual = require('lodash.isequal'),
-      testCases = ${JSON.stringify(testCases)};
+    require 'json'
+    test_cases = ${JSON.stringify(testCases)}
 
-    let results = {},
-      score = 0;
+    results = {}
+    score = 0
 
-    for (let i = 0; i < testCases.length; i++) {
-      let {test, solution} = testCases[i],
-        userAns;
-      test = JSON.parse(test);
-      solution = JSON.parse(solution);
+    for i in 0..${testCases.length - 1}
+      testcase = test_cases[i]
+      test = JSON.parse(testcase[:test])
+      solution = JSON.parse(testcase[:solution])
 
-      try {
-        userAns = ${testName}(test);
-      } catch (error) {
-        console.error(error);
-        process.exit(1);
-      }
+      user_sol = ${testName}(test)
 
-      if (isEqual(userAns, solution)) {
-        score++;
-      } else {
+      if (user_sol === solution)
+        score += 1
+      else
         results = {
-          test,
+          test: test,
           expected: solution,
-          output: JSON.stringify(userAns),
-          ...results
-        };
-        break;
-      }
-    }
+          output: user_sol
+        }
+        break
+      end
+    end
 
-    score = score / ${testCases.length};
-    if (score !== 0 && score !== 1) score = parseFloat(score.toFixed(2));
-    results.score = score;
+    score = (score * 1.0) / ${testCases.length};
+    results[:score] = score.round(2);
 
-    fs.writeFileSync('./test/${nonce}.js', JSON.stringify(results));
+    File.write('./test/${nonce}.rb', JSON.generate(results));
   `;
   let containerRef = null;
 
   docker.createContainer({
-    Image: "node-judge",
+    Image: "ruby:2.7.1-alpine",
     Cmd: [
-      "node",
+      "ruby",
       "-e",
       code + codeTester,
     ],
@@ -92,9 +84,10 @@ const nodeJudge = ({
     containerRef.modem.demuxStream(stream, capturedInfo.write("log"), capturedInfo.write("err"));
     
     stream.on('end', () => {
+      console.log({capturedInfo})
       containerRef.inspect()
         .then(data => {
-          let testFile = `./test/${nonce}/${nonce}.js`,
+          let testFile = `./test/${nonce}/${nonce}.rb`,
             results, passed;
 
           if (fs.existsSync(testFile)) {
@@ -102,6 +95,7 @@ const nodeJudge = ({
             passed = results.score === 1;
             score = results.score;
           } else {
+            console.log("nope")
             passed = false;
             score = 0;
           }
@@ -133,4 +127,4 @@ const nodeJudge = ({
   });
 }
 
-module.exports = nodeJudge;
+module.exports = rubyJudge;

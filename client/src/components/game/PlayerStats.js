@@ -9,7 +9,6 @@ export default ({ownStats, opponentStats, spectator}) => {
   };
 
   const setResultsProps = parsed => {
-    debugger
     if (!parsed || (parsed && parsed.error !== undefined)) return;
     setProps({ 
       test: parsed.test,
@@ -49,7 +48,6 @@ export default ({ownStats, opponentStats, spectator}) => {
   const shouldUpdateOnLastOwnSubmitted = ownStats && ownStats.lastSubmittedResult;
   useEffect(() => {
     if (ownStats && ownStats.lastSubmittedResult && !spectator) {
-      debugger
       const parsed = JSON.parse(ownStats.lastSubmittedResult);
       setOwnParsed(parsed);
       

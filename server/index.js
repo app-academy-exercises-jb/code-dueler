@@ -75,6 +75,12 @@ if (process.env.NODE_ENV === "production") {
 
 const port = process.env.PORT || 5000;
 
+const oldLog = console.log;
+
+console.log = (msg, ...args) => {
+  oldLog((new Date()).toLocaleString() + " - " + msg, ...args);
+}
+
 app.listen = function () {
   let server;
 

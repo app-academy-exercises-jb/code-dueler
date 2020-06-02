@@ -10,6 +10,7 @@ const GamesList = ({ games, joinGame }) => {
       <tr className="games-list-heading">
         <th scope="col">Host</th>
         <th scope="col">Challenge</th>
+        <th scope="col">Language</th>
         <th scope="col"># of Users</th>
         <th scope="col">Status</th>
       </tr>
@@ -22,6 +23,7 @@ const GamesList = ({ games, joinGame }) => {
       >
         <th scope="row">{game.host}</th>
         <th>{game.challenge}</th>
+        <th>{game.language}</th>
         <th>{game.connections}</th>
         <th>{game.status}</th>
       </tr>

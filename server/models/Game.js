@@ -88,9 +88,12 @@ GameSchema.statics.start = async (challenge, language, user, ws, pubsub) => {
     user,
     game,
     Game,
-    language,
-    challenge,
-    challengeBody: question.body
+    question: {
+      language,
+      challenge,
+      challengeBody: question.body,
+      fn: question.functionNames.find(fn => fn.language === language),
+    }
   });
 
   return game._id;

@@ -17,6 +17,7 @@ const presenceUtils = pubsub => {
         _id: game._id,
         host: (game.p1 && game.p1.player.username) || 'None',
         challenge: game.challenge || "FizzBuzz",
+        language: game.language,
         connections: game.connections,
         status: game.status
       });

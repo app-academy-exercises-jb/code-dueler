@@ -10,6 +10,10 @@ const FunctionNameSchema = new Schema({
     type: String,
     required: true,
   },
+  argList: {
+    type: String,
+    required: true,
+  }
 });
 
 const TestCaseSchema = new Schema({

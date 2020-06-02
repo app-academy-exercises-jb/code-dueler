@@ -68,6 +68,7 @@ export default ({ me, gameEvent, questionData, ...props }) => {
                   gameId={gameId}
                   data={player1Stats && player1Stats.currentCode}
                   spectator={true}
+                  questionData={questionData}
                 />
               </div>
             </div>
@@ -86,6 +87,7 @@ export default ({ me, gameEvent, questionData, ...props }) => {
                   gameId={gameId}
                   data={player2Stats && player2Stats.currentCode}
                   spectator={true}
+                  questionData={questionData}
                 />
               </div>
             </div>

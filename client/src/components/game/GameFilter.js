@@ -96,8 +96,9 @@ export default ({ me, ...props }) => {
     || gameStatus === "not ok") return null;
 
   const { queryGameInfo } = gameData,
-    { isInGame, isSpectator, gameExists, challenge, body } = queryGameInfo,
-    questionData = {challenge, body};
+    { isInGame, isSpectator, gameExists, challenge, 
+      body, language, fnName, fnArgs } = queryGameInfo,
+    questionData = {challenge, body, language, fnName, fnArgs};
 
   if (!gameExists) {
     return <Redirect to={'/'} />

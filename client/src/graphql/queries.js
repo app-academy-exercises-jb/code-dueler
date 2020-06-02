@@ -35,6 +35,7 @@ export const GET_ONLINE_GAMES = gql`
       _id
       host
       challenge
+      language
       connections
       status
     }
@@ -64,6 +65,9 @@ export const IN_GAME_INFO = gql`
       isSpectator
       challenge
       body
+      language
+      fnName
+      fnArgs
     }
   }
 `;

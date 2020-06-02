@@ -7,11 +7,27 @@ import {
   SUBMIT_CODE,
 } from "../../graphql/mutations";
 
-const CodeEditor = ({ gameId, me, spectator, data }) => {
+const CodeEditor = ({ gameId, me, spectator, data, questionData }) => {
   const editorRef = useRef(null);
-  const [code, setCode] = useState(`var fizzBuzz = (n) => {
-    
-  };`);
+  let defaultCode = '';
+
+  switch (questionData.language) {
+    case "javascript":
+      defaultCode = `var ${questionData.fnName} = (${questionData.fnArgs}) => {
+  
+};`
+      break;
+    case "ruby":
+      defaultCode = `def ${questionData.fnName}(${questionData.fnArgs})
+
+end`
+      break;
+    default:
+      throw "unknown language"
+  }
+
+
+  const [code, setCode] = useState(defaultCode);
   const [charCount, setCharCount] = useState(0);
   const [lineCount, setLineCount] = useState(0);
 
@@ -63,7 +79,16 @@ const CodeEditor = ({ gameId, me, spectator, data }) => {
           onValueChange={(code) => {
             handleValueChange(code);
           }}
-          highlight={(code) => Prism.highlight(code, Prism.languages.js)}
+          highlight={(code) => {
+            switch (questionData.language) {
+              case "ruby": 
+                require("prismjs/components/prism-ruby");
+                return Prism.highlight(code, Prism.languages.ruby);
+              case "javascript":
+              default: 
+                return Prism.highlight(code, Prism.languages.js);
+            }
+          }}
           padding={10}
           preClassName="editorPre"
           style={{

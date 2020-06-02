@@ -5,8 +5,8 @@ const ChallengeQuestion = ({challenge, body}) => {
     <div className="question-text-box scroll">
       <h1>{challenge}</h1>
 
-      {body.split("\n").map(line => (
-        <p>{line}</p>
+      {body.split("\n").map((line, idx) => (
+        <p key={idx}>{line}</p>
       ))}
     </div>
   );

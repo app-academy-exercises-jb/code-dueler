@@ -12,7 +12,7 @@ const HostGameButton = props => {
     await hostGame({
       variables: {
         challenge: "FizzBuzz",
-        language: "javascript"
+        language: "ruby"
       }})
       .then(async ({data: { hostGame: gameId }}) => {
         await props.refetchMe();

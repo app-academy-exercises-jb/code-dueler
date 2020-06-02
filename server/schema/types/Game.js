@@ -64,13 +64,17 @@ const typeDefs = `
     gameStatus: String
     isInGame: Boolean!
     isSpectator: Boolean!
-    challenge: String!
-    body: String!
+    challenge: String
+    body: String
+    language: String
+    fnName: String
+    fnArgs: String
   }
   type GameLog {
     _id: ID!
     host: String!
     challenge: String!
+    language: String!
     connections: Int!
     status: String!
   }
@@ -91,8 +95,11 @@ const resolvers = {
           : "not ok"),
         isInGame: Boolean(ws.gameId || pubsub.games.inGame[user._id]),
         isSpectator: Boolean(game && game.spectatorsKey[user._id]),
-        challenge: game.challenge,
-        body: game.challengeBody
+        challenge: game && game.challenge,
+        body: game && game.challengeBody,
+        language: game && game.language,
+        fnName: game && game.fnName,
+        fnArgs: game && game.fnArgs
       }
     },
     games: (_, __, { pubsub }) => {
@@ -105,6 +112,7 @@ const resolvers = {
           _id: game._id,
           host: (game.p1 && game.p1.player.username) || 'None',
           challenge: game.challenge || "FizzBuzz",
+          language: game.language,
           connections: game.connections,
           status: game.status
         }
@@ -199,6 +207,7 @@ const resolvers = {
       ws.gameId = gameId;
       pubsub.games.inGame[user._id] = gameId;
       game.users[user._id] = ws;
+      // console.log("over heere", {_id: user._id,users: Object.keys(game.users)})
       return "ok";
     },
     joinGame: async (_, { player: playerId, gameId }, { user, pubsub, ws }) => {
@@ -330,17 +339,15 @@ const resolvers = {
           console.log("subscribing to game event")
           return pubsub.asyncIterator("gameEvent");
         },
-        ({ p1, p2, _id }, _, { user, pubsub, ws }) => {
+        ({ _id }, _, { user, pubsub, ws }) => {
           return (
-            user._id === ws.userId &&
-            ((p1 && p1.player._id === user._id) ||
-            (p2 && p2.player._id === user._id) ||
-            pubsub.games[_id].spectatorsKey[user._id] !== undefined)
+            _id === ws.gameId 
+            && user._id === ws.userId
+            && pubsub.games[_id].users[user._id] === ws
           );
         }
       ),
       resolve: payload => {
-        // console.log("gameEvent:", {payload});
         return payload;
       }
     },

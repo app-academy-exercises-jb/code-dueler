@@ -52,7 +52,7 @@ const nodeJudge = (
   let containerRef = null;
 
   docker.createContainer({
-    Image: "node-judge",
+    Image: "jorgebarreto/node-judge:1.0.0",
     Cmd: [
       "node",
       "-e",

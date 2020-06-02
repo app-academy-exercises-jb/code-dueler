@@ -184,6 +184,7 @@ const setupGame = pubsub => game => {
           }
         }
 
+        console.log("adding spectator")
         game.connections += 1;
         game.users[user._id] = user.ws;
         pubsub.games.inGame[user._id] = game._id;
@@ -274,10 +275,16 @@ const setupGame = pubsub => game => {
 
         game.connections -= 1;
         
-        if (game.connections === 0 && game.status !== "initializing") {
-          console.log("deleting in memory game")
-          delete pubsub.games[game._id];
-        }
+        // make sure it isn't just someone temporarily DC'd
+        // or changing party
+        setTimeout(() => {
+          if (game.connections === 0) {
+            console.log("deleting in memory game")
+            delete pubsub.games[game._id];
+            game.status = "over";
+            pubsub.publishGameLoggedEvent(game);
+          }
+        }, 700);
 
         pubsub.publish("gameEvent", game);
         pubsub.publishUserLoggedEvent(user, Boolean(pubsub.subscribers[user._id]));
