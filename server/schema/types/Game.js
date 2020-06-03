@@ -3,14 +3,6 @@ const mongoose = require("mongoose"),
   jobQueue = new Queue('code-review', process.env.REDIS_URI);
 const { withFilter } = require("apollo-server-express");
 
-
-let http;
-if (process.env.HTTPS !== 'true') {
-  http = require('http');
-} else {
-  http = require('https');
-}
-
 const Game = mongoose.model('Game');
 
 const typeDefs = `
@@ -207,7 +199,6 @@ const resolvers = {
       ws.gameId = gameId;
       pubsub.games.inGame[user._id] = gameId;
       game.users[user._id] = ws;
-      // console.log("over heere", {_id: user._id,users: Object.keys(game.users)})
       return "ok";
     },
     joinGame: async (_, { player: playerId, gameId }, { user, pubsub, ws }) => {

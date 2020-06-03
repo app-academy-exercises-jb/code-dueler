@@ -38,3 +38,5 @@
 ## 0.9.1 - 6/1/2020
 
   * simplify coding judge to just one worker, which can be horizontally scaled. code submission queue is now run by the game server.
+  * fix bug where certain games with status "over" sometimes stay in the game list. related to the bug where leaving game from spectators (when one is the last player) doesn't properly delete the in-memory game
+  * added temporary fix for the img-src CSP issue leading to non-loading images in game lobby
