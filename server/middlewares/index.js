@@ -7,13 +7,8 @@ const graphqlLogger = shouldLog => (req, res, next) => {
         const operation = operationName || 'no operation specified';
         console.log(
           "\x1b[36m%s%s\x1b[0m",
-          `${new Date().toLocaleString("en-US")} - `,
           operation  
         );
-        console.group();
-        if (query) console.log(query);
-        if (variables) console.log("variables: ", variables)
-        console.groupEnd();
       });
     });
     return next();

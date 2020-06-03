@@ -1,3 +1,8 @@
+const oldLog = console.log;
+console.log = (msg, ...args) => {
+  oldLog((new Date()).toLocaleString() + " - " + msg, ...args);
+};
+
 const express = require("express"),
   app = express(),
   mongoose = require("mongoose"),
@@ -47,11 +52,12 @@ mongoose
 
 if (process.env.NODE_ENV !== "production") {
   app.use(cors({ origin: "http://localhost:3000" }));
+  app.use(morgan("dev"));
 } else if (process.env.NODE_ENV === "production") {
   app.use(cors({ origin: process.env.PRODUCTION_URI }));
+  app.use(morgan(":remote-addr - [:date[clf]] - \":method :url HTTP/:http-version\" :status :res[content-length] \":referrer\""));
 }
 
-app.use(morgan("dev"));
 
 app.use("/graphql", passportAuthenticate(passport));
 
@@ -74,12 +80,6 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const port = process.env.PORT || 5000;
-
-const oldLog = console.log;
-
-console.log = (msg, ...args) => {
-  oldLog((new Date()).toLocaleString() + " - " + msg, ...args);
-}
 
 app.listen = function () {
   let server;
