@@ -310,12 +310,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 0 !important;
   >h1 {
     font-size: 2em;
     font-weight: 400;
     text-decoration: underline;
   }
+  >input {
+    box-sizing: border-box;
+    margin: 1rem;
+    width: auto;
+    align-self: stretch;
+    color: #E4E6C3;
+  }
+  >input::placeholder {
+    color: rgb(110, 112, 65);
+  }
+}
+
+.sidebar-wrapper .games-lobby {
+  margin-left: 0;
 }
 
 .games-list {
@@ -343,5 +356,45 @@
     cursor: pointer;
     background-color: #45495a;
     color: #e4e6c3;
+  }
+}
+
+.host-game-item {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+
+  &:hover {
+    cursor: default;
+  }
+
+  &>*:nth-last-child(-n+2) {
+    opacity: 0;
+  }
+
+  &:hover>*:nth-last-child(-n+2) {
+    cursor: pointer;
+    opacity: 1;
+  }
+
+  >*:last-child:hover {
+    transform: scale(2);
+    transition: all 0.1s linear;
+    text-shadow: 0px 0px 5px #e4e6c3;
+    color: #c7ca88;
+  }
+
+  >select {
+    padding: 3px;
+    background-color: rgba(0,0,0,0);
+    color: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+
+    option {
+      background: #45495a; 
+      color: inherit;
+    }
   }
 }

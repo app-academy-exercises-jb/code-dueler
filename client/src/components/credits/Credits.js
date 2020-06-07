@@ -37,7 +37,7 @@ export default (props) => {
               </a>
               <a href={`https://angel.co/u/jorge-barreto-2`}>
                 <i className="credits-icon angellist">
-                  <img src={AngelList} />
+                  <img src={AngelList} alt="angellist" />
                 </i>
               </a>
               <a href={`https://jorgebarreto.dev`}>
@@ -71,7 +71,7 @@ export default (props) => {
               </a>
               <a href={`https://angel.co/u/jacobpmeyer`}>
                 <i className="credits-icon angellist">
-                  <img src={AngelList} />
+                  <img src={AngelList} alt="angellist" />
                 </i>
               </a>
               <a href={`https://jacobmeyer.dev`}>

@@ -40,3 +40,9 @@
   * simplify coding judge to just one worker, which can be horizontally scaled. code submission queue is now run by the game server.
   * fix bug where certain games with status "over" sometimes stay in the game list. related to the bug where leaving game from spectators (when one is the last player) doesn't properly delete the in-memory game
   * added temporary fix for the img-src CSP issue leading to non-loading images in game lobby
+
+## 0.9.2 - 6/7/2020
+
+  * fixed issue where logout in one browser caused logout in every browser
+  * added frontend ability to choose the challenge/language you want to play
+  * cleaned up frontend compiler warnings

@@ -6,6 +6,7 @@ import LobbyTour from "../components/tour/LobbyTour";
 
 export default ({users, games, me, refetchMe, refetchMeLogged}) => {
   const [showUsers, setShowUsers] = useState(true);
+  const [showHost, setShowHost] = useState(false);
 
   return (
     <div className="global">
@@ -17,6 +18,8 @@ export default ({users, games, me, refetchMe, refetchMeLogged}) => {
         refetchMe={refetchMe}
         setShowUsers={setShowUsers}
         showUsers={showUsers}
+        setShowHost={setShowHost}
+        showHost={showHost}
       />
       <div className="main">
         <SideBar
@@ -24,6 +27,7 @@ export default ({users, games, me, refetchMe, refetchMeLogged}) => {
           inGame={false}
           refetchMe={refetchMe}
           showUsers={showUsers}
+          showHost={showHost}
           games={games}
         />
         <Chat me={me} />

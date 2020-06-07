@@ -1,7 +1,9 @@
-const oldLog = console.log;
-console.log = (msg, ...args) => {
-  oldLog((new Date()).toLocaleString() + " - " + msg, ...args);
-};
+if (process.env.NODE_ENV === "production") {
+  const oldLog = console.log;
+  console.log = (msg, ...args) => {
+    oldLog((new Date()).toLocaleString() + " - " + msg, ...args);
+  };
+}
 
 const express = require("express"),
   app = express(),
@@ -139,7 +141,7 @@ app.listen = function () {
       },
       onDisconnect: (ws) => {
         if (ws.userId === undefined) {
-          console.log('found rogue ws:', {ws});
+          console.log('found rogue ws:');
           ws.close();
           return;
         }

@@ -4,9 +4,9 @@ import ReactModal from "react-modal";
 import { useMutation } from "@apollo/react-hooks";
 import { JOIN_GAME, HANDLE_GAME } from "../../graphql/mutations";
 import { useHistory } from "react-router-dom";
-import ToolTip from "../util/ToolTip";
 import InGameUsers from "./InGameUsers";
 import GamesList from "./GamesList";
+import GameHost from "./GameHost";
 
 const SideBar = ({ 
   users,
@@ -19,10 +19,9 @@ const SideBar = ({
   refetchMe,
   gameId,
   showUsers,
+  showHost,
  }) => {
   ReactModal.setAppElement("#root");
-
-  const [errorModelOpen, setErrorModalOpen] = useState(false);
   const [spectateModalOpen, setSpectateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -40,11 +39,11 @@ const SideBar = ({
       data: { joinGame: gameId },
     } = await join({ variables });
     setSpectateModalOpen(false);
-    if (gameId.split("not ok:").length !== 1) {
-      let reason = gameId.split("not ok: ")[1];
-      setErrorModalOpen(true);
-      throw 'implement me';
-    }
+
+    // __TODO__ check if gameId starts with 'not ok:' and if so,
+    // parse out the reason: let reason = gameId.split("not ok: ")[1];
+    // and implement an error modal
+    
     await refetchMe();
     setTimeout(() => {
       history.push(`/game/${gameId}`);
@@ -78,16 +77,20 @@ const SideBar = ({
         );
       }
     } else {
-      return (
-      <GamesList 
-        games={games}
-        joinGame={joinGame}
-      />
-      );
+      if (showHost) {
+        return <GameHost />
+      } else {
+        return (
+        <GamesList 
+          games={games}
+          joinGame={joinGame}
+        />
+        );
+      }
     }
   }
 
-  let className = `sidebar-wrapper scroll ${showUsers ? "" : "game-lobbies"}`;
+  let className = `sidebar-wrapper scroll ${showUsers && !showHost ? "" : "game-lobbies"}`;
 
   return (
     <div className={className}>

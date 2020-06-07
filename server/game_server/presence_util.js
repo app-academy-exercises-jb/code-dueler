@@ -56,7 +56,7 @@ const presenceUtils = pubsub => {
   };
 
   const removeWs = ws => {
-    if (ws.gameId) (() => {
+    if (ws.gameId) {
       let game = pubsub.games[ws.gameId];
       if (game === undefined) return;
       if (game.spectatorsKey[ws.userId]) {
@@ -64,7 +64,7 @@ const presenceUtils = pubsub => {
       } else {
         game.removePlayer({_id: ws.userId, username: ws.username});
       }
-    })();
+    };
 
     if (!pubsub.subscribers[ws.userId]) return;
 
@@ -72,7 +72,7 @@ const presenceUtils = pubsub => {
       subWs => subWs === ws
     );
 
-    if (userIdx === -1) throw "tried to remove nonexistent WS"
+    if (userIdx === -1) return "tried to remove nonexistent WS";
     
     const oldWs = pubsub.subscribers[ws.userId][userIdx],
       user = {
@@ -90,9 +90,16 @@ const presenceUtils = pubsub => {
     }
   }
 
-  const logoutUser = ({user}) => {
-    pubsub.publishUserLoggedEvent(user, false);
-    delete pubsub.subscribers[user._id];
+  const logoutUser = ({user, ws}) => {
+    const userWsArr = pubsub.subscribers[user._id],
+      wsIdx = userWsArr.findIndex(userWs => userWs === ws);
+
+    userWsArr.splice(wsIdx, 1);
+
+    if (userWsArr.length === 0) {
+      pubsub.publishUserLoggedEvent(user, false);
+      delete pubsub.subscribers[user._id];
+    }
   }
 
   const loginUser = user => {

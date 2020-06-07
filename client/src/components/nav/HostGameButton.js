@@ -1,28 +1,20 @@
 import React from 'react';
-import { useMutation } from '@apollo/react-hooks';
-import { HOST_GAME } from '../../graphql/mutations';
-import { useHistory } from 'react-router-dom';
 
-const HostGameButton = props => {
-  const [hostGame] = useMutation(HOST_GAME);
-  const history = useHistory();
-
-  const handleClick = async e => {
-    //show modal with host game options, such as: choose your challenge / language
-    await hostGame({
-      variables: {
-        challenge: "FizzBuzz",
-        language: "ruby"
-      }})
-      .then(async ({data: { hostGame: gameId }}) => {
-        await props.refetchMe();
-        return gameId;
-      })
-      .then(gameId => {
-        if (gameId !== null) {
-          history.push(`/game/${gameId}`);
-        };
-      });
+const HostGameButton = ({
+  refetchMe,
+  setShowUsers,
+  setShowHost,
+  showHost,
+  showUsers,
+}) => {
+  const handleClick = () => {
+    if (showUsers) {
+      setShowUsers(false);
+      return setShowHost(!showHost);
+    } else {
+      if (showHost) setShowUsers(true);
+      return setShowHost(!showHost);
+    }
   };
 
   return (
@@ -30,9 +22,9 @@ const HostGameButton = props => {
       className="nav-button"
       onClick={handleClick}
     >
-      <button>Host Game</button>
+      <button>{showHost ? "Global Lobby" : "Host Game"}</button>
     </div>
-  );
+    );
 };
 
 export default HostGameButton;

@@ -17,7 +17,7 @@ export default ({ me, gameId, refetchMeLogged, gameEvent, questionData }) => {
   const [spectators, setSpectators] = useState([]);
 
   useEffect(() => {
-    if (gameEvent) {
+    if (me._id && gameEvent) {
       let self, opponent;
       if (gameEvent.p1.player._id === me._id) {
         self = "p1";
@@ -45,7 +45,7 @@ export default ({ me, gameId, refetchMeLogged, gameEvent, questionData }) => {
       setSpectators(gameEvent.spectators);
     }
   
-  }, [gameEvent]);
+  }, [gameEvent, me._id]);
 
   if (gameEvent === null) return null;
 

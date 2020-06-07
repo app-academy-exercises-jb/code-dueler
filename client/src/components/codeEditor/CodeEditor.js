@@ -22,8 +22,7 @@ const CodeEditor = ({ gameId, me, spectator, data, questionData }) => {
 
 end`
       break;
-    default:
-      throw "unknown language"
+    default: break;
   }
 
 

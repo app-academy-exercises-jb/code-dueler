@@ -9,7 +9,6 @@ import StartGameButton from "./StartGameButton";
 import ReadyGameButton from "./ReadyGameButton";
 import SpectatorButton from "./SpectatorButton";
 import ToolTip from "../util/ToolTip";
-import Credits from "../credits/Credits";
 import {ReactComponent as BurgerIcon} from "../../images/hamburger_icon.svg"
 
 const NavBar = ({
@@ -26,7 +25,9 @@ const NavBar = ({
   me,
   gameId,
   setShowUsers,
-  showUsers
+  showUsers,
+  setShowHost,
+  showHost,
 }) => {
   const burger = useRef();
   const [width, setWidth] = useState(window.innerWidth);
@@ -81,13 +82,22 @@ const NavBar = ({
     if (inLobby) {
       lobbyComponent = <>
         <div>
-          <ProtectedComponent component={HostGameButton} refetchMe={refetchMe}/>
+          <ProtectedComponent
+            component={HostGameButton}
+            refetchMe={refetchMe}
+            setShowHost={setShowHost}
+            setShowUsers={setShowUsers}
+            showUsers={showUsers}
+            showHost={showHost}
+          />
         </div>
         <div>
           <ProtectedComponent 
             component={GameLobbyButton}
             setShowUsers={setShowUsers}
+            setShowHost={setShowHost}
             showUsers={showUsers}
+            showHost={showHost}
           />
         </div>
       </>;

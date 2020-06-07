@@ -2,11 +2,8 @@ import React, { useState, useEffect } from "react";
 import Chat from "../chat/Chat";
 import ChallengeQuestion from "../game/ChallengeQuestion";
 import CodeEditor from "../codeEditor/CodeEditor";
-import { useSubscription, useMutation } from "@apollo/react-hooks";
 import { useParams, useHistory } from "react-router-dom";
-import { ON_GAME } from "../../graphql/subscriptions";
 import ReactModal from "react-modal";
-import { LEAVE_GAME } from "../../graphql/mutations";
 import PlayerStats from "../game/PlayerStats";
 import NavBar from "../nav/NavBar";
 

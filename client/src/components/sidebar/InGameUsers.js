@@ -34,14 +34,14 @@ const InGameUsers = ({
             : players.length === 1
               ? "Challenge host!"
               : "Claim host!");
-        default: throw `unknown game self status: ${gameSelfStatus}`;
+        default: return `unknown game self status: ${gameSelfStatus}`;
       }
     } else {
         switch (gameSelfStatus) {
           case 'host': case 'player': 
             return 'Become a spectator';
           case 'spectator': return "You're already a spectator!";
-          default: throw `unknown game self status: ${gameSelfStatus}`;
+          default: return `unknown game self status: ${gameSelfStatus}`;
         }
     }
   };

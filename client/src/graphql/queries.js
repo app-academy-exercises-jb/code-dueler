@@ -71,3 +71,13 @@ export const IN_GAME_INFO = gql`
     }
   }
 `;
+
+export const GET_QUESTIONS = gql`
+  query GetQuestions($filter: String!) {
+     getQuestions(filter: $filter) {
+       _id
+       challenge
+       languages
+     }
+  }
+`;

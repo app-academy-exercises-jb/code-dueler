@@ -1,15 +1,17 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 
 const GameLobbyButton = ({ 
   setShowUsers,
+  setShowHost,
   showUsers,
-  ...props
+  showHost,
 }) => {
-  const history = useHistory();
-
   const handleClick = e => {
-    setShowUsers(!showUsers);
+    if (showHost) {
+      setShowHost(false);
+    } else {
+      setShowUsers(!showUsers);
+    }
   };
 
   return (
@@ -17,7 +19,7 @@ const GameLobbyButton = ({
       className="nav-button"
       onClick={handleClick}
     >
-      <button>{showUsers ? "Join Game" : "Global Lobby"} </button>
+      <button>{showUsers || showHost ? "Join Game" : "Global Lobby"} </button>
     </div>
   );
 };
