@@ -46,3 +46,23 @@
   * fixed issue where logout in one browser caused logout in every browser
   * added frontend ability to choose the challenge/language you want to play
   * cleaned up frontend compiler warnings
+
+## 0.9.3 - 6/8/2020
+
+  * fixed coding judges to asynchronously download missing images prior to judging
+  * simplified mutations to add challenges. Challenges look like this:
+  ```
+    {
+      challenge: Title Case String, title of the challenge
+      body: Whitespace-including string, description of the challenge
+      functionNames: Array of objects: {
+        language: lowercase string, supported language keyword
+        name: Language-dependent casing string, name of function which we expect user to define
+        argList: Language-dependent casing, comma separated string of arguments
+      }
+      testCases: Array of objects: {
+        test: JSON compliant string representing an array of arguments
+        solution: JSON compliant string representing the expected output
+      }
+    }
+  ```

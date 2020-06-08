@@ -154,7 +154,17 @@ export const SUBMIT_CODE = gql`
 `;
 
 export const ADD_QUESTION = gql`
-  mutation AddQuestion {
-    addQuestion
+  mutation AddQuestion(
+    $testCases: String!,
+    $functionNames: String!,
+    $challenge: String!,
+    $body: String!
+  ) {
+    addQuestion(
+      testCases: $testCases,
+      functionNames: $functionNames,
+      challenge: $challenge,
+      body: $body
+    )
   }
 `;

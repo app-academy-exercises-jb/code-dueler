@@ -361,7 +361,10 @@
 
 .host-game-item {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 1.25rem;
+  height: 1rem;
   align-items: center;
   width: 100%;
 

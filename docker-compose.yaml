@@ -11,7 +11,6 @@ services:
       TESTING_DIR: $PWD/code_judge/test
     volumes: 
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./code_judge/test:/usr/src/app/test
       - ./code_judge:/usr/src/app
     command: npm run dev
 
