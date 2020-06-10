@@ -71,7 +71,7 @@
 
   * added feature to generate random user
   * added Demo User/Generate New User links to the welcome page, in lieu of Login/Signup (which are in the navbar)
-  * fixed credits link in navbar shennanigans
+  * fixed credits link in navbar shenanigans
   * fixed interaction between dropdown and splash page slideshow
   * reshuffled some TODO's priority
   * our docker images had the whole of node_modules! fixed
@@ -79,3 +79,13 @@
 ## 0.9.5 - 6/10/2020
 
   * remove graphql playground due to a [package vulnerability](https://github.com/advisories/GHSA-4852-vrh7-28rf)
+
+## 0.9.6 - 6/10/2020
+
+  * fixed bug where the `game won` message notification could not read the winner's username
+  * fixed issue where in game screen, player stats boxes would become deformed when the stats popup was visible
+  * fixed styling on results and error modals
+  * added simple frontend locking mechanism and cursor animation to the `Submit Your Code` button on the game screen
+  * fixed issue where users created by old secrets would see error if they were already logged in
+  * update splash page to show off new features
+  * fix favicon

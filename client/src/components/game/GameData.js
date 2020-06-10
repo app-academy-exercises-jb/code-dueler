@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSubscription } from "@apollo/react-hooks";
 import { ON_GAME } from '../../graphql/subscriptions';
+import { useHistory } from 'react-router-dom';
 
 const GameData = ({ 
   gameId,
@@ -10,6 +11,7 @@ const GameData = ({
   refetchGame,
   ...props
 }) => {
+  const history = useHistory();
   const [gameEvent, setGameEvent] = useState(null);
 
   useSubscription(ON_GAME, {
@@ -28,6 +30,9 @@ const GameData = ({
             .then(res => {
               setGameStarted(res.data.queryGameInfo.gameStatus);
               setGameEvent(e);      
+            })
+            .catch(err => {
+              history.push("/");
             });
         }
       } else {

@@ -8,7 +8,10 @@ import {
 } from "../../graphql/mutations";
 
 const CodeEditor = ({ gameId, me, spectator, data, questionData }) => {
-  const editorRef = useRef(null);
+  const editorRef = useRef(null),
+    submitButtonRef = useRef(null),
+    codeSubmitted = useRef(false);
+
   let defaultCode = '';
 
   switch (questionData.language) {
@@ -52,14 +55,23 @@ end`
   };
 
   const disabled = spectator ? true : false;
-
   let button = null;
+
   if (!disabled) {
     button = (
       <button
+        ref={submitButtonRef}
         className="code-submit"
         onClick={(e) => {
-          submitCode({variables: { code: editorRef.current.props.value }});
+          if (codeSubmitted.current === false) {
+            submitButtonRef.current.classList.add("pending-submit");
+            codeSubmitted.current = true;
+            submitCode({variables: { code: editorRef.current.props.value }})
+              .then(res => {
+                submitButtonRef.current.classList.remove("pending-submit");
+                codeSubmitted.current = false;
+              });
+          }
         }}
       >
         <h1>Submit your code</h1>

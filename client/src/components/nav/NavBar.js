@@ -106,25 +106,21 @@ const NavBar = ({
       </>;
     } else if (inGameLobby) {
       lobbyComponent = <ProtectedComponent>
-        <div>
-          {getUserButton()}
-        </div>
+          <div>
+            {getUserButton()}
+          </div>
       </ProtectedComponent>;
     } else if (inSplash || inCredits) {
       lobbyComponent = <AuthComponent>
         <div>
-          <div className="nav-button">
-            <Link to={"/login"}>
-              Login
-            </Link>
-          </div>
+          <Link to={"/login"} className="nav-button">
+            Login
+          </Link>
         </div>
         <div>
-          <div className="nav-button">
-          <Link to={"/signup"}>
+          <Link to={"/signup"} className="nav-button">
             Sign Up
           </Link>
-          </div>
         </div>
       </AuthComponent>
     }

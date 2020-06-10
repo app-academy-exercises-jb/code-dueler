@@ -109,6 +109,9 @@
 .stats-modal {
   height: fit-content;
   width: fit-content;
+  max-width: 80%;
+  max-height: 80%;
+  overflow: auto;
   position: fixed;
   z-index: -100;
   left: 50%;
@@ -130,6 +133,7 @@
 .error-block {
   display: flex;
   z-index: 50;
+
 }
 
 .error-hidden {
@@ -150,10 +154,23 @@
   justify-content: space-between;
   align-items: center;
   flex-direction: column;
-  height: fit-content;
-  width: 100%;
+  overflow-wrap: break-word;
   color: maroon;
+  width: fit-content;
+  height: fit-content;
+  max-width: 100%;
+}
 
+.stats-modal-error {
+  align-items: flex-start;
+
+  >pre {
+    margin: 0;
+
+    &:last-of-type {
+      margin-bottom: 2rem;
+    }
+  }
 }
 
 .stats-modal-buttons {
@@ -167,4 +184,5 @@
 
 .stats-modal-results {
   font-size: 22px;
+  max-width: 100%;
 }

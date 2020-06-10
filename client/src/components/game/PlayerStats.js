@@ -102,13 +102,14 @@ export default ({ownStats, opponentStats, spectator}) => {
         />
       </div>
       <ReactModal
+        className="modal-overlay"
         isOpen={modalOpen}
         shouldCloseOnEsc={true}
         onRequestClose={() => {}}
       >
         {
           modalToOpen === "results"
-            ? <ResultsModal test={"test"} {...props} />
+            ? <ResultsModal {...props} />
             : <ErrorModal {...props} />
         }
       </ReactModal>

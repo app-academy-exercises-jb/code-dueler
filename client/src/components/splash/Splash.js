@@ -1,5 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import ClickOnToJoin from "../../images/click-to-join.gif"
+import JoinTheDuel from "../../images/join-the-duel.gif"
+import JoinTheDuelFromLobby from "../../images/join-the-duel-from-lobby.gif"
+import HostTheDuel from "../../images/host-duel.gif"
+import InGame from "../../images/in-duel.gif"
 
 class SplashComponent extends React.Component {
   constructor(props) {
@@ -70,19 +75,47 @@ class SplashComponent extends React.Component {
             <div ref={this.photo3} className="card_part card_part-3">
               <p className="slide-text flex-start">
                 When logging in, each player is entered in into the global
-                lobby. To challenge a player simply click on their name.
+                lobby. If a player's icon is <span style={{color:"red"}}>red</span>,
+                you can click on it to spectate the game they're in. If it's
+                <span style={{color:"gold"}}> gold</span>, and you can join the game
+                they're about to start!
               </p>
+              <div>
+                <img src={ClickOnToJoin} alt="click on name to join" />
+                &nbsp;
+                <img src={JoinTheDuel} alt="click on name to join" />
+              </div>
             </div>
 
-            <div ref={this.photo4} className="card_part card_part-4"></div>
+            <div ref={this.photo4} className="card_part card_part-4">
+              <p className="slide-text">
+                You can access the game lobby and see the games that are available to join, either as a player or spectator
+              </p>
 
-            <div ref={this.photo5} className="card_part card_part-5"></div>
+              <div>
+                <img src={JoinTheDuelFromLobby} alt="click on game to join" />
+              </div>
+            </div>
+
+            <div ref={this.photo5} className="card_part card_part-5">
+              <p className="slide-text flex-start">
+                You can also choose your own challenge/language combination with which to host a game
+              </p>
+
+              <div>
+                <img src={HostTheDuel} alt="click host game to start" />
+              </div>
+              </div>
 
             <div ref={this.photo6} className="card_part card_part-6">
               <p className="slide-text">
                 Once in a game, the race is on! Problem solving is done in the
                 code editor.
               </p>
+
+              <div>
+                <img src={InGame} alt="in game" />
+              </div>
             </div>
 
             <div ref={this.photo7} className="card_part card_part-7">

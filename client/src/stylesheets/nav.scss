@@ -73,6 +73,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
   }
 }
 
@@ -88,6 +89,9 @@
   background-color: #6E7DAB;
   border: solid #575366 1px;
   border-radius: 3px;
+  width: fit-content;
+  display: flex;
+  justify-content: center;
   &:hover {
     background-color: #575366;
   }
@@ -110,6 +114,12 @@
   width: 150px;
   display: flex;
   flex-direction: column;
+
+  >div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
 }
 
 .burger-content > * > * {

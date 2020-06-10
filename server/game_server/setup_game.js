@@ -306,11 +306,12 @@ const setupGame = pubsub => game => {
 
     // if the game has a winner, we have to publish a message about it
     if (Boolean(game.winner)) {
-      let loser = game.winner._id === game.p1.player._id 
-        ? game.p1.player
-        : game.p2.player;
+      let winner = game[game.winner].player;
+      let loser = game.winner === "p1" 
+        ? game.p2.player
+        : game.p1.player;
       pubsub.publishMessage({
-        message: `${game.winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}` : 'code duel'}`,
+        message: `${winner.username} just beat ${loser.username} at a ${game.challenge ? `game of ${game.challenge}!` : 'code duel'}`,
       });
     }
 

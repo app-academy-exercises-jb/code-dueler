@@ -59,6 +59,7 @@ export default ({ me, ...props }) => {
             return await props.refetchMe();
           }
         })
+        .catch(err => history.push('/'))
     }
 
     if (shouldUpdateExists === undefined) return () => {};

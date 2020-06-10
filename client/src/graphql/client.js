@@ -77,7 +77,7 @@ const createClient = async () => {
       return (
         def.kind === 'OperationDefinition' && 
           (def.operation === 'subscription'
-            || (def.operation === 'query' )
+            || (def.operation === 'query')
             || (def.operation === 'mutation'
               && def.name.value !== 'LogIn'
               && def.name.value !== 'SignUp')
@@ -117,10 +117,13 @@ const createClient = async () => {
   });
 
   if (localStorage.getItem("token")) {
-    await client.query({ query: CURRENT_USER }).then(({ data }) => {
-     
-      if (!data || !data.me) client.resetStore();
-    });
+    await client.query({ query: CURRENT_USER })
+      .then(({ data }) => {
+        if (!data || !data.me) client.resetStore();
+      })
+      .catch(err => {
+        client.resetStore();
+      });
   }
 
   client.subscriptionClient = wsLink.subscriptionClient;

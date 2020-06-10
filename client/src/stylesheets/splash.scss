@@ -97,6 +97,12 @@
   background-position: center;
   background-size: cover;
   transition: cubic-bezier(0, 0, 0.2, 1) 1.3s;
+
+  >div {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
 } 
 
 .card_part.card_part-2 {
@@ -107,21 +113,57 @@
 .card_part.card_part-3 {
   z-index: 5;
   background-image: none;
+  
+  >p {
+    display: inline;
+
+    >div {
+      display: inline;
+    }
+  }
+
+  >div {
+    max-width: 100%;
+    >img{
+      width: 50%;
+    }
+  }
 }
 
 .card_part.card_part-4 {
   z-index: 4;
-  background-image: url( https://codedueler.s3.us-east-2.amazonaws.com/challenge.gif );
+  background-image: none;
+
+  >div {
+    justify-content: center;
+    >img{
+      width: 75%;
+    }
+  }
 }
 
 .card_part.card_part-5 {
   z-index: 6;
-  background-image: url( https://codedueler.s3.us-east-2.amazonaws.com/acceptchallenge.gif );
+  background-image: none;
+  
+  >div {
+    justify-content: center;
+    >img{
+      width: 75%;
+    }
+  }
 }
 
 .card_part.card_part-6 {
   z-index: 6;
-  background-image: url( https://codedueler.s3.us-east-2.amazonaws.com/follow.gif );
+  background-image: none;
+
+  >div {
+    justify-content: center;
+    >img{
+      width: 75%;
+    }
+  }
 }
 
 .card_part.card_part-7 {
