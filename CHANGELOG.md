@@ -66,3 +66,12 @@
       }
     }
   ```
+
+## 0.9.4 - 6/9/2020
+
+  * added feature to generate random user
+  * added Demo User/Generate New User links to the welcome page, in lieu of Login/Signup (which are in the navbar)
+  * fixed credits link in navbar shennanigans
+  * fixed interaction between dropdown and splash page slideshow
+  * reshuffled some TODO's priority
+  * our docker images had the whole of node_modules! fixed

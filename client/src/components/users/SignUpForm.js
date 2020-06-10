@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { SIGNUP_USER } from "../../graphql/mutations";
 import { IS_LOGGED_IN, CURRENT_USER } from "../../graphql/queries";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import faker from "faker/locale/en_BORK";
+import { useEffect } from "react";
 
 export default () => {
   const [username, setUsername] = useState("");
@@ -26,6 +28,27 @@ export default () => {
     },
     refetchQueries: [{ query: IS_LOGGED_IN }, { query: CURRENT_USER }],
   });
+
+  const generateUser = () => {
+    let usr = faker.internet.userName(null, "."),
+      pwd = faker.internet.password(8, true);
+    
+    setUsername(usr);
+    setPassword(pwd);
+    // setPersonalMessage(`Your new password is: ${pwd}`);
+  }
+  
+  let location = useLocation(),
+    shouldUpdate = location.state && location.state.demoUser;
+
+  useEffect(() => {
+    if (shouldUpdate) {
+      generateUser();
+      setTimeout(() => {
+        signup();
+      }, 100);
+    }
+  }, [shouldUpdate]);
 
   return (
     <form
@@ -62,6 +85,14 @@ export default () => {
 
       <button className="session-button" disabled={loading}>
         Sign Up
+      </button>
+      <button 
+        id="demo"
+        className="session-button"
+        disabled={loading}
+        onClick={() => generateUser()}
+      >
+        Generate New User
       </button>
       <Link to="/login">
         Already have an account? Sign in

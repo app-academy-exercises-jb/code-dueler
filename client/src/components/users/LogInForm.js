@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { LOGIN_USER } from "../../graphql/mutations";
 // import { IS_LOGGED_IN, CURRENT_USER } from '../../graphql/queries';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
-export default () => {
+export default (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
@@ -35,6 +36,23 @@ export default () => {
       setErrorMessage("Something went wrong");
     },
   });
+
+  const demoLogin = () => {
+    setUsername('scobyLover');
+    setPassword('asdfasdf');
+  };
+
+  let location = useLocation(),
+    shouldUpdate = location.state && location.state.demoUser;
+
+  useEffect(() => {
+    if (shouldUpdate) {
+      demoLogin();
+      setTimeout(() => {
+        login();
+      }, 100);
+    }
+  }, [shouldUpdate]);
 
   return (
     <form
@@ -76,7 +94,7 @@ export default () => {
         id="demo"
         className="session-button"
         disabled={loading}
-        onClick={() => {setUsername('scobyLover'); setPassword('asdfasdf')}}
+        onClick={() => demoLogin()}
       >
         Demo User
       </button>

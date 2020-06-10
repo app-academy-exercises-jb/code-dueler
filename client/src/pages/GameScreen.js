@@ -72,7 +72,6 @@ export default ({ me, gameId, refetchMeLogged, gameEvent, questionData }) => {
         userCount={spectators.length}
         refetchMeLogged={refetchMeLogged}
       />
-      <GameTour />
 
       <div className="main">
         <div className="game-screen">

@@ -5,7 +5,7 @@ import NavBar from "../components/nav/NavBar";
 export default (props) => {
   return (
     <div className="global">
-      <NavBar />
+      <NavBar inSplash={true} />
       <div className="main">
         <SplashComponent />
       </div>

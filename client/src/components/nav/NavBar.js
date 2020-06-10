@@ -10,6 +10,7 @@ import ReadyGameButton from "./ReadyGameButton";
 import SpectatorButton from "./SpectatorButton";
 import ToolTip from "../util/ToolTip";
 import {ReactComponent as BurgerIcon} from "../../images/hamburger_icon.svg"
+import AuthComponent from "../util/AuthComponent";
 
 const NavBar = ({
   userCount,
@@ -17,6 +18,8 @@ const NavBar = ({
   inGame,
   inLobby,
   inGameLobby,
+  inSplash,
+  inCredits,
   refetchMe,
   refetchMeLogged,
   gameSelfStatus,
@@ -107,20 +110,41 @@ const NavBar = ({
           {getUserButton()}
         </div>
       </ProtectedComponent>;
+    } else if (inSplash || inCredits) {
+      lobbyComponent = <AuthComponent>
+        <div>
+          <div className="nav-button">
+            <Link to={"/login"}>
+              Login
+            </Link>
+          </div>
+        </div>
+        <div>
+          <div className="nav-button">
+          <Link to={"/signup"}>
+            Sign Up
+          </Link>
+          </div>
+        </div>
+      </AuthComponent>
     }
 
     return <>
       {lobbyComponent}
-      <div>
-        <ProtectedComponent component={LogOutButton} refetchMeLogged={refetchMeLogged} />
-      </div>
+      {!inCredits && <>
+      <ProtectedComponent>
+        <div>
+          <LogOutButton refetchMeLogged={refetchMeLogged} />
+        </div>
+      </ProtectedComponent>
       <div>
         <div className="nav-button" onClick={() => history.push('/credits')}>
-        <button>
-          Credits
-        </button>
+          <button>
+            Credits
+          </button>
         </div>
       </div>
+      </>}
     </>;
   }
 

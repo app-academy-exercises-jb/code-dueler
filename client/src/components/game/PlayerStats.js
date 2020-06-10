@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Stats from "./Stats";
 import ErrorModal from './ErrorModal';
 import ResultsModal from './ResultsModal';
+import ReactModal from "react-modal";
 
 export default ({ownStats, opponentStats, spectator}) => {
   const handleModalClose = () => {
@@ -100,12 +101,17 @@ export default ({ownStats, opponentStats, spectator}) => {
           {...statsProps}
         />
       </div>
-      {modalOpen && 
-        ((modalToOpen === "results" &&  
-          <ResultsModal test={"test"} {...props} />) ||
-        (modalToOpen === "error" &&  
-          <ErrorModal {...props} />))
-      }
+      <ReactModal
+        isOpen={modalOpen}
+        shouldCloseOnEsc={true}
+        onRequestClose={() => {}}
+      >
+        {
+          modalToOpen === "results"
+            ? <ResultsModal test={"test"} {...props} />
+            : <ErrorModal {...props} />
+        }
+      </ReactModal>
     </>
   )
 };

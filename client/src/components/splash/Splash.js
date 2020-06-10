@@ -104,11 +104,21 @@ class SplashComponent extends React.Component {
           </button>
         </div>
         <div className="splash-controls-bottom">
-          <Link to={"/login"} className="splash-button">
-            Login
+          <Link to={{
+            pathname: "/login",
+            state: {
+              demoUser: true
+            }
+          }} className="splash-button">
+            Demo User
           </Link>
-          <Link to={"/signup"} className="splash-button">
-            Sign Up
+          <Link to={{
+            pathname: "/signup",
+            state: {
+              demoUser: true
+            }
+          }} className="splash-button">
+            Generate New User
           </Link>
         </div>
       </div>
