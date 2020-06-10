@@ -8,7 +8,6 @@ if (process.env.NODE_ENV === "production") {
 const express = require("express"),
   app = express(),
   mongoose = require("mongoose"),
-  expressPlayground = require("graphql-playground-middleware-express").default,
   passport = require("passport"),
   jwt = require("jsonwebtoken"),
   morgan = require("morgan"),
@@ -60,7 +59,6 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan(":remote-addr - [:date[clf]] - \":method :url HTTP/:http-version\" :status :res[content-length] \":referrer\""));
 }
 
-
 app.use("/graphql", passportAuthenticate(passport));
 
 server.applyMiddleware({
@@ -68,8 +66,6 @@ server.applyMiddleware({
   path: "/graphql",
   cors: false,
 });
-
-app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
 if (process.env.NODE_ENV === "production") {
   const path = require("path");

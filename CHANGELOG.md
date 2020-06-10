@@ -75,3 +75,7 @@
   * fixed interaction between dropdown and splash page slideshow
   * reshuffled some TODO's priority
   * our docker images had the whole of node_modules! fixed
+
+## 0.9.5 - 6/10/2020
+
+  * remove graphql playground due to a [package vulnerability](https://github.com/advisories/GHSA-4852-vrh7-28rf)
