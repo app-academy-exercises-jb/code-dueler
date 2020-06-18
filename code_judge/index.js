@@ -36,8 +36,13 @@ const connectMongoose = () => {
 
 setInterval(connectMongoose, 500);
 
+let jobQueue;
 
-const jobQueue = new Queue('code-review', process.env.REDIS_URI);
+try {
+  jobQueue = new Queue('code-review', process.env.REDIS_URI)
+} catch (err) {
+  process.exit(1);
+}
 
 jobQueue.process('submitCode', async job => {
   const Question = mongoose.model('Question'),
