@@ -40,6 +40,6 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "subscriptions-transport-ws": "^0.9.16",
-    "ws": "^7.2.3"
+    "ws": "^7.4.6"
   }
 }
